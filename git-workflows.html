@@ -150,6 +150,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.9rem;
             line-height: 1.6;
+            white-space: pre;
         }
 
         code {
@@ -204,9 +205,10 @@
             padding: 1rem;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
-            line-height: 1.4;
+            line-height: 1.5;
             overflow-x: auto;
             margin: 1rem 0;
+            white-space: pre;
         }
 
         .diagram .main { color: var(--accent-green); }
@@ -618,8 +620,7 @@
                 <p>The most structured workflow with dedicated branches for features, releases, and hotfixes. Ideal for teams with scheduled release cycles.</p>
 
                 <h3>Branch Structure</h3>
-                <div class="diagram">
-<span class="main">main</span>         ← Production-ready code (long-lived)
+<pre class="diagram"><span class="main">main</span>         ← Production-ready code (long-lived)
   │
   └── <span class="develop">develop</span>    ← Integration branch (long-lived)
         │
@@ -627,13 +628,11 @@
         │
         ├── <span class="release">release/*</span>  ← Release preparation (short-lived)
         │
-        └── <span class="hotfix">hotfix/*</span>   ← Emergency fixes (short-lived)
-                </div>
+        └── <span class="hotfix">hotfix/*</span>   ← Emergency fixes (short-lived)</pre>
 
                 <h3>Visual Flow</h3>
-                <div class="diagram">
-<span class="main">main:</span>       ●─────────────────────●─────────●
-                              ↑         ↑
+<pre class="diagram"><span class="main">main:</span>       ●─────────────────────●─────────●
+                                  ↑         ↑
 <span class="release">release:</span>                 ●───●          │
                         /    \         │
 <span class="develop">develop:</span>  ●────●────●────●──────●─────────●
@@ -641,8 +640,7 @@
 <span class="feature">feature:</span>       ●────●          │
                                │
 <span class="hotfix">hotfix:</span>                             ●────●
-                                    (from main)
-                </div>
+                                    (from main)</pre>
 
                 <h3>Merge Rules</h3>
                 <table>
@@ -673,7 +671,7 @@
                 </table>
 
                 <h3>Commands</h3>
-                <pre><code><span class="comment"># Feature workflow</span>
+<pre><span class="comment"># Feature workflow</span>
 <span class="command">git checkout</span> develop
 <span class="command">git checkout -b</span> <span class="branch">feature/snmp-monitoring</span>
 <span class="comment"># ... work on feature ...</span>
@@ -698,7 +696,7 @@
 <span class="command">git checkout</span> main
 <span class="command">git merge</span> <span class="branch">hotfix/critical-bug</span>
 <span class="command">git checkout</span> develop
-<span class="command">git merge</span> <span class="branch">hotfix/critical-bug</span></code></pre>
+<span class="command">git merge</span> <span class="branch">hotfix/critical-bug</span></pre>
             </div>
 
             <!-- GITHUB FLOW -->
@@ -710,16 +708,14 @@
                 <p>A lightweight workflow with only main and feature branches. Perfect for continuous deployment and small teams.</p>
 
                 <h3>Visual Flow</h3>
-                <div class="diagram">
-<span class="main">main:</span>      ●────●────●────●────●────●
-                  \        /    \    /
+<pre class="diagram"><span class="main">main:</span>      ●────●────●────●────●────●
+                \        /    \    /
 <span class="feature">feature:</span>        ●──────●      ●──●
-                      ↓           ↓
-                Pull Request  Pull Request
-                </div>
+                    ↓           ↓
+              Pull Request  Pull Request</pre>
 
                 <h3>Commands</h3>
-                <pre><code><span class="comment"># Everything branches from main</span>
+<pre><span class="comment"># Everything branches from main</span>
 <span class="command">git checkout</span> main
 <span class="command">git checkout -b</span> <span class="branch">feature/new-api</span>
 
@@ -732,7 +728,7 @@
 
 <span class="command">git checkout</span> main
 <span class="command">git pull origin</span> main
-<span class="command">git branch -d</span> <span class="branch">feature/new-api</span></code></pre>
+<span class="command">git branch -d</span> <span class="branch">feature/new-api</span></pre>
 
                 <h3>Key Points</h3>
                 <table>
@@ -754,16 +750,14 @@
                 <p>An environment-based workflow that promotes code through staging environments before production.</p>
 
                 <h3>Visual Flow</h3>
-                <div class="diagram">
-<span class="main">main:</span>        ●────●────●────●
+<pre class="diagram"><span class="main">main:</span>        ●────●────●────●
                        │
 <span class="develop">staging:</span>           └────●────●
                             │
-<span class="release">production:</span>              └────●
-                </div>
+<span class="release">production:</span>              └────●</pre>
 
                 <h3>Commands</h3>
-                <pre><code><span class="comment"># Feature merged to main</span>
+<pre><span class="comment"># Feature merged to main</span>
 <span class="command">git checkout</span> main
 <span class="command">git merge</span> <span class="branch">feature/api</span>
 
@@ -773,7 +767,7 @@
 
 <span class="comment"># After testing, promote to production</span>
 <span class="command">git checkout</span> production
-<span class="command">git merge</span> staging</code></pre>
+<span class="command">git merge</span> staging</pre>
             </div>
 
             <!-- TRUNK-BASED -->
@@ -785,15 +779,13 @@
                 <p>Everyone commits directly to main. Requires feature flags to hide incomplete work and mature CI/CD.</p>
 
                 <h3>Visual Flow</h3>
-                <div class="diagram">
-<span class="main">main:</span>  ●──●──●──●──●──●──●──●──●
+<pre class="diagram"><span class="main">main:</span>  ●──●──●──●──●──●──●──●──●
         ↑  ↑  ↑  ↑  ↑  ↑  ↑  ↑
        All developers commit directly
-       (use feature flags to hide incomplete work)
-                </div>
+       (use feature flags to hide incomplete work)</pre>
 
                 <h3>Feature Flags Example</h3>
-                <pre><code><span class="comment"># Feature flag to hide incomplete work</span>
+<pre><span class="comment"># Feature flag to hide incomplete work</span>
 FEATURE_FLAGS = {
     "new_checkout": False,  <span class="comment"># Hidden from users</span>
     "dark_mode": True,      <span class="comment"># Visible to users</span>
@@ -802,7 +794,7 @@ FEATURE_FLAGS = {
 if FEATURE_FLAGS["new_checkout"]:
     show_new_checkout()     <span class="comment"># Still in development</span>
 else:
-    show_old_checkout()     <span class="comment"># Production-ready</span></code></pre>
+    show_old_checkout()     <span class="comment"># Production-ready</span></pre>
 
                 <h3>Key Points</h3>
                 <table>
@@ -824,18 +816,16 @@ else:
                 <p>Contributors fork the repository and submit Pull Requests to upstream. Standard for open source projects.</p>
 
                 <h3>Visual Flow</h3>
-                <div class="diagram">
-<span class="main">upstream/main:</span>     ●────●────●────●
+<pre class="diagram"><span class="main">upstream/main:</span>     ●────●────●────●
                                    ↑
                               Pull Request
                                    │
 <span class="develop">your-fork/main:</span>    ●────●────●
                          ↑
-<span class="feature">your-fork/feature:</span> ●────●
-                </div>
+<span class="feature">your-fork/feature:</span> ●────●</pre>
 
                 <h3>Commands</h3>
-                <pre><code><span class="comment"># Fork on GitHub, then clone your fork</span>
+<pre><span class="comment"># Fork on GitHub, then clone your fork</span>
 <span class="command">git clone</span> https://github.com/YOUR-USER/repo.git
 
 <span class="comment"># Add upstream remote</span>
@@ -851,7 +841,7 @@ else:
 <span class="comment"># Keep your fork updated</span>
 <span class="command">git fetch</span> upstream
 <span class="command">git checkout</span> main
-<span class="command">git merge</span> upstream/main</code></pre>
+<span class="command">git merge</span> upstream/main</pre>
             </div>
 
             <!-- CENTRALIZED WORKFLOW -->
@@ -863,16 +853,14 @@ else:
                 <p>Everyone commits directly to main with no branches. Similar to SVN. Best for small teams or learning Git.</p>
 
                 <h3>Visual Flow</h3>
-                <div class="diagram">
-<span class="main">main:</span>  ●──●──●──●──●──●──●──●
+<pre class="diagram"><span class="main">main:</span>  ●──●──●──●──●──●──●──●
         ↑  ↑  ↑  ↑  ↑  ↑  ↑  ↑
       Alice Bob Carol Alice Bob Carol
-      
-      No branches, no PRs, no reviews
-                </div>
+
+      No branches, no PRs, no reviews</pre>
 
                 <h3>Commands</h3>
-                <pre><code><span class="comment"># Everyone works on main</span>
+<pre><span class="comment"># Everyone works on main</span>
 <span class="command">git clone</span> https://github.com/company/project.git
 
 <span class="comment"># Make changes and push</span>
@@ -881,7 +869,7 @@ else:
 
 <span class="comment"># If someone else pushed first</span>
 <span class="command">git pull origin</span> main   <span class="comment"># Merge their changes</span>
-<span class="command">git push origin</span> main   <span class="comment"># Now push yours</span></code></pre>
+<span class="command">git push origin</span> main   <span class="comment"># Now push yours</span></pre>
             </div>
 
             <!-- MERGE STRATEGIES -->
@@ -933,7 +921,7 @@ else:
             </div>
 
             <h3>Strategy Commands</h3>
-            <pre><code><span class="comment"># Default merge (uses ort)</span>
+<pre><span class="comment"># Default merge (uses ort)</span>
 <span class="command">git merge</span> feature-branch
 
 <span class="comment"># Explicitly specify strategy</span>
@@ -945,15 +933,15 @@ else:
 <span class="command">git merge -s</span> ours feature    <span class="comment"># Strategy: ignore other branch entirely!</span>
 
 <span class="comment"># Rename detection threshold</span>
-<span class="command">git merge -X</span> find-renames=50 feature</code></pre>
+<span class="command">git merge -X</span> find-renames=50 feature</pre>
 
             <h3>Rename Files Correctly</h3>
-            <pre><code><span class="comment"># Correct command (git rename does NOT exist!)</span>
+<pre><span class="comment"># Correct command (git rename does NOT exist!)</span>
 <span class="command">git mv</span> old_name.py new_name.py
 <span class="command">git commit -m</span> "Rename old_name to new_name"
 
 <span class="comment"># View history including before rename</span>
-<span class="command">git log --follow</span> new_name.py</code></pre>
+<span class="command">git log --follow</span> new_name.py</pre>
 
         </section>
 

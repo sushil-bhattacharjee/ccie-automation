@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Workflows - DevNet Expert Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --border-color: #30363d;
+            --code-bg: #0d1117;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 6rem 2rem 3rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            color: var(--accent-blue);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--accent-purple);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .comment { color: var(--text-secondary); }
+        .command { color: var(--accent-green); }
+        .branch { color: var(--accent-orange); }
+
+        /* Workflow Cards */
+        .workflow-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .workflow-card h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .workflow-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-complex { background: var(--accent-red); color: white; }
+        .badge-medium { background: var(--accent-orange); color: var(--bg-primary); }
+        .badge-simple { background: var(--accent-green); color: var(--bg-primary); }
+
+        /* Visual Diagrams */
+        .diagram {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .diagram .main { color: var(--accent-green); }
+        .diagram .develop { color: var(--accent-blue); }
+        .diagram .feature { color: var(--accent-orange); }
+        .diagram .release { color: var(--accent-purple); }
+        .diagram .hotfix { color: var(--accent-red); }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        td {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: var(--bg-tertiary);
+        }
+
+        .check { color: var(--accent-green); }
+        .cross { color: var(--accent-red); }
+
+        /* MCQ Styles */
+        .quiz-header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .score-display {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .score-correct { color: var(--accent-green); }
+        .score-total { color: var(--text-secondary); }
+
+        .quiz-controls {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: #79b8ff;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .question-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .question-card.answered-correct {
+            border-color: var(--accent-green);
+        }
+
+        .question-card.answered-incorrect {
+            border-color: var(--accent-red);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .question-number {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .question-type {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-orange);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background: var(--bg-primary);
+            border-color: var(--border-color);
+        }
+
+        .option-item.selected {
+            border-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .option-item.correct {
+            border-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .option-item.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        .option-item.disabled {
+            cursor: default;
+        }
+
+        .option-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .option-item.selected .option-checkbox {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        .option-item.correct .option-checkbox {
+            border-color: var(--accent-green);
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .option-item.incorrect .option-checkbox {
+            border-color: var(--accent-red);
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .submit-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #79b8ff;
+        }
+
+        .submit-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .explanation-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .result-icon {
+            font-size: 1.25rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Summary Box */
+        .summary-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .summary-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 8rem 1rem 2rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="nav-title">🔀 Git Workflows - DevNet Expert</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn Workflows</button>
+                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- SECTION 1: Learn Workflows -->
+        <section id="learn" class="section active">
+            <h1>Git Workflows Explained</h1>
+            <p class="intro-text">
+                A comprehensive guide to Git branching workflows for CCIE DevNet Expert certification preparation.
+                Includes visual diagrams, merge commands, and best practices.
+            </p>
+
+            <!-- Comparison Table -->
+            <h2>📊 Quick Comparison</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Workflow</th>
+                        <th>Branches</th>
+                        <th>Complexity</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gitflow</strong></td>
+                        <td>main, develop, feature/*, release/*, hotfix/*</td>
+                        <td><span class="cross">●</span> High</td>
+                        <td>Scheduled releases</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GitHub Flow</strong></td>
+                        <td>main, feature/*</td>
+                        <td><span class="check">●</span> Low</td>
+                        <td>Continuous deployment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GitLab Flow</strong></td>
+                        <td>main, staging, production</td>
+                        <td><span style="color: var(--accent-orange);">●</span> Medium</td>
+                        <td>Environment promotion</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trunk-Based</strong></td>
+                        <td>main only</td>
+                        <td><span class="check">●</span> Lowest</td>
+                        <td>Mature CI/CD teams</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Forking</strong></td>
+                        <td>fork + upstream</td>
+                        <td><span style="color: var(--accent-orange);">●</span> Medium</td>
+                        <td>Open source</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Centralized</strong></td>
+                        <td>main only</td>
+                        <td><span class="check">●</span> Simplest</td>
+                        <td>Small teams, learning</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- GITFLOW -->
+            <div class="workflow-card">
+                <h3>
+                    <span>1. Gitflow</span>
+                    <span class="workflow-badge badge-complex">Complex</span>
+                </h3>
+                <p>The most structured workflow with dedicated branches for features, releases, and hotfixes. Ideal for teams with scheduled release cycles.</p>
+
+                <h3>Branch Structure</h3>
+                <div class="diagram">
+<span class="main">main</span>         ← Production-ready code (long-lived)
+  │
+  └── <span class="develop">develop</span>    ← Integration branch (long-lived)
+        │
+        ├── <span class="feature">feature/*</span>  ← New features (short-lived)
+        │
+        ├── <span class="release">release/*</span>  ← Release preparation (short-lived)
+        │
+        └── <span class="hotfix">hotfix/*</span>   ← Emergency fixes (short-lived)
+                </div>
+
+                <h3>Visual Flow</h3>
+                <div class="diagram">
+<span class="main">main:</span>       ●─────────────────────●─────────●
+                              ↑         ↑
+<span class="release">release:</span>                 ●───●          │
+                        /    \         │
+<span class="develop">develop:</span>  ●────●────●────●──────●─────────●
+               ↑    ↑          ↑
+<span class="feature">feature:</span>       ●────●          │
+                               │
+<span class="hotfix">hotfix:</span>                             ●────●
+                                    (from main)
+                </div>
+
+                <h3>Merge Rules</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Branch</th>
+                            <th>Created FROM</th>
+                            <th>Merges TO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>feature/*</td>
+                            <td>develop</td>
+                            <td>develop</td>
+                        </tr>
+                        <tr>
+                            <td>release/*</td>
+                            <td>develop</td>
+                            <td>main + develop</td>
+                        </tr>
+                        <tr>
+                            <td>hotfix/*</td>
+                            <td>main</td>
+                            <td>main + develop</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Commands</h3>
+                <pre><code><span class="comment"># Feature workflow</span>
+<span class="command">git checkout</span> develop
+<span class="command">git checkout -b</span> <span class="branch">feature/snmp-monitoring</span>
+<span class="comment"># ... work on feature ...</span>
+<span class="command">git checkout</span> develop
+<span class="command">git merge</span> <span class="branch">feature/snmp-monitoring</span>
+<span class="command">git branch -d</span> <span class="branch">feature/snmp-monitoring</span>
+
+<span class="comment"># Release workflow</span>
+<span class="command">git checkout</span> develop
+<span class="command">git checkout -b</span> <span class="branch">release/v1.0</span>
+<span class="comment"># ... final testing, version bump ...</span>
+<span class="command">git checkout</span> main
+<span class="command">git merge</span> <span class="branch">release/v1.0</span>
+<span class="command">git tag -a</span> v1.0 -m "Release v1.0"
+<span class="command">git checkout</span> develop
+<span class="command">git merge</span> <span class="branch">release/v1.0</span>
+
+<span class="comment"># Hotfix workflow (production is down!)</span>
+<span class="command">git checkout</span> main
+<span class="command">git checkout -b</span> <span class="branch">hotfix/critical-bug</span>
+<span class="comment"># ... fix the bug ...</span>
+<span class="command">git checkout</span> main
+<span class="command">git merge</span> <span class="branch">hotfix/critical-bug</span>
+<span class="command">git checkout</span> develop
+<span class="command">git merge</span> <span class="branch">hotfix/critical-bug</span></code></pre>
+            </div>
+
+            <!-- GITHUB FLOW -->
+            <div class="workflow-card">
+                <h3>
+                    <span>2. GitHub Flow</span>
+                    <span class="workflow-badge badge-simple">Simple</span>
+                </h3>
+                <p>A lightweight workflow with only main and feature branches. Perfect for continuous deployment and small teams.</p>
+
+                <h3>Visual Flow</h3>
+                <div class="diagram">
+<span class="main">main:</span>      ●────●────●────●────●────●
+                  \        /    \    /
+<span class="feature">feature:</span>        ●──────●      ●──●
+                      ↓           ↓
+                Pull Request  Pull Request
+                </div>
+
+                <h3>Commands</h3>
+                <pre><code><span class="comment"># Everything branches from main</span>
+<span class="command">git checkout</span> main
+<span class="command">git checkout -b</span> <span class="branch">feature/new-api</span>
+
+<span class="comment"># Work on feature</span>
+<span class="command">git commit -am</span> "Add new API endpoint"
+<span class="command">git push origin</span> <span class="branch">feature/new-api</span>
+
+<span class="comment"># Create Pull Request on GitHub</span>
+<span class="comment"># After review, merge via PR</span>
+
+<span class="command">git checkout</span> main
+<span class="command">git pull origin</span> main
+<span class="command">git branch -d</span> <span class="branch">feature/new-api</span></code></pre>
+
+                <h3>Key Points</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Long-lived branches</td><td>main only</td></tr>
+                        <tr><td>Feature branches from</td><td>main</td></tr>
+                        <tr><td>Merge via</td><td>Pull Request</td></tr>
+                        <tr><td>Deploy frequency</td><td>After every merge</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- GITLAB FLOW -->
+            <div class="workflow-card">
+                <h3>
+                    <span>3. GitLab Flow</span>
+                    <span class="workflow-badge badge-medium">Medium</span>
+                </h3>
+                <p>An environment-based workflow that promotes code through staging environments before production.</p>
+
+                <h3>Visual Flow</h3>
+                <div class="diagram">
+<span class="main">main:</span>        ●────●────●────●
+                       │
+<span class="develop">staging:</span>           └────●────●
+                            │
+<span class="release">production:</span>              └────●
+                </div>
+
+                <h3>Commands</h3>
+                <pre><code><span class="comment"># Feature merged to main</span>
+<span class="command">git checkout</span> main
+<span class="command">git merge</span> <span class="branch">feature/api</span>
+
+<span class="comment"># Promote to staging</span>
+<span class="command">git checkout</span> staging
+<span class="command">git merge</span> main
+
+<span class="comment"># After testing, promote to production</span>
+<span class="command">git checkout</span> production
+<span class="command">git merge</span> staging</code></pre>
+            </div>
+
+            <!-- TRUNK-BASED -->
+            <div class="workflow-card">
+                <h3>
+                    <span>4. Trunk-Based Development</span>
+                    <span class="workflow-badge badge-simple">Simplest</span>
+                </h3>
+                <p>Everyone commits directly to main. Requires feature flags to hide incomplete work and mature CI/CD.</p>
+
+                <h3>Visual Flow</h3>
+                <div class="diagram">
+<span class="main">main:</span>  ●──●──●──●──●──●──●──●──●
+        ↑  ↑  ↑  ↑  ↑  ↑  ↑  ↑
+       All developers commit directly
+       (use feature flags to hide incomplete work)
+                </div>
+
+                <h3>Feature Flags Example</h3>
+                <pre><code><span class="comment"># Feature flag to hide incomplete work</span>
+FEATURE_FLAGS = {
+    "new_checkout": False,  <span class="comment"># Hidden from users</span>
+    "dark_mode": True,      <span class="comment"># Visible to users</span>
+}
+
+if FEATURE_FLAGS["new_checkout"]:
+    show_new_checkout()     <span class="comment"># Still in development</span>
+else:
+    show_old_checkout()     <span class="comment"># Production-ready</span></code></pre>
+
+                <h3>Key Points</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Branches</td><td>main only (or very short-lived)</td></tr>
+                        <tr><td>Feature flags</td><td><span class="check">✓</span> Essential</td></tr>
+                        <tr><td>CI/CD</td><td><span class="check">✓</span> Required</td></tr>
+                        <tr><td>Best for</td><td>Mature teams, Google/Facebook style</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- FORKING WORKFLOW -->
+            <div class="workflow-card">
+                <h3>
+                    <span>5. Forking Workflow</span>
+                    <span class="workflow-badge badge-medium">Medium</span>
+                </h3>
+                <p>Contributors fork the repository and submit Pull Requests to upstream. Standard for open source projects.</p>
+
+                <h3>Visual Flow</h3>
+                <div class="diagram">
+<span class="main">upstream/main:</span>     ●────●────●────●
+                                   ↑
+                              Pull Request
+                                   │
+<span class="develop">your-fork/main:</span>    ●────●────●
+                         ↑
+<span class="feature">your-fork/feature:</span> ●────●
+                </div>
+
+                <h3>Commands</h3>
+                <pre><code><span class="comment"># Fork on GitHub, then clone your fork</span>
+<span class="command">git clone</span> https://github.com/YOUR-USER/repo.git
+
+<span class="comment"># Add upstream remote</span>
+<span class="command">git remote add</span> upstream https://github.com/ORIGINAL/repo.git
+
+<span class="comment"># Create feature branch</span>
+<span class="command">git checkout -b</span> <span class="branch">feature/fix-bug</span>
+<span class="comment"># ... work ...</span>
+<span class="command">git push origin</span> <span class="branch">feature/fix-bug</span>
+
+<span class="comment"># Create Pull Request to upstream on GitHub</span>
+
+<span class="comment"># Keep your fork updated</span>
+<span class="command">git fetch</span> upstream
+<span class="command">git checkout</span> main
+<span class="command">git merge</span> upstream/main</code></pre>
+            </div>
+
+            <!-- CENTRALIZED WORKFLOW -->
+            <div class="workflow-card">
+                <h3>
+                    <span>6. Centralized Workflow</span>
+                    <span class="workflow-badge badge-simple">Simplest</span>
+                </h3>
+                <p>Everyone commits directly to main with no branches. Similar to SVN. Best for small teams or learning Git.</p>
+
+                <h3>Visual Flow</h3>
+                <div class="diagram">
+<span class="main">main:</span>  ●──●──●──●──●──●──●──●
+        ↑  ↑  ↑  ↑  ↑  ↑  ↑  ↑
+      Alice Bob Carol Alice Bob Carol
+      
+      No branches, no PRs, no reviews
+                </div>
+
+                <h3>Commands</h3>
+                <pre><code><span class="comment"># Everyone works on main</span>
+<span class="command">git clone</span> https://github.com/company/project.git
+
+<span class="comment"># Make changes and push</span>
+<span class="command">git commit -am</span> "Add feature"
+<span class="command">git push origin</span> main
+
+<span class="comment"># If someone else pushed first</span>
+<span class="command">git pull origin</span> main   <span class="comment"># Merge their changes</span>
+<span class="command">git push origin</span> main   <span class="comment"># Now push yours</span></code></pre>
+            </div>
+
+            <!-- MERGE STRATEGIES -->
+            <h2>🔧 Git Merge Strategies</h2>
+            
+            <div class="summary-box">
+                <div class="summary-title">Strategies with Rename Detection</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Strategy</th>
+                            <th>Rename Support</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ort</code></td>
+                            <td><span class="check">✓</span> Yes</td>
+                            <td>Default strategy for 2 branches</td>
+                        </tr>
+                        <tr>
+                            <td><code>recursive</code></td>
+                            <td><span class="check">✓</span> Yes</td>
+                            <td>Synonym for ort (since v2.50)</td>
+                        </tr>
+                        <tr>
+                            <td><code>subtree</code></td>
+                            <td><span class="check">✓</span> Yes</td>
+                            <td>Merge into subdirectory</td>
+                        </tr>
+                        <tr>
+                            <td><code>resolve</code></td>
+                            <td><span class="cross">✗</span> No</td>
+                            <td>Simple 3-way merge</td>
+                        </tr>
+                        <tr>
+                            <td><code>octopus</code></td>
+                            <td><span class="cross">✗</span> No</td>
+                            <td>Merge 3+ branches</td>
+                        </tr>
+                        <tr>
+                            <td><code>ours</code></td>
+                            <td><span class="cross">✗</span> No</td>
+                            <td>Ignore other branch entirely</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Strategy Commands</h3>
+            <pre><code><span class="comment"># Default merge (uses ort)</span>
+<span class="command">git merge</span> feature-branch
+
+<span class="comment"># Explicitly specify strategy</span>
+<span class="command">git merge -s</span> ort feature-branch
+<span class="command">git merge -s</span> octopus branch1 branch2 branch3
+
+<span class="comment"># Strategy OPTIONS (-X) vs Strategy (-s)</span>
+<span class="command">git merge -X</span> ours feature    <span class="comment"># Option: favor our changes in conflicts</span>
+<span class="command">git merge -s</span> ours feature    <span class="comment"># Strategy: ignore other branch entirely!</span>
+
+<span class="comment"># Rename detection threshold</span>
+<span class="command">git merge -X</span> find-renames=50 feature</code></pre>
+
+            <h3>Rename Files Correctly</h3>
+            <pre><code><span class="comment"># Correct command (git rename does NOT exist!)</span>
+<span class="command">git mv</span> old_name.py new_name.py
+<span class="command">git commit -m</span> "Rename old_name to new_name"
+
+<span class="comment"># View history including before rename</span>
+<span class="command">git log --follow</span> new_name.py</code></pre>
+
+        </section>
+
+        <!-- SECTION 2: MCQ Practice -->
+        <section id="quiz" class="section">
+            <h1>MCQ Practice</h1>
+            <p class="intro-text">
+                Test your knowledge of Git workflows and merge strategies. 
+                Select your answers and submit to see explanations.
+            </p>
+
+            <div class="quiz-header">
+                <div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <span class="score-display">
+                        Score: <span class="score-correct" id="correctCount">0</span>
+                        <span class="score-total">/ <span id="totalAnswered">0</span> answered</span>
+                    </span>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset Quiz</button>
+                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All Answers</button>
+                </div>
+            </div>
+
+            <div id="quizContainer"></div>
+        </section>
+    </main>
+
+    <script>
+        // Quiz Questions Data
+        const questions = [
+            // MERGE STRATEGIES
+            {
+                id: 1,
+                category: "Merge Strategies",
+                question: "Which merge strategies support rename detection?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "ort", correct: true },
+                    { text: "octopus", correct: false },
+                    { text: "resolve", correct: false },
+                    { text: "recursive", correct: true },
+                    { text: "ours", correct: false },
+                    { text: "subtree", correct: true }
+                ],
+                explanation: "ort, recursive, and subtree all support rename detection. ort is the default strategy, recursive is now a synonym for ort (since Git v2.50), and subtree is a modified ort strategy that inherits rename detection. resolve explicitly 'does not handle renames', octopus is for 3+ branches without rename support, and ours ignores the other branch entirely."
+            },
+            {
+                id: 2,
+                category: "Merge Strategies",
+                question: "Which merge strategy does Git automatically select when merging 3 or more branches?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "ort", correct: false },
+                    { text: "octopus", correct: true },
+                    { text: "resolve", correct: false },
+                    { text: "ours", correct: false }
+                ],
+                explanation: "Git automatically selects the octopus strategy when merging 3 or more branches. Octopus is designed for bundling multiple topic branches together but refuses complex merges that need manual resolution."
+            },
+            {
+                id: 3,
+                category: "Merge Strategies",
+                question: "Which command correctly renames a file while preserving Git history?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "git rename old.py new.py", correct: false },
+                    { text: "git mv old.py new.py", correct: true },
+                    { text: "git move old.py new.py", correct: false },
+                    { text: "git rn old.py new.py", correct: false }
+                ],
+                explanation: "git mv is the correct command for renaming files in Git. The commands git rename, git move, and git rn do not exist! Use 'git log --follow newname.py' to view history including before the rename."
+            },
+            {
+                id: 4,
+                category: "Merge Strategies",
+                question: "What is the difference between '-s ours' and '-X ours' in git merge?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "They are the same thing", correct: false },
+                    { text: "-s ours is a strategy that ignores other branch; -X ours is an option that favors our changes in conflicts", correct: true },
+                    { text: "-X ours ignores the other branch entirely", correct: false },
+                    { text: "-s ours only works with octopus strategy", correct: false }
+                ],
+                explanation: "-s ours specifies the 'ours' STRATEGY which completely ignores all changes from the other branch. -X ours passes an OPTION to the merge strategy (like ort) that favors 'our' version only when there are conflicts. This is a critical exam distinction!"
+            },
+            // GITFLOW
+            {
+                id: 5,
+                category: "Gitflow",
+                question: "In Gitflow, which branches are considered 'long-lived' (permanent) branches?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "main", correct: true },
+                    { text: "develop", correct: true },
+                    { text: "feature/*", correct: false },
+                    { text: "release/*", correct: false },
+                    { text: "hotfix/*", correct: false },
+                    { text: "bugfix/*", correct: false }
+                ],
+                explanation: "In Gitflow, main and develop are the only long-lived (permanent) branches. Feature, release, and hotfix branches are 'short-lived' or 'supporting' branches that are created for specific work and deleted after merging."
+            },
+            {
+                id: 6,
+                category: "Gitflow",
+                question: "In Gitflow, where is a 'feature' branch created FROM?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "main", correct: false },
+                    { text: "develop", correct: true },
+                    { text: "release/*", correct: false },
+                    { text: "hotfix/*", correct: false }
+                ],
+                explanation: "In Gitflow, feature branches are always created FROM develop and merged back TO develop. This keeps the main branch clean and only containing production-ready code."
+            },
+            {
+                id: 7,
+                category: "Gitflow",
+                question: "In Gitflow, where does a 'release' branch get created FROM?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "main", correct: false },
+                    { text: "develop", correct: true },
+                    { text: "feature/*", correct: false },
+                    { text: "hotfix/*", correct: false }
+                ],
+                explanation: "Release branches are created FROM develop (not main!) when the code is ready for release preparation. The release branch is used for final testing, version bumps, and documentation updates. Then it merges TO both main and develop."
+            },
+            {
+                id: 8,
+                category: "Gitflow",
+                question: "In Gitflow, where does a 'hotfix' branch merge TO after completion?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "main only", correct: false },
+                    { text: "develop only", correct: false },
+                    { text: "Both main and develop", correct: true },
+                    { text: "feature/* branch", correct: false }
+                ],
+                explanation: "Hotfix branches merge TO both main (for immediate production fix) AND develop (so the fix is included in future development). This ensures the fix is not lost when the next release is made from develop."
+            },
+            {
+                id: 9,
+                category: "Gitflow",
+                question: "Production is DOWN! A critical bug needs immediate fix. In Gitflow, what's the correct approach?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Create hotfix/* from main", correct: true },
+                    { text: "Create hotfix/* from develop", correct: false },
+                    { text: "Create feature/* from main", correct: false },
+                    { text: "Direct commit to main", correct: false }
+                ],
+                explanation: "Hotfix branches are created FROM main because main represents the current production code. Develop might have new features that aren't ready for production yet, so you need to fix exactly what's running in production."
+            },
+            {
+                id: 10,
+                category: "Gitflow",
+                question: "In Gitflow, which branches are 'short-lived' (deleted after merging)?",
+                type: "multi",
+                chooseCount: 3,
+                options: [
+                    { text: "main", correct: false },
+                    { text: "develop", correct: false },
+                    { text: "feature/*", correct: true },
+                    { text: "release/*", correct: true },
+                    { text: "hotfix/*", correct: true },
+                    { text: "staging", correct: false }
+                ],
+                explanation: "Feature, release, and hotfix branches are all short-lived in Gitflow. They are created for a specific purpose and deleted after being merged. Main and develop are permanent branches. Staging is not part of standard Gitflow."
+            },
+            // WORKFLOW COMPARISON
+            {
+                id: 11,
+                category: "Workflow Comparison",
+                question: "Which workflows are BEST suited for continuous deployment (deploy multiple times per day)?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "Gitflow", correct: false },
+                    { text: "GitHub Flow", correct: true },
+                    { text: "GitLab Flow", correct: false },
+                    { text: "Trunk-Based Development", correct: true },
+                    { text: "Forking Workflow", correct: false },
+                    { text: "Centralized Workflow", correct: false }
+                ],
+                explanation: "GitHub Flow and Trunk-Based Development are designed for continuous deployment. GitHub Flow merges to main and deploys immediately. Trunk-Based has everyone commit to main with constant deployment. Gitflow is designed for scheduled releases with its complex branch structure."
+            },
+            {
+                id: 12,
+                category: "Workflow Comparison",
+                question: "Which workflow uses environment branches like 'staging' and 'production'?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Gitflow", correct: false },
+                    { text: "GitHub Flow", correct: false },
+                    { text: "GitLab Flow", correct: true },
+                    { text: "Trunk-Based Development", correct: false }
+                ],
+                explanation: "GitLab Flow is the environment-based workflow that uses branches like main → staging → production. Code is promoted through environments. Gitflow uses release branches, not environment branches."
+            },
+            {
+                id: 13,
+                category: "Workflow Comparison",
+                question: "Which workflows are commonly used in open source projects with external contributors?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "Gitflow", correct: false },
+                    { text: "GitHub Flow", correct: true },
+                    { text: "GitLab Flow", correct: false },
+                    { text: "Trunk-Based Development", correct: false },
+                    { text: "Forking Workflow", correct: true },
+                    { text: "Centralized Workflow", correct: false }
+                ],
+                explanation: "Forking Workflow is THE workflow designed for open source with external contributors - they fork, work in their fork, and submit PRs. GitHub Flow is also common in open source due to its simple PR-based approach. Trunk-Based requires write access to main, unsuitable for external contributors."
+            },
+            {
+                id: 14,
+                category: "Workflow Comparison",
+                question: "Which workflow has dedicated 'hotfix/*' branches for emergency production fixes?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Gitflow", correct: true },
+                    { text: "GitHub Flow", correct: false },
+                    { text: "GitLab Flow", correct: false },
+                    { text: "Trunk-Based Development", correct: false }
+                ],
+                explanation: "Only Gitflow has dedicated hotfix/* branches as part of its standard definition. GitHub Flow just uses another feature branch, GitLab Flow branches from production, and Trunk-Based commits directly to main."
+            },
+            {
+                id: 15,
+                category: "Workflow Comparison",
+                question: "Which workflows commonly use 'feature flags' to hide incomplete features in production?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "Gitflow", correct: false },
+                    { text: "GitHub Flow", correct: true },
+                    { text: "GitLab Flow", correct: false },
+                    { text: "Trunk-Based Development", correct: true },
+                    { text: "Forking Workflow", correct: false },
+                    { text: "Centralized Workflow", correct: false }
+                ],
+                explanation: "Trunk-Based Development REQUIRES feature flags since everyone commits to main directly. GitHub Flow commonly uses them for frequent deploys. Gitflow doesn't need feature flags because incomplete work stays in feature/develop branches until complete."
+            },
+            {
+                id: 16,
+                category: "Workflow Comparison",
+                question: "Which workflows require feature branches to be created FROM 'main' (not develop)?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "Gitflow", correct: false },
+                    { text: "GitHub Flow", correct: true },
+                    { text: "GitLab Flow", correct: true },
+                    { text: "Trunk-Based Development", correct: false },
+                    { text: "Forking Workflow", correct: false },
+                    { text: "Centralized Workflow", correct: false }
+                ],
+                explanation: "GitHub Flow and GitLab Flow both create feature branches from main. Gitflow creates features from develop. Trunk-Based rarely uses branches (if any, they're very short-lived). Forking creates branches in your fork."
+            },
+            {
+                id: 17,
+                category: "Workflow Comparison",
+                question: "Which workflows are MOST complex with multiple long-lived branches?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "Gitflow", correct: true },
+                    { text: "GitHub Flow", correct: false },
+                    { text: "GitLab Flow", correct: true },
+                    { text: "Trunk-Based Development", correct: false },
+                    { text: "Forking Workflow", correct: false },
+                    { text: "Centralized Workflow", correct: false }
+                ],
+                explanation: "Gitflow is the most complex with main + develop as long-lived branches. GitLab Flow has multiple long-lived environment branches (main, staging, production). GitHub Flow, Trunk-Based, and Centralized all only have main as a long-lived branch."
+            },
+            {
+                id: 18,
+                category: "Workflow Comparison",
+                question: "Which workflow is BEST for teams with scheduled release cycles (e.g., v1.0, v2.0 every quarter)?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Gitflow", correct: true },
+                    { text: "GitHub Flow", correct: false },
+                    { text: "Trunk-Based Development", correct: false },
+                    { text: "Centralized Workflow", correct: false }
+                ],
+                explanation: "Gitflow is specifically designed for scheduled releases with its release/* branches. You accumulate features in develop, create a release branch for preparation, then merge to main for the release. GitHub Flow and Trunk-Based are for continuous deployment."
+            },
+            {
+                id: 19,
+                category: "Workflow Comparison",
+                question: "Which workflow is the SIMPLEST with no branching at all?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "GitHub Flow", correct: false },
+                    { text: "GitLab Flow", correct: false },
+                    { text: "Trunk-Based Development", correct: false },
+                    { text: "Centralized Workflow", correct: true }
+                ],
+                explanation: "Centralized Workflow is the simplest - everyone commits directly to main with no branches, no PRs, and no reviews. It's like SVN. Trunk-Based also uses main only but typically includes CI/CD, feature flags, and code reviews."
+            },
+            // BRANCH CONCEPTS
+            {
+                id: 20,
+                category: "Branch Concepts",
+                question: "Which statement about Git branches is TRUE?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Branches are nested like folders (feature under develop under main)", correct: false },
+                    { text: "All branches are flat/equal, workflows define rules for creating and merging", correct: true },
+                    { text: "Child branches automatically sync with parent branches", correct: false },
+                    { text: "Deleting main deletes all other branches", correct: false }
+                ],
+                explanation: "All Git branches are flat and equal - they're just pointers to commits. There's no parent-child hierarchy in Git itself. Gitflow and other workflows define RULES about where to create branches from and where to merge them, but these are conventions, not Git structure."
+            },
+            {
+                id: 21,
+                category: "Branch Concepts",
+                question: "When you run 'git checkout develop && git checkout -b feature/api', what happens?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Feature branch inherits all commits from develop", correct: true },
+                    { text: "Feature branch is completely empty", correct: false },
+                    { text: "Feature branch only contains commits made after creation", correct: false },
+                    { text: "Develop branch automatically gets feature commits", correct: false }
+                ],
+                explanation: "When you create a branch from another branch, the new branch INHERITS all commits from the source branch. It starts at the same point. New commits on the feature branch stay isolated until merged back."
+            },
+            {
+                id: 22,
+                category: "Branch Concepts",
+                question: "What does '3-way merge' refer to in Git?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Merging 3 branches at once", correct: false },
+                    { text: "3 file snapshots: common ancestor, ours, theirs", correct: true },
+                    { text: "3 developers reviewing the merge", correct: false },
+                    { text: "3 commit messages combined", correct: false }
+                ],
+                explanation: "3-way merge refers to three FILE SNAPSHOTS that Git compares: (1) the common ancestor version, (2) 'ours' (current branch HEAD), and (3) 'theirs' (branch being merged). Git uses these to determine what changed and how to combine them."
+            },
+            // MERGE DIRECTIONS
+            {
+                id: 23,
+                category: "Merge Directions",
+                question: "Which merge direction statements are CORRECT?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "Gitflow: feature/* → main", correct: false },
+                    { text: "Gitflow: hotfix/* → main + develop", correct: true },
+                    { text: "GitHub Flow: feature/* → develop", correct: false },
+                    { text: "GitLab Flow: main → staging → production", correct: true },
+                    { text: "Trunk-Based: feature/* → develop", correct: false },
+                    { text: "Forking: upstream → fork", correct: false }
+                ],
+                explanation: "Gitflow hotfixes go to BOTH main and develop. GitLab Flow promotes code main → staging → production. Gitflow features go to develop (not main). GitHub Flow has no develop branch. Trunk-Based has no develop. Forking goes fork → upstream (not the reverse)."
+            },
+            {
+                id: 24,
+                category: "Merge Directions",
+                question: "In Gitflow, where does 'release/*' branch merge TO?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "main only", correct: false },
+                    { text: "develop only", correct: false },
+                    { text: "Both main and develop", correct: true },
+                    { text: "feature/* branches", correct: false }
+                ],
+                explanation: "Release branches merge TO both main (for production release) AND develop (to sync any changes made during release prep back to develop). This is the same pattern as hotfix branches."
+            },
+            // ADDITIONAL QUESTIONS
+            {
+                id: 25,
+                category: "Git Commands",
+                question: "Which command shows file history INCLUDING before a rename?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "git log filename", correct: false },
+                    { text: "git log --follow filename", correct: true },
+                    { text: "git log --rename filename", correct: false },
+                    { text: "git history filename", correct: false }
+                ],
+                explanation: "git log --follow shows the complete history of a file, including commits from before the file was renamed. Without --follow, git log only shows history after the rename."
+            },
+            {
+                id: 26,
+                category: "Merge Strategies",
+                question: "When is the 'octopus' merge strategy automatically used?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "When merging any 2 branches", correct: false },
+                    { text: "When merging 3 or more branches", correct: true },
+                    { text: "When there are merge conflicts", correct: false },
+                    { text: "When using --no-ff flag", correct: false }
+                ],
+                explanation: "Git automatically selects octopus when you specify 3+ branches in a single merge command (e.g., 'git merge branch1 branch2 branch3'). For 2 branches, Git uses ort (the default)."
+            },
+            {
+                id: 27,
+                category: "Workflow Comparison",
+                question: "Which workflow would you choose for a team that deploys 50+ times per day with mature CI/CD?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Gitflow", correct: false },
+                    { text: "GitHub Flow", correct: false },
+                    { text: "Trunk-Based Development", correct: true },
+                    { text: "Forking Workflow", correct: false }
+                ],
+                explanation: "Trunk-Based Development is designed for very frequent deployments with mature CI/CD. Everyone commits to main, feature flags hide incomplete work, and deployment is continuous. This is the Google/Facebook approach."
+            },
+            {
+                id: 28,
+                category: "Gitflow",
+                question: "You need to add a critical security patch to production AND ensure it's included in ongoing development. In Gitflow, which branch type handles this?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "feature/*", correct: false },
+                    { text: "release/*", correct: false },
+                    { text: "hotfix/*", correct: true },
+                    { text: "bugfix/*", correct: false }
+                ],
+                explanation: "Hotfix branches are created from main for emergency production fixes. They merge to BOTH main (immediate fix) and develop (include in future releases). This ensures the fix is in production immediately AND not lost in future development."
+            },
+            {
+                id: 29,
+                category: "Branch Concepts",
+                question: "What happens when you use 'git merge -s ours otherbranch'?",
+                type: "single",
+                chooseCount: 1,
+                options: [
+                    { text: "Conflicts are resolved by favoring current branch changes", correct: false },
+                    { text: "The other branch's changes are completely ignored", correct: true },
+                    { text: "Both branches are merged with equal priority", correct: false },
+                    { text: "The merge fails if there are any differences", correct: false }
+                ],
+                explanation: "The '-s ours' STRATEGY completely ignores all changes from the other branch. The resulting tree is identical to the current branch. This is useful for marking obsolete branches as 'merged' without taking their changes. Don't confuse with '-X ours' which only affects conflict resolution."
+            },
+            {
+                id: 30,
+                category: "Workflow Comparison",
+                question: "Which statements about Pull Requests (PRs) are correct?",
+                type: "multi",
+                chooseCount: 2,
+                options: [
+                    { text: "GitHub Flow relies heavily on PRs for code review", correct: true },
+                    { text: "Gitflow requires PRs for all merges", correct: false },
+                    { text: "Forking Workflow uses PRs to contribute to upstream", correct: true },
+                    { text: "Trunk-Based Development never uses PRs", correct: false },
+                    { text: "Centralized Workflow requires PRs", correct: false },
+                    { text: "PRs are a Git feature, not a platform feature", correct: false }
+                ],
+                explanation: "GitHub Flow relies heavily on PRs for code review before merging to main. Forking Workflow uses PRs to contribute back to the upstream repository. PRs are a platform feature (GitHub, GitLab, Bitbucket) - not built into Git itself. Gitflow doesn't require PRs (though teams may use them)."
+            }
+        ];
+
+        // State
+        let userAnswers = {};
+        let submitted = {};
+
+        // Initialize
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = questions.map((q, index) => createQuestionHTML(q, index)).join('');
+            updateProgress();
+        }
+
+        function createQuestionHTML(q, index) {
+            const chooseText = q.chooseCount === 1 ? 'Choose 1' : `Choose ${q.chooseCount}`;
+            return `
+                <div class="question-card" id="question-${q.id}">
+                    <div class="question-header">
+                        <span class="question-number">Question ${index + 1} • ${q.category}</span>
+                        <span class="question-type">${chooseText}</span>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="options-list" id="options-${q.id}">
+                        ${q.options.map((opt, i) => `
+                            <div class="option-item" onclick="selectOption(${q.id}, ${i}, '${q.type}', ${q.chooseCount})">
+                                <div class="option-checkbox">${String.fromCharCode(65 + i)}</div>
+                                <div class="option-text">${opt.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-btn" id="submit-${q.id}" onclick="submitAnswer(${q.id})" disabled>
+                        Submit Answer
+                    </button>
+                    <div class="explanation" id="explanation-${q.id}">
+                        <div class="explanation-title">📖 Explanation</div>
+                        <div class="explanation-text">${q.explanation}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectOption(qId, optIndex, type, chooseCount) {
+            if (submitted[qId]) return;
+
+            if (!userAnswers[qId]) {
+                userAnswers[qId] = [];
+            }
+
+            const optionIndex = userAnswers[qId].indexOf(optIndex);
+
+            if (type === 'single') {
+                userAnswers[qId] = [optIndex];
+            } else {
+                if (optionIndex > -1) {
+                    userAnswers[qId].splice(optionIndex, 1);
+                } else {
+                    if (userAnswers[qId].length < chooseCount) {
+                        userAnswers[qId].push(optIndex);
+                    } else {
+                        userAnswers[qId].shift();
+                        userAnswers[qId].push(optIndex);
+                    }
+                }
+            }
+
+            updateOptionDisplay(qId);
+            
+            const submitBtn = document.getElementById(`submit-${qId}`);
+            const question = questions.find(q => q.id === qId);
+            submitBtn.disabled = userAnswers[qId].length !== question.chooseCount;
+        }
+
+        function updateOptionDisplay(qId) {
+            const optionsContainer = document.getElementById(`options-${qId}`);
+            const options = optionsContainer.querySelectorAll('.option-item');
+            
+            options.forEach((opt, i) => {
+                opt.classList.remove('selected');
+                if (userAnswers[qId] && userAnswers[qId].includes(i)) {
+                    opt.classList.add('selected');
+                }
+            });
+        }
+
+        function submitAnswer(qId) {
+            if (submitted[qId]) return;
+            submitted[qId] = true;
+
+            const question = questions.find(q => q.id === qId);
+            const userSelected = userAnswers[qId] || [];
+            const correctIndices = question.options
+                .map((opt, i) => opt.correct ? i : -1)
+                .filter(i => i !== -1);
+
+            const isCorrect = userSelected.length === question.chooseCount &&
+                userSelected.every(i => correctIndices.includes(i)) &&
+                correctIndices.filter(i => userSelected.includes(i)).length === Math.min(question.chooseCount, correctIndices.length);
+
+            const optionsContainer = document.getElementById(`options-${qId}`);
+            const options = optionsContainer.querySelectorAll('.option-item');
+
+            options.forEach((opt, i) => {
+                opt.classList.add('disabled');
+                opt.classList.remove('selected');
+                
+                if (question.options[i].correct) {
+                    opt.classList.add('correct');
+                } else if (userSelected.includes(i)) {
+                    opt.classList.add('incorrect');
+                }
+            });
+
+            const questionCard = document.getElementById(`question-${qId}`);
+            questionCard.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+
+            const submitBtn = document.getElementById(`submit-${qId}`);
+            submitBtn.innerHTML = isCorrect ? '✅ Correct!' : '❌ Incorrect';
+            submitBtn.disabled = true;
+            submitBtn.style.background = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
+
+            document.getElementById(`explanation-${qId}`).classList.add('show');
+
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const total = questions.length;
+            const answered = Object.keys(submitted).length;
+            const correct = Object.keys(submitted).filter(qId => {
+                const question = questions.find(q => q.id === parseInt(qId));
+                const userSelected = userAnswers[qId] || [];
+                const correctIndices = question.options
+                    .map((opt, i) => opt.correct ? i : -1)
+                    .filter(i => i !== -1);
+                return userSelected.length === question.chooseCount &&
+                    userSelected.every(i => correctIndices.includes(i));
+            }).length;
+
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('totalAnswered').textContent = answered;
+            document.getElementById('progressBar').style.width = `${(answered / total) * 100}%`;
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            submitted = {};
+            initQuiz();
+        }
+
+        function showAllAnswers() {
+            questions.forEach(q => {
+                if (!submitted[q.id]) {
+                    const correctIndices = q.options
+                        .map((opt, i) => opt.correct ? i : -1)
+                        .filter(i => i !== -1);
+                    userAnswers[q.id] = correctIndices.slice(0, q.chooseCount);
+                    submitAnswer(q.id);
+                }
+            });
+        }
+
+        // Section Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (sectionId === 'quiz' && !document.getElementById('quizContainer').innerHTML) {
+                initQuiz();
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initQuiz();
+        });
+    </script>
+</body>
+</html>

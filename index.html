@@ -20,27 +20,24 @@
             --sidebar-width: 280px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            min-height: 100vh;
             display: flex;
+            flex-direction: column;
         }
 
         /* Top Navigation Bar */
         .top-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
             height: 50px;
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             padding: 0 1rem;
-            z-index: 1000;
+            flex-shrink: 0;
         }
         .top-nav-brand {
             font-weight: 600;
@@ -60,21 +57,26 @@
         }
         .top-nav-links a:hover { color: var(--text-primary); }
 
+        /* Main Layout */
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
         /* Sidebar */
         .sidebar {
-            position: fixed;
-            top: 50px;
-            left: 0;
             width: var(--sidebar-width);
-            height: calc(100vh - 50px);
             background: var(--bg-secondary);
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
-            transition: transform 0.3s ease, width 0.3s ease;
-            z-index: 900;
+            transition: width 0.3s ease, min-width 0.3s ease;
+            flex-shrink: 0;
         }
         .sidebar.collapsed {
-            transform: translateX(calc(-1 * var(--sidebar-width)));
+            width: 0;
+            min-width: 0;
+            overflow: hidden;
         }
         .sidebar-header {
             padding: 1rem;
@@ -82,6 +84,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--bg-secondary);
+            z-index: 10;
         }
         .sidebar-title {
             font-size: 0.85rem;
@@ -98,47 +104,44 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
         .sidebar-toggle:hover { background: var(--bg-tertiary); color: var(--text-primary); }
 
         /* Navigation Tree */
-        .nav-tree {
-            padding: 0.5rem 0;
-        }
-        .nav-chapter {
-            border-bottom: 1px solid var(--border-color);
-        }
+        .nav-tree { padding: 0.5rem 0; }
+        .nav-chapter { border-bottom: 1px solid var(--border-color); }
         .nav-chapter:last-child { border-bottom: none; }
         .chapter-header {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 1rem;
             cursor: pointer;
             transition: background 0.2s;
             user-select: none;
         }
         .chapter-header:hover { background: var(--bg-tertiary); }
         .chapter-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             margin-right: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: transform 0.2s;
         }
-        .chapter-icon svg { width: 12px; height: 12px; fill: var(--text-secondary); }
+        .chapter-icon svg { width: 10px; height: 10px; fill: var(--text-secondary); }
         .nav-chapter.expanded .chapter-icon { transform: rotate(90deg); }
         .chapter-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             color: var(--text-primary);
             flex: 1;
         }
         .chapter-badge {
-            font-size: 0.7rem;
-            padding: 0.15rem 0.4rem;
-            border-radius: 10px;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.35rem;
+            border-radius: 8px;
             background: var(--bg-tertiary);
             color: var(--text-secondary);
         }
@@ -146,18 +149,19 @@
         /* Chapter Items */
         .chapter-items {
             display: none;
-            padding-left: 1rem;
+            padding-left: 0.75rem;
         }
         .nav-chapter.expanded .chapter-items { display: block; }
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 0.5rem 1rem;
+            padding: 0.45rem 1rem;
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: all 0.2s;
             border-left: 2px solid transparent;
+            cursor: pointer;
         }
         .nav-item:hover {
             background: var(--bg-tertiary);
@@ -168,40 +172,42 @@
             color: var(--accent-blue);
             border-left-color: var(--accent-blue);
         }
+        .nav-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .nav-item-icon {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             margin-right: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
         .nav-item-text { flex: 1; }
         .nav-item-badge {
-            font-size: 0.65rem;
-            padding: 0.1rem 0.35rem;
-            border-radius: 8px;
+            font-size: 0.6rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 6px;
             font-weight: 600;
         }
         .badge-ready { background: var(--accent-green); color: #000; }
         .badge-soon { background: var(--bg-tertiary); color: var(--text-secondary); }
 
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            margin-top: 50px;
+        /* Content Area */
+        .content-wrapper {
             flex: 1;
-            padding: 2rem;
-            transition: margin-left 0.3s ease;
-            min-height: calc(100vh - 50px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
-        .main-content.expanded { margin-left: 0; }
 
         /* Toggle Button (when sidebar hidden) */
         .sidebar-show-btn {
-            position: fixed;
-            top: 60px;
+            position: absolute;
+            top: 10px;
             left: 10px;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -209,17 +215,29 @@
             padding: 0.5rem;
             border-radius: 6px;
             cursor: pointer;
-            z-index: 800;
+            z-index: 100;
             display: none;
             transition: all 0.2s;
         }
         .sidebar-show-btn:hover { background: var(--bg-tertiary); }
-        .sidebar.collapsed + .sidebar-show-btn { display: flex; }
+        .sidebar.collapsed ~ .content-wrapper .sidebar-show-btn { display: flex; }
 
-        /* Content Area */
-        .content-header {
-            margin-bottom: 2rem;
+        /* Content Frame */
+        .content-frame {
+            flex: 1;
+            border: none;
+            background: var(--bg-primary);
         }
+
+        /* Welcome Content (shown by default) */
+        .welcome-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .welcome-content.hidden { display: none; }
+
+        .content-header { margin-bottom: 2rem; }
         .content-header h1 {
             font-size: 2rem;
             color: var(--accent-blue);
@@ -230,73 +248,13 @@
             font-size: 1rem;
         }
 
-        /* Guide Cards */
-        .guide-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        .guide-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.2s;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-        .guide-card:hover {
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .guide-card-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-        .guide-card-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-        .guide-card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-        .guide-card-desc {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-        .guide-card-meta {
-            margin-top: 1rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-        .meta-tag {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-            color: var(--text-secondary);
-        }
-
-        /* Objective Box (like in the reference image) */
         .objective-box {
             background: rgba(88, 166, 255, 0.1);
             border: 1px solid var(--accent-blue);
             border-radius: 8px;
             padding: 1rem 1.25rem;
             margin-bottom: 1.5rem;
+            max-width: 900px;
         }
         .objective-header {
             display: flex;
@@ -311,13 +269,7 @@
             font-size: 0.95rem;
         }
 
-        /* Welcome Section */
-        .welcome-section {
-            max-width: 800px;
-        }
-        .chapter-overview {
-            margin-top: 2rem;
-        }
+        .chapter-overview { margin-top: 2rem; max-width: 1200px; }
         .chapter-overview h2 {
             font-size: 1.25rem;
             color: var(--text-primary);
@@ -326,37 +278,91 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* Footer */
-        footer {
-            margin-top: 3rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+        .guide-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .guide-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .guide-card.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .guide-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .guide-card-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .guide-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .guide-card-desc {
             color: var(--text-secondary);
             font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .guide-card-meta {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .meta-tag {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            color: var(--text-secondary);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(calc(-1 * var(--sidebar-width)));
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .sidebar-show-btn {
-                display: flex;
-            }
-            .top-nav-links { display: none; }
+        footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
         }
 
         /* Scrollbar */
-        .sidebar::-webkit-scrollbar { width: 6px; }
-        .sidebar::-webkit-scrollbar-track { background: var(--bg-secondary); }
-        .sidebar::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
-        .sidebar::-webkit-scrollbar-thumb:hover { background: var(--border-color); }
+        .sidebar::-webkit-scrollbar, .welcome-content::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track, .welcome-content::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        .sidebar::-webkit-scrollbar-thumb, .welcome-content::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar { 
+                position: absolute;
+                height: calc(100% - 50px);
+                z-index: 1000;
+            }
+            .sidebar.collapsed { width: 0; }
+            .top-nav-links { display: none; }
+            .guide-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -368,419 +374,426 @@
         </div>
     </nav>
 
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <span class="sidebar-title">CCIE Automation</span>
-            <button class="sidebar-toggle" onclick="toggleSidebar()" title="Hide sidebar">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M6 2L2 8l4 6V2z"/>
-                    <path d="M10 2h1v12h-1z"/>
-                    <path d="M13 2h1v12h-1z"/>
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">CCIE Automation</span>
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="Hide sidebar">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M6 2L2 8l4 6V2z"/>
+                        <path d="M10 2h1v12h-1z"/>
+                        <path d="M13 2h1v12h-1z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="nav-tree">
+                <!-- Getting Started -->
+                <div class="nav-chapter">
+                    <div class="nav-item active" onclick="showWelcome()">
+                        <span class="nav-item-icon">🏠</span>
+                        <span class="nav-item-text">Getting Started</span>
+                    </div>
+                </div>
+
+                <!-- CCIE Workbook -->
+                <div class="nav-chapter expanded">
+                    <div class="chapter-header" onclick="toggleChapter(this)">
+                        <span class="chapter-icon">
+                            <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                        </span>
+                        <span class="chapter-title">CCIE Workbook</span>
+                    </div>
+                    <div class="chapter-items">
+                        <!-- Chapter 1: Git -->
+                        <div class="nav-chapter expanded">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 1, Git</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item" onclick="loadContent('git-workflows.html', this)">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Git Workflows</span>
+                                    <span class="nav-item-badge badge-ready">Ready</span>
+                                </div>
+                                <div class="nav-item" onclick="loadContent('git-ops.html', this)">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Git Operations</span>
+                                    <span class="nav-item-badge badge-ready">Ready</span>
+                                </div>
+                                <div class="nav-item" onclick="loadContent('cherry-pick-rebase.html', this)">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Cherry-Pick & Rebase</span>
+                                    <span class="nav-item-badge badge-ready">Ready</span>
+                                </div>
+                                <div class="nav-item" onclick="loadContent('git-merge-strategies.html', this)">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Merge Strategies</span>
+                                    <span class="nav-item-badge badge-ready">Ready</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 2: REST API -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 2, REST API</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">REST Fundamentals</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">API Authentication</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 3: YANG -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 3, YANG</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">YANG Basics</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Must Statement</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">When Statement</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 4: NETCONF -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 4, NETCONF</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">NETCONF Operations</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 5: Cisco NSO -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 5, Cisco NSO</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">NSO Basics</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 6: RESTCONF -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 6, RESTCONF</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">RESTCONF Operations</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 7: pyATS -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 7, pyATS</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Testbed & Topology</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Job Files</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Runtime Arguments</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 8: Ansible -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 8, Ansible</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Playbooks</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 9: Terraform -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 9, Terraform</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Terraform Basics</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 10: Docker -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 10, Docker</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Dockerfile</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 11: Kubernetes -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                </span>
+                                <span class="chapter-title">Chapter 11, Kubernetes</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item disabled">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">K8s Basics</span>
+                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Section -->
+                <div class="nav-chapter">
+                    <div class="chapter-header" onclick="toggleChapter(this)">
+                        <span class="chapter-icon">
+                            <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                        </span>
+                        <span class="chapter-title">Quiz Bank</span>
+                        <span class="chapter-badge">4</span>
+                    </div>
+                    <div class="chapter-items">
+                        <div class="nav-item" onclick="loadContent('git-workflows.html', this)">
+                            <span class="nav-item-icon">💬</span>
+                            <span class="nav-item-text">Git Workflows (30 MCQ)</span>
+                        </div>
+                        <div class="nav-item" onclick="loadContent('git-ops.html', this)">
+                            <span class="nav-item-icon">💬</span>
+                            <span class="nav-item-text">Git Operations (20 MCQ)</span>
+                        </div>
+                        <div class="nav-item" onclick="loadContent('cherry-pick-rebase.html', this)">
+                            <span class="nav-item-icon">💬</span>
+                            <span class="nav-item-text">Cherry-Pick (20 MCQ)</span>
+                        </div>
+                        <div class="nav-item" onclick="loadContent('git-merge-strategies.html', this)">
+                            <span class="nav-item-icon">💬</span>
+                            <span class="nav-item-text">Merge Strategies (20 MCQ)</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Content Wrapper -->
+        <div class="content-wrapper">
+            <!-- Toggle Button -->
+            <button class="sidebar-show-btn" onclick="toggleSidebar()" title="Show sidebar">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M10 2l4 6-4 6V2z"/>
+                    <path d="M5 2h1v12H5z"/>
+                    <path d="M2 2h1v12H2z"/>
                 </svg>
             </button>
+
+            <!-- Welcome Content -->
+            <div class="welcome-content" id="welcomeContent">
+                <div class="content-header">
+                    <h1>🎯 CCIE Automation Study Guides</h1>
+                    <p>DevNet Expert Exam Preparation Resources</p>
+                </div>
+
+                <div class="objective-box">
+                    <div class="objective-header">
+                        <span>✅</span> Objective
+                    </div>
+                    <div class="objective-text">
+                        Master the CCIE DevNet Expert exam topics through interactive study guides, hands-on labs, and MCQ practice. Each chapter includes theory, code examples, and quiz questions.
+                    </div>
+                </div>
+
+                <div class="chapter-overview">
+                    <h2>📚 Available Guides</h2>
+                    <div class="guide-grid">
+                        <div class="guide-card" onclick="loadContentFromCard('git-workflows.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🔀</div>
+                                <div class="guide-card-title">Git Workflows</div>
+                            </div>
+                            <div class="guide-card-desc">Gitflow, GitHub Flow, GitLab Flow, Trunk-Based Development, and merge strategies.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">30 MCQ</span>
+                                <span class="meta-tag">6 Workflows</span>
+                            </div>
+                        </div>
+
+                        <div class="guide-card" onclick="loadContentFromCard('git-ops.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🔧</div>
+                                <div class="guide-card-title">Git Operations</div>
+                            </div>
+                            <div class="guide-card-desc">revert, reset, rebase, cherry-pick, bisect, format-patch commands.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">20 MCQ</span>
+                                <span class="meta-tag">7 Commands</span>
+                            </div>
+                        </div>
+
+                        <div class="guide-card" onclick="loadContentFromCard('cherry-pick-rebase.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🍒</div>
+                                <div class="guide-card-title">Cherry-Pick & Rebase</div>
+                            </div>
+                            <div class="guide-card-desc">Selective commit transfer, interactive rebase, format-patch workflows.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">20 MCQ</span>
+                                <span class="meta-tag">Lab Included</span>
+                            </div>
+                        </div>
+
+                        <div class="guide-card" onclick="loadContentFromCard('git-merge-strategies.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🔀</div>
+                                <div class="guide-card-title">Merge Strategies</div>
+                            </div>
+                            <div class="guide-card-desc">3-way merge, -s vs -X flags, ort, recursive, octopus strategies.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">20 MCQ</span>
+                                <span class="meta-tag">Drag & Drop</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chapter-overview">
+                    <h2>🚀 Coming Soon</h2>
+                    <div class="guide-grid">
+                        <div class="guide-card disabled">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🧪</div>
+                                <div class="guide-card-title">pyATS & Genie</div>
+                            </div>
+                            <div class="guide-card-desc">Network testing, testbed configuration, job files, and parsing.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">Coming Soon</span>
+                            </div>
+                        </div>
+
+                        <div class="guide-card disabled">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">📋</div>
+                                <div class="guide-card-title">YANG & NETCONF</div>
+                            </div>
+                            <div class="guide-card-desc">YANG models, must/when statements, NETCONF operations.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">Coming Soon</span>
+                            </div>
+                        </div>
+
+                        <div class="guide-card disabled">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">⚙️</div>
+                                <div class="guide-card-title">Ansible</div>
+                            </div>
+                            <div class="guide-card-desc">Playbooks, roles, network modules, and automation patterns.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">Coming Soon</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <footer>
+                    <p>📚 Navigate using the sidebar to explore chapters. Each guide includes theory and MCQ practice.</p>
+                </footer>
+            </div>
+
+            <!-- Content Frame (for loading guides) -->
+            <iframe class="content-frame" id="contentFrame" style="display: none;"></iframe>
         </div>
-
-        <nav class="nav-tree">
-            <!-- Getting Started -->
-            <div class="nav-chapter">
-                <a href="#" class="nav-item active">
-                    <span class="nav-item-icon">🏠</span>
-                    <span class="nav-item-text">Getting Started</span>
-                </a>
-            </div>
-
-            <!-- CCIE Workbook -->
-            <div class="nav-chapter expanded">
-                <div class="chapter-header" onclick="toggleChapter(this)">
-                    <span class="chapter-icon">
-                        <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                    </span>
-                    <span class="chapter-title">CCIE Workbook</span>
-                </div>
-                <div class="chapter-items">
-                    <!-- Chapter 1: Git -->
-                    <div class="nav-chapter expanded">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 1, Git</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="git-workflows.html" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Git Workflows</span>
-                                <span class="nav-item-badge badge-ready">Ready</span>
-                            </a>
-                            <a href="git-ops.html" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Git Operations</span>
-                                <span class="nav-item-badge badge-ready">Ready</span>
-                            </a>
-                            <a href="cherry-pick-rebase.html" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Cherry-Pick & Rebase</span>
-                                <span class="nav-item-badge badge-ready">Ready</span>
-                            </a>
-                            <a href="git-merge-strategies.html" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Merge Strategies</span>
-                                <span class="nav-item-badge badge-ready">Ready</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 2: REST API -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 2, REST API</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">REST Fundamentals</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">API Authentication</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 3: YANG -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 3, YANG</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">YANG Basics</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Must Statement</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">When Statement</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 4: NETCONF -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 4, NETCONF</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">NETCONF Operations</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 5: Cisco NSO -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 5, Cisco NSO</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">NSO Basics</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 6: RESTCONF -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 6, RESTCONF</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">RESTCONF Operations</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 7: pyATS -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 7, pyATS</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Testbed & Topology</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Job Files</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Runtime Arguments</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 8: Ansible -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 8, Ansible</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Playbooks</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 9: Terraform -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 9, Terraform</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Terraform Basics</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 10: Docker -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 10, Docker</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">Dockerfile</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Chapter 11: Kubernetes -->
-                    <div class="nav-chapter">
-                        <div class="chapter-header" onclick="toggleChapter(this)">
-                            <span class="chapter-icon">
-                                <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                            </span>
-                            <span class="chapter-title">Chapter 11, Kubernetes</span>
-                        </div>
-                        <div class="chapter-items">
-                            <a href="#" class="nav-item">
-                                <span class="nav-item-icon">📄</span>
-                                <span class="nav-item-text">K8s Basics</span>
-                                <span class="nav-item-badge badge-soon">Soon</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quiz Section -->
-            <div class="nav-chapter">
-                <div class="chapter-header" onclick="toggleChapter(this)">
-                    <span class="chapter-icon">
-                        <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
-                    </span>
-                    <span class="chapter-title">Quiz Bank</span>
-                    <span class="chapter-badge">4</span>
-                </div>
-                <div class="chapter-items">
-                    <a href="git-workflows.html" class="nav-item">
-                        <span class="nav-item-icon">💬</span>
-                        <span class="nav-item-text">Git Workflows (30 MCQ)</span>
-                    </a>
-                    <a href="git-ops.html" class="nav-item">
-                        <span class="nav-item-icon">💬</span>
-                        <span class="nav-item-text">Git Operations (20 MCQ)</span>
-                    </a>
-                    <a href="cherry-pick-rebase.html" class="nav-item">
-                        <span class="nav-item-icon">💬</span>
-                        <span class="nav-item-text">Cherry-Pick (20 MCQ)</span>
-                    </a>
-                    <a href="git-merge-strategies.html" class="nav-item">
-                        <span class="nav-item-icon">💬</span>
-                        <span class="nav-item-text">Merge Strategies (20 MCQ)</span>
-                    </a>
-                </div>
-            </div>
-        </nav>
-    </aside>
-
-    <!-- Sidebar Toggle Button (shown when sidebar is hidden) -->
-    <button class="sidebar-show-btn" onclick="toggleSidebar()" title="Show sidebar">
-        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-            <path d="M10 2l4 6-4 6V2z"/>
-            <path d="M5 2h1v12H5z"/>
-            <path d="M2 2h1v12H2z"/>
-        </svg>
-    </button>
-
-    <!-- Main Content -->
-    <main class="main-content" id="mainContent">
-        <div class="welcome-section">
-            <div class="content-header">
-                <h1>🎯 CCIE Automation Study Guides</h1>
-                <p>DevNet Expert Exam Preparation Resources</p>
-            </div>
-
-            <div class="objective-box">
-                <div class="objective-header">
-                    <span>✅</span> Objective
-                </div>
-                <div class="objective-text">
-                    Master the CCIE DevNet Expert exam topics through interactive study guides, hands-on labs, and MCQ practice. Each chapter includes theory, code examples, and quiz questions.
-                </div>
-            </div>
-
-            <div class="chapter-overview">
-                <h2>📚 Available Guides</h2>
-                <div class="guide-grid">
-                    <a href="git-workflows.html" class="guide-card">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">🔀</div>
-                            <div class="guide-card-title">Git Workflows</div>
-                        </div>
-                        <div class="guide-card-desc">Gitflow, GitHub Flow, GitLab Flow, Trunk-Based Development, and merge strategies.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">30 MCQ</span>
-                            <span class="meta-tag">6 Workflows</span>
-                        </div>
-                    </a>
-
-                    <a href="git-ops.html" class="guide-card">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">🔧</div>
-                            <div class="guide-card-title">Git Operations</div>
-                        </div>
-                        <div class="guide-card-desc">revert, reset, rebase, cherry-pick, bisect, format-patch commands and scenarios.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">20 MCQ</span>
-                            <span class="meta-tag">7 Commands</span>
-                        </div>
-                    </a>
-
-                    <a href="cherry-pick-rebase.html" class="guide-card">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">🍒</div>
-                            <div class="guide-card-title">Cherry-Pick & Rebase</div>
-                        </div>
-                        <div class="guide-card-desc">Selective commit transfer, interactive rebase, format-patch workflows.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">20 MCQ</span>
-                            <span class="meta-tag">Lab Included</span>
-                        </div>
-                    </a>
-
-                    <a href="git-merge-strategies.html" class="guide-card">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">🔀</div>
-                            <div class="guide-card-title">Merge Strategies</div>
-                        </div>
-                        <div class="guide-card-desc">3-way merge, -s vs -X flags, ort, recursive, octopus, subtree strategies.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">20 MCQ</span>
-                            <span class="meta-tag">Drag & Drop</span>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div class="chapter-overview">
-                <h2>🚀 Coming Soon</h2>
-                <div class="guide-grid">
-                    <div class="guide-card" style="opacity: 0.6; pointer-events: none;">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">🧪</div>
-                            <div class="guide-card-title">pyATS & Genie</div>
-                        </div>
-                        <div class="guide-card-desc">Network testing, testbed configuration, job files, and parsing.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">Coming Soon</span>
-                        </div>
-                    </div>
-
-                    <div class="guide-card" style="opacity: 0.6; pointer-events: none;">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">📋</div>
-                            <div class="guide-card-title">YANG & NETCONF</div>
-                        </div>
-                        <div class="guide-card-desc">YANG models, must/when statements, NETCONF operations.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">Coming Soon</span>
-                        </div>
-                    </div>
-
-                    <div class="guide-card" style="opacity: 0.6; pointer-events: none;">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">⚙️</div>
-                            <div class="guide-card-title">Ansible</div>
-                        </div>
-                        <div class="guide-card-desc">Playbooks, roles, network modules, and automation patterns.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">Coming Soon</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <footer>
-                <p>📚 Navigate using the sidebar to explore chapters. Each guide includes theory and MCQ practice.</p>
-            </footer>
-        </div>
-    </main>
+    </div>
 
     <script>
         function toggleChapter(header) {
@@ -790,37 +803,50 @@
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
             sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
         }
 
-        // Highlight active link based on current page
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-            document.querySelectorAll('.nav-item').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPage) {
-                    link.classList.add('active');
+        function loadContent(url, element) {
+            // Hide welcome, show iframe
+            document.getElementById('welcomeContent').style.display = 'none';
+            const frame = document.getElementById('contentFrame');
+            frame.style.display = 'block';
+            frame.src = url;
+
+            // Update active state
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (element) element.classList.add('active');
+        }
+
+        function loadContentFromCard(url) {
+            // Find corresponding nav item and activate it
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                // Check if this nav item matches the URL
+                const onclick = item.getAttribute('onclick');
+                if (onclick && onclick.includes(url)) {
+                    item.classList.add('active');
                     // Expand parent chapters
-                    let parent = link.closest('.nav-chapter');
+                    let parent = item.closest('.nav-chapter');
                     while (parent) {
                         parent.classList.add('expanded');
                         parent = parent.parentElement.closest('.nav-chapter');
                     }
                 }
             });
-        });
+            
+            loadContent(url, null);
+        }
 
-        // Mobile sidebar toggle
-        document.addEventListener('click', (e) => {
-            const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth <= 768) {
-                if (!sidebar.contains(e.target) && !e.target.classList.contains('sidebar-show-btn')) {
-                    sidebar.classList.remove('mobile-open');
-                }
-            }
-        });
+        function showWelcome() {
+            // Show welcome, hide iframe
+            document.getElementById('welcomeContent').style.display = 'block';
+            document.getElementById('contentFrame').style.display = 'none';
+
+            // Update active state
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector('.nav-item').classList.add('active');
+        }
     </script>
 </body>
 </html>

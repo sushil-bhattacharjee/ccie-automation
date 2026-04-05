@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Operations - DevNet Expert Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --border-color: #30363d;
+            --code-bg: #0d1117;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .nav-tabs { display: flex; gap: 0.5rem; }
+        .nav-tab {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .nav-tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-tab.active { background: var(--accent-blue); color: var(--bg-primary); }
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 6rem 2rem 3rem;
+        }
+        .section { display: none; }
+        .section.active { display: block; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            color: var(--accent-blue);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--accent-purple);
+        }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        .intro-text { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        pre code { background: none; padding: 0; }
+        .comment { color: var(--text-secondary); }
+        .command { color: var(--accent-green); }
+        .flag { color: var(--accent-orange); }
+        .workflow-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .workflow-card h3 { margin-top: 0; display: flex; align-items: center; gap: 0.5rem; }
+        .workflow-badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .badge-safe { background: var(--accent-green); color: var(--bg-primary); }
+        .badge-danger { background: var(--accent-red); color: white; }
+        .badge-warning { background: var(--accent-orange); color: var(--bg-primary); }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+        th { background: var(--bg-tertiary); font-weight: 600; color: var(--text-primary); }
+        td { background: var(--bg-secondary); color: var(--text-secondary); }
+        tr:hover td { background: var(--bg-tertiary); }
+        .check { color: var(--accent-green); }
+        .cross { color: var(--accent-red); }
+        .quiz-header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .score-display { font-size: 1.25rem; font-weight: 600; }
+        .score-correct { color: var(--accent-green); }
+        .score-total { color: var(--text-secondary); }
+        .quiz-controls { display: flex; gap: 0.75rem; }
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-primary { background: var(--accent-blue); color: var(--bg-primary); }
+        .btn-primary:hover { background: #79b8ff; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--border-color); }
+        .question-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .question-card.answered-correct { border-color: var(--accent-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .question-number {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+        .question-type {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-orange);
+        }
+        .scenario-box {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+        .options-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-item:hover:not(.disabled) {
+            background: var(--bg-primary);
+            border-color: var(--border-color);
+        }
+        .option-item.selected {
+            border-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+        .option-item.correct {
+            border-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+        .option-item.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(248, 81, 73, 0.1);
+        }
+        .option-item.disabled { cursor: default; }
+        .option-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .option-item.selected .option-checkbox {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+        .option-item.correct .option-checkbox {
+            border-color: var(--accent-green);
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+        .option-item.incorrect .option-checkbox {
+            border-color: var(--accent-red);
+            background: var(--accent-red);
+            color: white;
+        }
+        .option-text { flex: 1; color: var(--text-primary); }
+        .submit-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .submit-btn:hover:not(:disabled) { background: #79b8ff; }
+        .submit-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+            display: none;
+        }
+        .explanation.show { display: block; }
+        .explanation-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+        .explanation-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .tip-box {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .tip-box strong { color: var(--accent-blue); }
+        .warning-box {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .warning-box strong { color: var(--accent-red); }
+        @media (max-width: 768px) {
+            .nav-content { flex-direction: column; gap: 1rem; }
+            .main-content { padding: 8rem 1rem 2rem; }
+            h1 { font-size: 1.75rem; }
+            .quiz-header { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="nav-title">🔧 Git Operations - DevNet Expert</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
+                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- SECTION 1: Learn -->
+        <section id="learn" class="section active">
+            <h1>Git Operations Reference</h1>
+            <p class="intro-text">Master essential Git operations for CI/CD pipelines and network automation workflows.</p>
+
+            <!-- Quick Comparison -->
+            <h2>📊 Quick Comparison</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Purpose</th>
+                        <th>Rewrites History?</th>
+                        <th>Safe for Shared?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>git revert</code></td>
+                        <td>Undo commit safely</td>
+                        <td><span class="check">✗ No</span></td>
+                        <td><span class="check">✓ Yes</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>git reset</code></td>
+                        <td>Move HEAD, discard commits</td>
+                        <td><span class="cross">✓ Yes</span></td>
+                        <td><span class="cross">✗ No</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>git rebase</code></td>
+                        <td>Replay commits on new base</td>
+                        <td><span class="cross">✓ Yes</span></td>
+                        <td><span class="cross">✗ No</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>git cherry-pick</code></td>
+                        <td>Copy specific commit</td>
+                        <td><span class="check">✗ No</span></td>
+                        <td><span class="check">✓ Yes</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>git format-patch</code></td>
+                        <td>Export commits as files</td>
+                        <td><span class="check">✗ No</span></td>
+                        <td><span class="check">✓ Yes</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>git merge</code></td>
+                        <td>Combine branches</td>
+                        <td><span class="check">✗ No</span></td>
+                        <td><span class="check">✓ Yes</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>git bisect</code></td>
+                        <td>Find buggy commit</td>
+                        <td><span class="check">✗ No</span></td>
+                        <td><span class="check">✓ Yes</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- git revert -->
+            <div class="workflow-card">
+                <h3><span>git revert</span><span class="workflow-badge badge-safe">Safe</span></h3>
+                <p>Creates a NEW commit that undoes changes from a previous commit. History is preserved.</p>
+<pre><span class="comment"># Undo the last commit</span>
+<span class="command">git revert</span> HEAD
+
+<span class="comment"># Undo a specific commit</span>
+<span class="command">git revert</span> abc1234
+
+<span class="comment"># Result: Original commit stays, new "revert commit" added</span>
+$ git log --oneline
+6ededa0 Revert "Third commit"   <span class="comment">← NEW commit</span>
+decfe02 Third commit            <span class="comment">← Original preserved</span></pre>
+                <div class="tip-box">
+                    <strong>💡 Use When:</strong> Undoing changes on shared branches (main, develop). Safe because it doesn't rewrite history.
+                </div>
+            </div>
+
+            <!-- git reset -->
+            <div class="workflow-card">
+                <h3><span>git reset</span><span class="workflow-badge badge-danger">Rewrites History</span></h3>
+                <p>Moves HEAD backward. Three modes with different behaviors:</p>
+                <table>
+                    <thead>
+                        <tr><th>Flag</th><th>Commits</th><th>File Content</th><th>Changes State</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>--soft</code></td><td>Removed</td><td>Unchanged</td><td>Staged ✓</td></tr>
+                        <tr><td><code>--mixed</code></td><td>Removed</td><td>Unchanged</td><td>Unstaged</td></tr>
+                        <tr><td><code>--hard</code></td><td>Removed</td><td><strong>Reverted!</strong></td><td>Discarded ⚠️</td></tr>
+                    </tbody>
+                </table>
+<pre><span class="comment"># Reword last commit message (--soft)</span>
+<span class="command">git reset</span> <span class="flag">--soft</span> HEAD~1
+<span class="command">git commit</span> -m "Better message"
+
+<span class="comment"># Squash last 4 commits into one</span>
+<span class="command">git reset</span> <span class="flag">--soft</span> HEAD~4
+<span class="command">git commit</span> -m "Combined feature"
+
+<span class="comment"># Completely discard last commit (DESTRUCTIVE!)</span>
+<span class="command">git reset</span> <span class="flag">--hard</span> HEAD~1</pre>
+                <div class="warning-box">
+                    <strong>⚠️ Warning:</strong> <code>--hard</code> permanently discards changes! Never use reset on shared branches.
+                </div>
+            </div>
+
+            <!-- git rebase -->
+            <div class="workflow-card">
+                <h3><span>git rebase</span><span class="workflow-badge badge-danger">Rewrites History</span></h3>
+                <p>Replays commits on top of another branch. Creates linear history but destroys original commits.</p>
+<pre><span class="comment"># Update feature branch with latest main</span>
+<span class="command">git checkout</span> feature
+<span class="command">git rebase</span> main
+<span class="comment"># Your feature commits are RECREATED on top of main</span>
+
+<span class="comment"># Interactive rebase to squash/edit commits</span>
+<span class="command">git rebase</span> <span class="flag">-i</span> HEAD~4
+<span class="comment"># Opens editor: change 'pick' to 'squash' or 'edit'</span></pre>
+
+                <h3>Rebase vs Merge</h3>
+                <table>
+                    <thead>
+                        <tr><th>Aspect</th><th>Rebase</th><th>Merge</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>History</td><td>Linear</td><td>Shows branch structure</td></tr>
+                        <tr><td>Merge commit</td><td>No</td><td>Yes</td></tr>
+                        <tr><td>Rewrites history</td><td><span class="cross">Yes</span></td><td><span class="check">No</span></td></tr>
+                        <tr><td>Best for</td><td>Local cleanup</td><td>Shared branches</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- git cherry-pick -->
+            <div class="workflow-card">
+                <h3><span>git cherry-pick</span><span class="workflow-badge badge-safe">Safe</span></h3>
+                <p>COPIES a specific commit to your current branch. Original stays in source branch.</p>
+<pre><span class="comment"># Copy one commit from feature to main</span>
+<span class="command">git checkout</span> main
+<span class="command">git cherry-pick</span> abc1234
+
+<span class="comment"># Copy multiple commits</span>
+<span class="command">git cherry-pick</span> abc1234 def5678
+
+<span class="comment"># Result: NEW commits with DIFFERENT hashes</span></pre>
+                <div class="tip-box">
+                    <strong>💡 Key Point:</strong> Cherry-pick COPIES (not moves). Original commit remains. New commit gets a different hash.
+                </div>
+            </div>
+
+            <!-- git format-patch -->
+            <div class="workflow-card">
+                <h3><span>git format-patch / git am</span><span class="workflow-badge badge-safe">Safe</span></h3>
+                <p>Export commits as patch files for transfer (email, USB, air-gapped networks).</p>
+<pre><span class="comment"># Create patch files for last 2 commits</span>
+<span class="command">git format-patch</span> -2
+<span class="comment"># Creates: 0001-First-change.patch, 0002-Second-change.patch</span>
+
+<span class="comment"># Apply patch (changes only, no commit)</span>
+<span class="command">git apply</span> 0001-First-change.patch
+
+<span class="comment"># Apply patch AND create commit with original metadata</span>
+<span class="command">git am</span> 0001-First-change.patch</pre>
+                <table>
+                    <thead>
+                        <tr><th>Command</th><th>Applies Changes</th><th>Creates Commit</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>git apply</code></td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
+                        <tr><td><code>git am</code></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- git bisect -->
+            <div class="workflow-card">
+                <h3><span>git bisect</span><span class="workflow-badge badge-safe">Safe</span></h3>
+                <p>Binary search to find the commit that introduced a bug. Halves search space each step.</p>
+<pre><span class="comment"># Start bisect session</span>
+<span class="command">git bisect</span> start
+<span class="command">git bisect</span> bad              <span class="comment"># Current commit is broken</span>
+<span class="command">git bisect</span> good abc1234     <span class="comment"># This commit was working</span>
+
+<span class="comment"># Git checks out middle commit - test it</span>
+<span class="command">git bisect</span> good   <span class="comment"># or 'bad' based on test result</span>
+<span class="comment"># Repeat until culprit found</span>
+
+<span class="command">git bisect</span> reset            <span class="comment"># Return to original state</span>
+
+<span class="comment"># Automated bisect with script</span>
+<span class="command">git bisect</span> run ./test-script.sh
+<span class="comment"># Exit 0 = good, Exit 1 = bad</span></pre>
+                <div class="tip-box">
+                    <strong>💡 Efficiency:</strong> For 50 commits, bisect needs only ~6 tests (log₂50), not 50!
+                </div>
+            </div>
+
+            <!-- HEAD~N Notation -->
+            <h2>📍 HEAD~N Notation</h2>
+            <div class="workflow-card">
+<pre>f277ad0 (HEAD)  ← HEAD~0 (current)
+5b75696         ← HEAD~1 (1 back)
+6ededa0         ← HEAD~2 (2 back)
+decfe02         ← HEAD~3 (3 back)
+
+<span class="comment"># Examples:</span>
+<span class="command">git reset</span> HEAD~1     <span class="comment"># Go back 1 commit</span>
+<span class="command">git rebase -i</span> HEAD~4 <span class="comment"># Interactive rebase last 4</span>
+<span class="command">git diff</span> HEAD~2 HEAD <span class="comment"># Diff between 2 commits ago and now</span></pre>
+            </div>
+
+        </section>
+
+        <!-- SECTION 2: MCQ Practice -->
+        <section id="quiz" class="section">
+            <h1>MCQ Practice</h1>
+            <p class="intro-text">20 scenario-based questions covering git operations for CCIE Automation exam preparation.</p>
+
+            <div class="quiz-header">
+                <div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <span class="score-display">
+                        Score: <span class="score-correct" id="correctCount">0</span>
+                        <span class="score-total">/ <span id="totalAnswered">0</span> answered</span>
+                    </span>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
+                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+                </div>
+            </div>
+
+            <div id="quizContainer"></div>
+        </section>
+    </main>
+
+    <script>
+        const questions = [
+            // Q1-10: Original questions
+            {
+                id: 1, category: "git revert",
+                scenario: "A teammate pushed a buggy commit to the shared 'main' branch. Multiple team members have already pulled this commit. Your manager asks you to undo this commit without disrupting everyone's work.",
+                question: "Which TWO approaches are safe for this situation?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git reset --hard HEAD~1 on main", correct: false },
+                    { text: "git revert <commit-hash>", correct: true },
+                    { text: "git rebase -i HEAD~1 and drop the commit", correct: false },
+                    { text: "git revert HEAD followed by git push", correct: true },
+                    { text: "Delete the branch and recreate it", correct: false },
+                    { text: "git reset --soft HEAD~1 and force push", correct: false }
+                ],
+                explanation: "git revert is safe for shared branches because it creates a NEW commit without rewriting history. reset and rebase rewrite history, breaking other developers' repositories."
+            },
+            {
+                id: 2, category: "git reset",
+                scenario: "You just committed with message 'WIP stuff'. Before pushing, you want to change it to 'Add pyATS OSPF test script'. The files are correct — only the message needs updating.",
+                question: "Which TWO commands would fix this?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git reset --hard HEAD~1", correct: false },
+                    { text: "git reset --soft HEAD~1 then git commit -m 'new message'", correct: true },
+                    { text: "git commit --amend -m 'Add pyATS OSPF test script'", correct: true },
+                    { text: "git reset --mixed HEAD~1", correct: false },
+                    { text: "git revert HEAD", correct: false },
+                    { text: "git cherry-pick HEAD --edit", correct: false }
+                ],
+                explanation: "git commit --amend is simplest for changing the last commit message. git reset --soft HEAD~1 removes the commit but keeps changes STAGED for recommitting. --hard would discard changes!"
+            },
+            {
+                id: 3, category: "git reset modes",
+                scenario: "A developer accidentally committed API keys in the last commit on their local branch. They haven't pushed yet and need to completely remove this commit and all traces of the sensitive file.",
+                question: "Which git reset command should they use?",
+                type: "single", count: 1,
+                options: [
+                    { text: "git reset --soft HEAD~1", correct: false },
+                    { text: "git reset --mixed HEAD~1", correct: false },
+                    { text: "git reset --hard HEAD~1", correct: true },
+                    { text: "git reset HEAD~1 (default)", correct: false }
+                ],
+                explanation: "git reset --hard completely removes the commit AND discards all file changes. --soft/--mixed would leave the sensitive credentials in the files. For security incidents, --hard ensures complete removal."
+            },
+            {
+                id: 4, category: "git rebase",
+                scenario: "Your feature branch is 3 days old. Meanwhile, main has 5 new commits including security patches. You need to incorporate these changes with a linear history.",
+                question: "Which TWO statements are TRUE about using git rebase here?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git rebase main replays your commits on top of latest main", correct: true },
+                    { text: "Rebase creates a merge commit", correct: false },
+                    { text: "Your original commit hashes will be preserved", correct: false },
+                    { text: "Rebase destroys and recreates commits with new hashes", correct: true },
+                    { text: "Rebase is safer than merge for shared branches", correct: false },
+                    { text: "Rebase automatically resolves all conflicts", correct: false }
+                ],
+                explanation: "Rebase replays commits creating NEW hashes (originals destroyed). This gives linear history but rewrites history. Never use on shared branches."
+            },
+            {
+                id: 5, category: "git cherry-pick",
+                scenario: "Your team has 'release-2.0' (production) and 'develop' branches. A critical NETCONF bug fix (commit abc123) is on develop. Production needs ONLY this fix, not other in-progress features.",
+                question: "Which TWO statements about cherry-pick are correct?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "cherry-pick will MOVE the commit from develop", correct: false },
+                    { text: "cherry-pick will COPY the commit with a new hash", correct: true },
+                    { text: "Cherry-pick rewrites history", correct: false },
+                    { text: "Original commit abc123 remains in develop", correct: true },
+                    { text: "Cherry-pick merges entire develop branch", correct: false },
+                    { text: "Cherry-pick requires force push", correct: false }
+                ],
+                explanation: "cherry-pick COPIES a commit (new hash). Original remains in source branch. Does NOT rewrite history (safe for shared branches). Does NOT merge entire branch."
+            },
+            {
+                id: 6, category: "git format-patch",
+                scenario: "Your dev network is air-gapped from production. You've developed an Ansible fix and need to transfer 3 commits via USB to the production Git server.",
+                question: "Which TWO methods work for air-gapped transfer?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git format-patch -3, then git am to apply", correct: true },
+                    { text: "git bundle create, then git clone from bundle", correct: true },
+                    { text: "git push --force to production", correct: false },
+                    { text: "Copy .git folder via USB", correct: false },
+                    { text: "git merge --email", correct: false },
+                    { text: "git cherry-pick over SSH", correct: false }
+                ],
+                explanation: "format-patch exports commits as .patch files; git am imports them. git bundle creates a portable file containing commits. Both work offline."
+            },
+            {
+                id: 7, category: "git bisect",
+                scenario: "Your pyATS test worked last week but now fails. You have 50 commits between the known-good state and now. The test takes 2 minutes to run.",
+                question: "Which TWO statements about git bisect are TRUE?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "Bisect uses binary search, needing ~6 tests (log₂50) to find the bug", correct: true },
+                    { text: "Mark commits as good/bad until Git identifies the culprit", correct: true },
+                    { text: "Bisect automatically fixes the bug", correct: false },
+                    { text: "Bisect rewrites history to remove bad commit", correct: false },
+                    { text: "Bisect requires testing all 50 commits", correct: false },
+                    { text: "Bisect only works with Python scripts", correct: false }
+                ],
+                explanation: "Bisect performs binary search, halving the search space each time. For 50 commits: log₂(50) ≈ 6 tests. It finds the commit but doesn't fix or remove it."
+            },
+            {
+                id: 8, category: "squashing",
+                scenario: "Before creating a PR, you want to combine your last 4 WIP commits into one clean commit. The commits are local only (not pushed).",
+                question: "Which TWO methods can squash these commits?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git reset --soft HEAD~4 then git commit -m 'Complete feature'", correct: true },
+                    { text: "git rebase -i HEAD~4 and mark as 'squash'", correct: true },
+                    { text: "git merge --squash HEAD~4", correct: false },
+                    { text: "git revert HEAD~4..HEAD", correct: false },
+                    { text: "git cherry-pick --squash HEAD~4..HEAD", correct: false },
+                    { text: "git commit --amend -4", correct: false }
+                ],
+                explanation: "reset --soft HEAD~4 removes commits but keeps changes staged for one new commit. rebase -i lets you mark commits as 'squash'. Both require local-only commits."
+            },
+            {
+                id: 9, category: "history rewriting",
+                scenario: "Your DevOps team is establishing Git policies. They need to identify which commands are safe for shared branches (main, develop).",
+                question: "Which TWO commands REWRITE history and should NEVER be used on shared branches?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git revert", correct: false },
+                    { text: "git reset", correct: true },
+                    { text: "git cherry-pick", correct: false },
+                    { text: "git rebase", correct: true },
+                    { text: "git merge", correct: false },
+                    { text: "git bisect", correct: false }
+                ],
+                explanation: "reset and rebase REWRITE history. revert/cherry-pick create new commits. merge preserves history. bisect is read-only. Never rewrite history on shared branches."
+            },
+            {
+                id: 10, category: "CI/CD",
+                scenario: "A GitLab CI pipeline fails because a recent merge introduced a Netmiko syntax error. You need to quickly restore the pipeline while preserving ability to investigate.",
+                question: "Which approach is BEST for this CI/CD emergency?",
+                type: "single", count: 1,
+                options: [
+                    { text: "git reset --hard to remove the merge, force push", correct: false },
+                    { text: "git revert the merge commit", correct: true },
+                    { text: "git rebase -i to drop the merge", correct: false },
+                    { text: "Delete branch and recreate from backup", correct: false }
+                ],
+                explanation: "git revert creates a new commit undoing changes, immediately restoring the pipeline while preserving full history. reset/rebase would break other developers' work."
+            },
+            // Q11-20: New questions
+            {
+                id: 11, category: "git reset --soft",
+                scenario: "You made 3 commits for a feature, but your team lead asks you to combine them into a single commit with a better message before pushing. All commits are local only.",
+                question: "After running 'git reset --soft HEAD~3', what is the state of your changes?",
+                type: "single", count: 1,
+                options: [
+                    { text: "Changes are discarded permanently", correct: false },
+                    { text: "Changes are staged (in index), ready to commit", correct: true },
+                    { text: "Changes are unstaged (in working directory only)", correct: false },
+                    { text: "Changes are stashed automatically", correct: false }
+                ],
+                explanation: "--soft removes commits but keeps all changes STAGED (in the index). You can immediately run 'git commit -m \"message\"' to create a single combined commit."
+            },
+            {
+                id: 12, category: "git reset --mixed",
+                scenario: "You accidentally staged several files with 'git add .' but realize some shouldn't be committed. You want to unstage everything while keeping the file changes.",
+                question: "Which command unstages all files without losing changes?",
+                type: "single", count: 1,
+                options: [
+                    { text: "git reset --hard HEAD", correct: false },
+                    { text: "git reset --soft HEAD", correct: false },
+                    { text: "git reset HEAD (or git reset --mixed HEAD)", correct: true },
+                    { text: "git checkout -- .", correct: false }
+                ],
+                explanation: "git reset HEAD (default is --mixed) unstages files but keeps changes in working directory. --hard would discard changes. --soft does nothing if you're at HEAD. checkout would discard changes."
+            },
+            {
+                id: 13, category: "git rebase -i",
+                scenario: "During interactive rebase, you see 'pick', 'reword', 'edit', 'squash', 'fixup', and 'drop' options. You want to combine commits 2, 3, and 4 into commit 1 while keeping commit 1's message.",
+                question: "Which action should you use for commits 2, 3, and 4?",
+                type: "single", count: 1,
+                options: [
+                    { text: "squash - combines and prompts to edit commit message", correct: false },
+                    { text: "fixup - combines and discards commit messages", correct: true },
+                    { text: "reword - only changes commit message", correct: false },
+                    { text: "edit - stops to let you amend the commit", correct: false }
+                ],
+                explanation: "'fixup' combines commits and DISCARDS their messages (keeps the first). 'squash' also combines but prompts you to edit the combined message. Use fixup when you want the original message."
+            },
+            {
+                id: 14, category: "git cherry-pick conflict",
+                scenario: "You run 'git cherry-pick abc123' but encounter a merge conflict. After resolving the conflict in your editor, you need to complete the cherry-pick.",
+                question: "Which TWO steps complete the cherry-pick after resolving conflicts?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git add <resolved-files>", correct: true },
+                    { text: "git cherry-pick --continue", correct: true },
+                    { text: "git commit -m 'cherry-pick complete'", correct: false },
+                    { text: "git cherry-pick --abort", correct: false },
+                    { text: "git merge --continue", correct: false },
+                    { text: "git push --force", correct: false }
+                ],
+                explanation: "After resolving conflicts: (1) git add the resolved files, (2) git cherry-pick --continue to finish. Using 'git commit' directly would work but --continue is the proper way."
+            },
+            {
+                id: 15, category: "git bisect automated",
+                scenario: "You want to automate git bisect with a test script. Your script returns exit code 0 when the test passes and exit code 1 when it fails.",
+                question: "Which statement about automated bisect is TRUE?",
+                type: "single", count: 1,
+                options: [
+                    { text: "Exit 0 = bad commit, Exit 1 = good commit", correct: false },
+                    { text: "Exit 0 = good commit, Exit 1 = bad commit", correct: true },
+                    { text: "Any non-zero exit means skip this commit", correct: false },
+                    { text: "Exit codes are ignored, only stdout matters", correct: false }
+                ],
+                explanation: "Standard Unix convention: Exit 0 = success (good commit), Exit 1 = failure (bad commit). Exit 125 means 'skip this commit'. bisect run uses these codes to navigate."
+            },
+            {
+                id: 16, category: "git am vs apply",
+                scenario: "You received a .patch file from a colleague. You want to apply the changes AND preserve the original author name, email, and commit message.",
+                question: "Which command preserves all original commit metadata?",
+                type: "single", count: 1,
+                options: [
+                    { text: "git apply colleague.patch", correct: false },
+                    { text: "git am colleague.patch", correct: true },
+                    { text: "git patch colleague.patch", correct: false },
+                    { text: "git diff --apply colleague.patch", correct: false }
+                ],
+                explanation: "git am (apply mailbox) applies the patch AND creates a commit with original author, email, and message. git apply only applies changes without committing."
+            },
+            {
+                id: 17, category: "rebase vs merge",
+                scenario: "Your feature branch diverged from main. Main has new commits. You need to integrate main's changes. Your team values seeing the branch structure in git history.",
+                question: "Which approach preserves the branch structure in history?",
+                type: "single", count: 1,
+                options: [
+                    { text: "git rebase main (on feature branch)", correct: false },
+                    { text: "git merge main (on feature branch)", correct: true },
+                    { text: "git reset --hard main", correct: false },
+                    { text: "git cherry-pick all commits from main", correct: false }
+                ],
+                explanation: "git merge preserves branch structure with a merge commit showing where branches joined. Rebase creates linear history (no branch structure visible). Team wants to see branches → use merge."
+            },
+            {
+                id: 18, category: "git revert merge",
+                scenario: "You need to revert a merge commit on main. The merge commit has two parents: main (parent 1) and feature (parent 2). You want to undo the feature branch changes.",
+                question: "Which command correctly reverts the merge?",
+                type: "single", count: 1,
+                options: [
+                    { text: "git revert <merge-commit>", correct: false },
+                    { text: "git revert -m 1 <merge-commit>", correct: true },
+                    { text: "git revert -m 2 <merge-commit>", correct: false },
+                    { text: "git reset --hard <merge-commit>~1", correct: false }
+                ],
+                explanation: "Reverting merges requires -m to specify which parent to keep. -m 1 keeps parent 1 (main) and reverts parent 2's changes (feature). -m 2 would do the opposite."
+            },
+            {
+                id: 19, category: "commit -a limitation",
+                scenario: "You create a new file 'config.py' and modify existing file 'main.py'. You run 'git commit -am \"update\"' expecting both files to be committed.",
+                question: "What is the result?",
+                type: "single", count: 1,
+                options: [
+                    { text: "Both files are committed successfully", correct: false },
+                    { text: "Only main.py is committed; config.py is not tracked", correct: true },
+                    { text: "Only config.py is committed", correct: false },
+                    { text: "Git throws an error about untracked files", correct: false }
+                ],
+                explanation: "git commit -a only stages TRACKED (modified) files. New/untracked files like config.py are NOT included. You need 'git add config.py' first or use 'git add .' before commit."
+            },
+            {
+                id: 20, category: "reflog recovery",
+                scenario: "You accidentally ran 'git reset --hard HEAD~3' and lost 3 important commits. The commits were local only (never pushed). You need to recover them.",
+                question: "Which TWO steps can recover the lost commits?",
+                type: "multi", count: 2,
+                options: [
+                    { text: "git reflog to find the lost commit hashes", correct: true },
+                    { text: "git checkout <lost-commit-hash> or git reset --hard <hash>", correct: true },
+                    { text: "git pull origin main to restore commits", correct: false },
+                    { text: "git revert HEAD~3 to undo the reset", correct: false },
+                    { text: "Check the recycle bin for deleted files", correct: false },
+                    { text: "Commits are permanently lost after --hard reset", correct: false }
+                ],
+                explanation: "git reflog shows history of HEAD movements, including 'lost' commits. Find the hash, then git reset --hard <hash> or git checkout -b recovery <hash>. Commits aren't truly deleted until garbage collection."
+            }
+        ];
+
+        let answers = {}, submitted = {}, score = 0;
+
+        function initQuiz() {
+            document.getElementById('quizContainer').innerHTML = questions.map((q, idx) => `
+                <div class="question-card" id="q${q.id}">
+                    <div class="question-header">
+                        <span class="question-number">Q${idx + 1} • ${q.category}</span>
+                        <span class="question-type">${q.count === 1 ? 'Choose 1' : `Choose ${q.count}`}</span>
+                    </div>
+                    <div class="scenario-box"><strong>Scenario:</strong> ${q.scenario}</div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="options-list" id="opts${q.id}">
+                        ${q.options.map((opt, i) => `
+                            <div class="option-item" data-qid="${q.id}" data-idx="${i}" onclick="selectOption(${q.id}, ${i}, '${q.type}', ${q.count})">
+                                <div class="option-checkbox">${String.fromCharCode(65 + i)}</div>
+                                <div class="option-text">${opt.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-btn" id="sub${q.id}" onclick="submitAnswer(${q.id})" disabled>Submit Answer</button>
+                    <div class="explanation" id="exp${q.id}">
+                        <div class="explanation-title">📖 Explanation</div>
+                        <div class="explanation-text">${q.explanation}</div>
+                    </div>
+                </div>
+            `).join('');
+            updateProgress();
+        }
+
+        function selectOption(qid, idx, type, count) {
+            if (submitted[qid]) return;
+            if (!answers[qid]) answers[qid] = [];
+            const i = answers[qid].indexOf(idx);
+            if (type === 'single') {
+                answers[qid] = [idx];
+            } else {
+                if (i > -1) answers[qid].splice(i, 1);
+                else if (answers[qid].length < count) answers[qid].push(idx);
+                else { answers[qid].shift(); answers[qid].push(idx); }
+            }
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, j) => {
+                el.classList.toggle('selected', answers[qid]?.includes(j));
+            });
+            document.getElementById(`sub${qid}`).disabled = answers[qid].length !== count;
+        }
+
+        function submitAnswer(qid) {
+            if (submitted[qid]) return;
+            submitted[qid] = true;
+            const q = questions.find(x => x.id === qid);
+            const correct = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1);
+            const user = answers[qid] || [];
+            const isCorrect = user.length === q.count && user.every(i => correct.includes(i));
+            if (isCorrect) score++;
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('totalAnswered').textContent = Object.keys(submitted).length;
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, i) => {
+                el.classList.add('disabled');
+                el.classList.remove('selected');
+                if (q.options[i].correct) el.classList.add('correct');
+                else if (user.includes(i)) el.classList.add('incorrect');
+            });
+            const card = document.getElementById(`q${qid}`);
+            card.classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            const btn = document.getElementById(`sub${qid}`);
+            btn.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+            btn.style.background = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
+            btn.disabled = true;
+            document.getElementById(`exp${qid}`).classList.add('show');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const pct = (Object.keys(submitted).length / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${pct}%`;
+        }
+
+        function resetQuiz() {
+            answers = {}; submitted = {}; score = 0;
+            document.getElementById('correctCount').textContent = '0';
+            document.getElementById('totalAnswered').textContent = '0';
+            initQuiz();
+        }
+
+        function showAllAnswers() {
+            questions.forEach(q => {
+                if (!submitted[q.id]) {
+                    answers[q.id] = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1).slice(0, q.count);
+                    submitAnswer(q.id);
+                }
+            });
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

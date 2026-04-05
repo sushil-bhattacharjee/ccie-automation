@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Stash, Sync & Merge - DevNet Expert Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39c5cf;
+            --accent-yellow: #f0e68c;
+            --border-color: #30363d;
+            --code-bg: #0d1117;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; }
+        .nav-container { position: fixed; top: 0; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); z-index: 1000; padding: 1rem 2rem; }
+        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-title { font-size: 1.25rem; font-weight: 700; color: var(--accent-orange); }
+        .nav-tabs { display: flex; gap: 0.5rem; align-items: center; }
+        .nav-tab { padding: 0.6rem 1.5rem; border: none; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; text-decoration: none; }
+        .nav-tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-tab.active { background: var(--accent-orange); color: var(--bg-primary); }
+        .main-content { max-width: 1000px; margin: 0 auto; padding: 6rem 2rem 3rem; }
+        .section { display: none; }
+        .section.active { display: block; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 1.75rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--accent-blue); padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--accent-purple); }
+        h4 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--accent-cyan); }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        .intro-text { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        pre { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.6; white-space: pre; }
+        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+        pre code { background: none; padding: 0; }
+        .comment { color: var(--text-secondary); }
+        .command { color: var(--accent-green); }
+        .flag { color: var(--accent-orange); }
+        .output { color: var(--accent-cyan); }
+        .step-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
+        .step-card h3 { margin-top: 0; display: flex; align-items: center; gap: 0.5rem; }
+        .step-number { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--accent-purple); color: var(--bg-primary); border-radius: 50%; font-weight: 700; font-size: 0.9rem; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-tertiary); font-weight: 600; color: var(--text-primary); }
+        td { background: var(--bg-secondary); color: var(--text-secondary); }
+        tr:hover td { background: var(--bg-tertiary); }
+        .check { color: var(--accent-green); }
+        .cross { color: var(--accent-red); }
+        .tip-box { background: rgba(88, 166, 255, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .tip-box strong { color: var(--accent-blue); }
+        .warning-box { background: rgba(248, 81, 73, 0.1); border: 1px solid var(--accent-red); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .warning-box strong { color: var(--accent-red); }
+        .golden-box { background: rgba(240, 230, 140, 0.1); border: 2px solid var(--accent-yellow); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; text-align: center; }
+        .golden-box strong { color: var(--accent-yellow); font-size: 1.1rem; }
+        .graph-box { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; white-space: pre; overflow-x: auto; }
+        .workflow-summary { background: var(--bg-secondary); border: 2px solid var(--accent-green); border-radius: 12px; padding: 1.5rem; margin: 2rem 0; }
+        .workflow-summary h3 { color: var(--accent-green); margin-top: 0; }
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-secondary); }
+        li { margin-bottom: 0.25rem; }
+
+        /* Quiz Styles */
+        .quiz-header { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .score-display { font-size: 1.25rem; font-weight: 600; }
+        .score-correct { color: var(--accent-green); }
+        .score-total { color: var(--text-secondary); }
+        .quiz-controls { display: flex; gap: 0.75rem; }
+        .btn { padding: 0.6rem 1.25rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .btn-primary { background: var(--accent-blue); color: var(--bg-primary); }
+        .btn-primary:hover { background: #79b8ff; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--border-color); }
+        .question-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .question-card.answered-correct { border-color: var(--accent-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); }
+        .question-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .question-number { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 20px; }
+        .question-type { font-size: 0.8rem; font-weight: 500; color: var(--accent-orange); }
+        .scenario-box { font-size: 0.9rem; color: var(--text-secondary); padding: 0.75rem; background: var(--bg-tertiary); border-radius: 8px; margin-bottom: 1rem; line-height: 1.6; border-left: 3px solid var(--accent-purple); }
+        .question-text { font-size: 1.1rem; font-weight: 500; color: var(--text-primary); margin-bottom: 1.25rem; line-height: 1.5; }
+        .options-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .option-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--bg-tertiary); border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        .option-item:hover:not(.disabled) { background: var(--bg-primary); border-color: var(--border-color); }
+        .option-item.selected { border-color: var(--accent-blue); background: rgba(88, 166, 255, 0.1); }
+        .option-item.correct { border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
+        .option-item.incorrect { border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
+        .option-item.disabled { cursor: default; }
+        .option-checkbox { width: 20px; height: 20px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.8rem; font-weight: 600; }
+        .option-item.selected .option-checkbox { border-color: var(--accent-blue); background: var(--accent-blue); color: var(--bg-primary); }
+        .option-item.correct .option-checkbox { border-color: var(--accent-green); background: var(--accent-green); color: var(--bg-primary); }
+        .option-item.incorrect .option-checkbox { border-color: var(--accent-red); background: var(--accent-red); color: white; }
+        .option-text { flex: 1; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+        .submit-btn { margin-top: 1rem; width: 100%; padding: 0.75rem; background: var(--accent-blue); color: var(--bg-primary); border: none; border-radius: 8px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .submit-btn:hover:not(:disabled) { background: #79b8ff; }
+        .submit-btn:disabled { background: var(--bg-tertiary); color: var(--text-secondary); cursor: not-allowed; }
+        .explanation { margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border-radius: 8px; border-left: 4px solid var(--accent-blue); display: none; }
+        .explanation.show { display: block; }
+        .explanation-title { font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem; }
+        .explanation-text { color: var(--text-secondary); font-size: 0.95rem; }
+        .progress-bar { width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-orange), var(--accent-cyan)); border-radius: 4px; transition: width 0.3s ease; }
+
+        /* Ordering Question Styles */
+        .ordering-container { display: flex; gap: 2rem; flex-wrap: wrap; margin: 1rem 0; }
+        .ordering-target, .ordering-source { flex: 1; min-width: 280px; }
+        .ordering-target h4, .ordering-source h4 { font-size: 0.9rem; color: var(--accent-purple); margin-bottom: 0.75rem; }
+        .order-slots { display: flex; flex-direction: column; gap: 0.5rem; }
+        .order-slot { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: var(--bg-tertiary); border-radius: 6px; min-height: 50px; }
+        .slot-number { width: 28px; height: 28px; background: var(--accent-purple); color: var(--bg-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; flex-shrink: 0; }
+        .slot-dropzone { flex: 1; min-height: 36px; border: 2px dashed var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .slot-dropzone.drag-over { border-color: var(--accent-blue); background: rgba(88, 166, 255, 0.1); }
+        .slot-dropzone .order-item { margin: 0; width: 100%; }
+        .slot-dropzone.correct { border-color: var(--accent-green); border-style: solid; }
+        .slot-dropzone.incorrect { border-color: var(--accent-red); border-style: solid; }
+        .order-items { display: flex; flex-direction: column; gap: 0.5rem; min-height: 150px; padding: 0.5rem; background: var(--bg-tertiary); border-radius: 8px; }
+        .order-item { padding: 0.6rem 1rem; background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: 6px; cursor: grab; font-size: 0.85rem; transition: all 0.2s; user-select: none; }
+        .order-item:hover { border-color: var(--accent-blue); }
+        .order-item.dragging { opacity: 0.5; cursor: grabbing; }
+        .order-item code { font-family: 'JetBrains Mono', monospace; background: none; padding: 0; }
+        .order-item.correct { border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
+        .order-item.incorrect { border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
+
+        @media (max-width: 768px) { 
+            .nav-content { flex-direction: column; gap: 1rem; } 
+            .main-content { padding: 8rem 1rem 2rem; } 
+            h1 { font-size: 1.75rem; } 
+            .quiz-header { flex-direction: column; text-align: center; }
+            .ordering-container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="nav-title">📦 Git Stash, Sync & Merge - DevNet Expert</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
+                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+                <a href="docs/stash_sync_merge.md" class="nav-tab" target="_blank">📄 Lab Guide</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- ==================== SECTION 1: LEARN ==================== -->
+        <section id="learn" class="section active">
+            <h1>Git Stash, Sync (Rebase) & Merge — Practice Lab</h1>
+            <p class="intro-text">Master git stash for interruptions, rebase for syncing, and merge for delivery — CCIE DevNet Expert style.</p>
+
+            <div class="tip-box">
+                <strong>📂 Lab path:</strong> <code>~/DevnetExpert/mock3/design/git-ops</code><br>
+                <strong>Setup:</strong> Nested <code>.git</code> inside parent DevnetExpert repo, excluded via <code>../design/.gitignore</code> → <code>/git-ops/.git/</code>
+            </div>
+
+            <div class="golden-box">
+                <strong>🎯 Golden Rule: Rebase to sync, merge to deliver. Break things on your branch, not on main.</strong>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="step-card">
+                <h3><span class="step-number">1</span> Initialize and First Commit on Main</h3>
+<pre><span class="command">cd</span> ~/DevnetExpert/mock3/design/git-ops
+<span class="command">git init</span>
+
+<span class="command">cat</span> > app.py << <span class="flag">'EOF'</span>
+<span class="comment"># Network Automation App</span>
+import os
+def main():
+    print("App started")
+if __name__ == "__main__":
+    main()
+<span class="flag">EOF</span>
+
+<span class="command">git add</span> app.py
+<span class="command">git commit</span> -m "Initial app.py on main"</pre>
+                <div class="graph-box">* cbe79d1 (main) Initial app.py on main</div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card">
+                <h3><span class="step-number">2</span> Create Feature Branch and Start Working</h3>
+<pre><span class="command">git checkout</span> -b feature-vlan
+
+<span class="comment"># Append a function to app.py (>> = append, > = overwrite)</span>
+<span class="command">cat</span> >> app.py << <span class="flag">'EOF'</span>
+def configure_vlan(vlan_id, name):
+    print(f"Configuring VLAN {vlan_id}: {name}")
+    # TODO: add NETCONF call here
+<span class="flag">EOF</span>
+
+<span class="comment"># Create a new untracked file</span>
+<span class="command">cat</span> > vlan_data.yaml << <span class="flag">'EOF'</span>
+vlans:
+  - id: 100
+    name: MGMT
+  - id: 200
+    name: DATA
+<span class="flag">EOF</span>
+
+<span class="command">git status</span></pre>
+                <p>At this point you have:</p>
+                <ul>
+                    <li><code>app.py</code> — <strong>modified</strong> (tracked, changes not staged)</li>
+                    <li><code>vlan_data.yaml</code> — <strong>untracked</strong> (new file, Git doesn't know about it yet)</li>
+                </ul>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+                <h3><span class="step-number">3</span> Stash Everything (Urgent Work Incoming)</h3>
+<pre><span class="command">git stash push</span> <span class="flag">-u</span> -m "WIP vlan feature including untracked"</pre>
+                <div class="warning-box">
+                    <strong>⚠️ Critical:</strong> The <code>-u</code> flag is required — without it, <code>vlan_data.yaml</code> stays behind!
+                </div>
+<pre><span class="comment"># Verify everything is clean</span>
+<span class="command">git status</span>
+<span class="output"># nothing to commit, working tree clean</span>
+
+<span class="command">ls</span>
+<span class="output"># Only app.py — vlan_data.yaml is stashed too</span>
+
+<span class="command">git stash list</span>
+<span class="output"># stash@{0}: On feature-vlan: WIP vlan feature including untracked</span></pre>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card">
+                <h3><span class="step-number">4</span> Do the Urgent Hotfix on Main</h3>
+<pre><span class="command">git checkout</span> main
+
+<span class="comment"># Quick edit (sed = command-line find-and-replace)</span>
+<span class="command">sed</span> -i 's/print("App started")/print("App started v1.1 - hotfix")/' app.py
+
+<span class="command">git add</span> app.py
+<span class="command">git commit</span> -m "Hotfix: version bump"</pre>
+                <p>Graph now shows <strong>divergence</strong> — main has a commit that feature doesn't:</p>
+                <div class="graph-box">      b7c549d  feature-vlan (stashed, no new commits yet)
+     /
+cbe79d1 --- 36ff161  main (Hotfix)</div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="step-card">
+                <h3><span class="step-number">5</span> Return to Feature and Restore Stash</h3>
+<pre><span class="command">git checkout</span> feature-vlan
+
+<span class="comment"># Method A: pop (restore + remove from stash)</span>
+<span class="command">git stash pop</span>
+
+<span class="comment"># Method B: apply (restore + keep in stash)</span>
+<span class="command">git stash apply</span>        <span class="comment"># then manually: git stash drop</span></pre>
+                <p>Stage and commit the restored work:</p>
+<pre><span class="command">git add</span> .
+<span class="command">git commit</span> -m "staging files after stash in feature-vlan"</pre>
+            </div>
+
+            <!-- Step 6 -->
+            <div class="step-card">
+                <h3><span class="step-number">6</span> Multiple Stashes (Exam Edge Case)</h3>
+                <p>Git stash is a <strong>stack</strong> (LIFO — last in, first out):</p>
+<pre><span class="command">echo</span> "# change 1" >> app.py
+<span class="command">git stash push</span> -m "change-1"
+
+<span class="command">echo</span> "# change 2" >> app.py
+<span class="command">git stash push</span> -m "change-2"
+
+<span class="command">git stash list</span>
+<span class="output"># stash@{0}: On feature-vlan: change-2    ← most recent (top)</span>
+<span class="output"># stash@{1}: On feature-vlan: change-1    ← older (bottom)</span>
+
+<span class="comment"># Apply a specific stash by index</span>
+<span class="command">git stash apply</span> stash@{1}     <span class="comment"># Gets change-1, skips change-2</span>
+
+<span class="comment"># View contents without applying</span>
+<span class="command">git stash show</span> stash@{0}
+
+<span class="comment"># Drop individually</span>
+<span class="command">git stash drop</span> stash@{0}</pre>
+            </div>
+
+            <!-- Git Stash Command Reference -->
+            <h2>📋 Git Stash — Command Reference</h2>
+            <table>
+                <thead><tr><th>Command</th><th>What It Does</th></tr></thead>
+                <tbody>
+                    <tr><td><code>git stash</code></td><td>Save tracked modified/staged files to the stash stack</td></tr>
+                    <tr><td><code>git stash push -m "msg"</code></td><td>Same as above, with a descriptive label</td></tr>
+                    <tr><td><code>git stash push -u -m "msg"</code></td><td>Stash tracked + <strong>untracked</strong> files</td></tr>
+                    <tr><td><code>git stash push -a -m "msg"</code></td><td>Stash tracked + untracked + <strong>ignored</strong> files</td></tr>
+                    <tr><td><code>git stash list</code></td><td>Show all stash entries</td></tr>
+                    <tr><td><code>git stash show</code></td><td>Show file diff summary of latest stash</td></tr>
+                    <tr><td><code>git stash show -p</code></td><td>Show full patch/diff of latest stash</td></tr>
+                    <tr><td><code>git stash pop</code></td><td>Restore latest stash <strong>and remove</strong> it from stack</td></tr>
+                    <tr><td><code>git stash apply</code></td><td>Restore latest stash <strong>but keep</strong> it in stack</td></tr>
+                    <tr><td><code>git stash apply stash@{N}</code></td><td>Restore a specific stash entry by index</td></tr>
+                    <tr><td><code>git stash drop</code></td><td>Delete latest stash without applying</td></tr>
+                    <tr><td><code>git stash drop stash@{N}</code></td><td>Delete a specific stash entry</td></tr>
+                    <tr><td><code>git stash clear</code></td><td>Delete <strong>all</strong> stash entries</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Exam-Relevant: What Restores Stashed Work?</h3>
+            <table>
+                <thead><tr><th>Choice</th><th>Restores?</th><th>Why</th></tr></thead>
+                <tbody>
+                    <tr><td><code>git stash pop</code></td><td><span class="check">✅ Yes</span></td><td>Restores + removes from stack</td></tr>
+                    <tr><td><code>git stash apply</code></td><td><span class="check">✅ Yes</span></td><td>Restores + keeps in stack</td></tr>
+                    <tr><td><code>git stash</code></td><td><span class="cross">❌ No</span></td><td>Only <strong>saves</strong> — doesn't restore</td></tr>
+                    <tr><td><code>git apply</code></td><td><span class="cross">❌ No</span></td><td>Applies <strong>patch files</strong> (format-patch), not stash</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Stash Flag Cheatsheet</h3>
+            <table>
+                <thead><tr><th>Flag</th><th>Stashes</th></tr></thead>
+                <tbody>
+                    <tr><td><em>(no flag)</em></td><td>Tracked modified/staged only</td></tr>
+                    <tr><td><code>-u</code> / <code>--include-untracked</code></td><td>Tracked + untracked</td></tr>
+                    <tr><td><code>-a</code> / <code>--all</code></td><td>Tracked + untracked + ignored</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Step 7 -->
+            <div class="step-card">
+                <h3><span class="step-number">7</span> Sync Feature with Main (Rebase)</h3>
+                
+                <h4>Why Sync First?</h4>
+                <p>After the hotfix, main has moved ahead. Feature-vlan doesn't have the hotfix:</p>
+                <div class="graph-box">BEFORE rebase (branches diverged):
+
+      b7c549d --- d7b6d07    feature-vlan
+     /
+cbe79d1 --- 36ff161           main (Hotfix)</div>
+                <p>If you merge feature into main now, you risk conflicts at the worst time — on the shared <code>main</code> branch. <strong>Sync first, break things on your own branch.</strong></p>
+
+                <h4>Rebase = Replay Your Commits on Top of Latest Main</h4>
+<pre><span class="command">git checkout</span> feature-vlan
+<span class="command">git rebase</span> main</pre>
+                <p>Git takes your feature commits, temporarily removes them, fast-forwards to main's tip, then <strong>replays</strong> your commits one by one on top:</p>
+                <div class="graph-box">AFTER rebase (linear history):
+
+cbe79d1 --- 36ff161 --- cfefd77 --- ea937f1    feature-vlan
+                ↑
+              main</div>
+                <p>Notice commit hashes changed — rebase creates <strong>new</strong> commits because the parent changed:</p>
+                <table>
+                    <thead><tr><th>Before Rebase</th><th>After Rebase</th><th>Same Content?</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>b7c549d</code></td><td><code>cfefd77</code></td><td>Yes — same changes, new hash</td></tr>
+                        <tr><td><code>d7b6d07</code></td><td><code>ea937f1</code></td><td>Yes — same changes, new hash</td></tr>
+                    </tbody>
+                </table>
+                <p>Feature-vlan now has the hotfix <strong>and</strong> sits cleanly ahead of main.</p>
+<pre><span class="command">git log</span> --oneline --graph --all
+<span class="output">* ea937f1 (HEAD -> feature-vlan) adding test for stash list</span>
+<span class="output">* cfefd77 staging files after stash in feature-vlan</span>
+<span class="output">* 36ff161 (main) Hotfix: version bump</span>
+<span class="output">* cbe79d1 Initial app.py on main</span></pre>
+            </div>
+
+            <!-- Step 8 -->
+            <div class="step-card">
+                <h3><span class="step-number">8</span> Merge Feature into Main (Deliver)</h3>
+                
+                <h4>What Merge Does Here</h4>
+                <p>Main is directly behind feature-vlan — a straight line. Git doesn't need to create a merge commit, it just moves the <code>main</code> pointer forward. This is called a <strong>fast-forward</strong>:</p>
+<pre><span class="command">git checkout</span> main
+<span class="command">git merge</span> feature-vlan
+<span class="output"># Fast-forward</span></pre>
+                <div class="graph-box">BEFORE merge:
+cbe79d1 --- 36ff161 --- cfefd77 --- ea937f1
+                ↑                       ↑
+              main              feature-vlan
+
+AFTER fast-forward:
+cbe79d1 --- 36ff161 --- cfefd77 --- ea937f1
+                                        ↑
+                                 main, feature-vlan</div>
+                <p>No 5th merge commit — main just "caught up."</p>
+
+                <h4>When Does Git Create a Merge Commit?</h4>
+                <p>Only when branches <strong>diverge</strong> (both have unique commits the other doesn't):</p>
+                <div class="graph-box">          F1 --- F2     feature
+         /
+M1 --- M2 --- M3       main    ← main has M3 that feature doesn't
+
+git merge feature →
+
+          F1 --- F2
+         /           \
+M1 --- M2 --- M3 --- M    ← merge commit required (5th commit)</div>
+
+                <h4>Force a Merge Commit (Even on Straight Line)</h4>
+<pre><span class="command">git merge</span> <span class="flag">--no-ff</span> feature-vlan</pre>
+                <p>Useful when you want history to explicitly show "a feature was integrated here."</p>
+            </div>
+
+            <!-- Step 9 -->
+            <div class="step-card">
+                <h3><span class="step-number">9</span> Cleanup</h3>
+<pre><span class="command">git branch</span> -d feature-vlan
+<span class="command">git stash clear</span>
+<span class="command">git log</span> --oneline --graph</pre>
+                <p>Final clean graph:</p>
+                <div class="graph-box">* ea937f1 (HEAD -> main) adding test for stash list
+* cfefd77 staging files after stash in feature-vlan
+* 36ff161 Hotfix: version bump
+* cbe79d1 Initial app.py on main</div>
+            </div>
+
+            <!-- Summary -->
+            <h2>📋 Summary — The Complete Workflow</h2>
+            <div class="workflow-summary">
+                <h3>🔄 End-to-End Workflow</h3>
+<pre>1.  <span class="command">git checkout</span> -b feature         <span class="comment"># Create feature branch</span>
+2.  <span class="comment">(work, edit files)</span>              <span class="comment"># Make changes</span>
+3.  <span class="command">git stash push</span> -u -m "WIP"     <span class="comment"># Urgent interrupt — stash everything</span>
+4.  <span class="command">git checkout</span> main               <span class="comment"># Handle urgent work</span>
+5.  <span class="comment">(hotfix, commit)</span>                <span class="comment"># Fix and commit on main</span>
+6.  <span class="command">git checkout</span> feature            <span class="comment"># Return to feature</span>
+7.  <span class="command">git stash pop</span>                   <span class="comment"># Restore stashed work</span>
+8.  <span class="command">git add</span> . && <span class="command">git commit</span>         <span class="comment"># Commit the feature work</span>
+9.  <span class="command">git rebase</span> main                 <span class="comment"># Sync — replay feature on top of main</span>
+10. <span class="command">git checkout</span> main              <span class="comment"># Switch to main</span>
+11. <span class="command">git merge</span> feature              <span class="comment"># Deliver — fast-forward merge</span>
+12. <span class="command">git branch</span> -d feature          <span class="comment"># Cleanup</span></pre>
+            </div>
+
+            <h3>Workflow Color Key</h3>
+            <ul>
+                <li>🟡 <strong>Yellow</strong> — Stash (interrupt)</li>
+                <li>🔴 <strong>Red</strong> — Divergence (problem)</li>
+                <li>🔵 <strong>Blue</strong> — Rebase/Sync (fix the divergence)</li>
+                <li>🟢 <strong>Green</strong> — Merge/Deliver (done)</li>
+                <li>⚪ <strong>Grey</strong> — Cleanup</li>
+            </ul>
+
+            <h2>📊 When to Use What</h2>
+            <table>
+                <thead><tr><th>Task</th><th>Command</th><th>Why</th></tr></thead>
+                <tbody>
+                    <tr><td>Sync feature with main</td><td><code>git rebase main</code></td><td>Linear history, catches conflicts on YOUR branch</td></tr>
+                    <tr><td>Deliver feature to main</td><td><code>git merge feature</code></td><td>Integrates finished work</td></tr>
+                    <tr><td>Shared branch (team)</td><td><code>git merge main</code> (not rebase)</td><td>Rebase rewrites history — dangerous if others have the branch</td></tr>
+                    <tr><td>Force merge commit</td><td><code>git merge --no-ff feature</code></td><td>Preserves "feature delivered here" marker in history</td></tr>
+                </tbody>
+            </table>
+
+            <div class="golden-box">
+                <strong>🎯 Golden Rule: Rebase to sync, merge to deliver. Break things on your branch, not on main.</strong>
+            </div>
+
+        </section>
+
+        <!-- ==================== SECTION 2: MCQ PRACTICE ==================== -->
+        <section id="quiz" class="section">
+            <h1>MCQ Practice</h1>
+            <p class="intro-text">20 scenario-based questions including 5 end-to-end ordering workflow questions — CCIE Automation style.</p>
+
+            <div class="quiz-header">
+                <div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <span class="score-display">
+                        Score: <span class="score-correct" id="correctCount">0</span>
+                        <span class="score-total">/ <span id="totalAnswered">0</span> answered</span>
+                    </span>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
+                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+                </div>
+            </div>
+
+            <div id="quizContainer"></div>
+        </section>
+    </main>
+
+    <script>
+        const questions = [
+            // ===== Q1-Q15: Standard MCQ Questions =====
+            {
+                id: 1, type: "single", count: 1, category: "stash basics",
+                scenario: "You're working on a feature branch with modified tracked files and a new untracked file. An urgent bug needs fixing on main. You need to save ALL your work before switching.",
+                question: "Which command saves both tracked AND untracked files to stash?",
+                options: [
+                    { text: "git stash", correct: false },
+                    { text: "git stash push -u -m 'WIP'", correct: true },
+                    { text: "git stash push -m 'WIP'", correct: false },
+                    { text: "git stash save --all", correct: false }
+                ],
+                explanation: "The -u (--include-untracked) flag is required to stash untracked files. Without it, new files are left behind.",
+                notes: ["A → ❌ 'git stash' only saves tracked modified/staged files, NOT untracked", "C → ❌ 'git stash push -m' adds a message but still doesn't include untracked files", "D → ❌ 'git stash save' is deprecated; use 'git stash push' instead"]
+            },
+            {
+                id: 2, type: "single", count: 1, category: "stash restore",
+                scenario: "You stashed work earlier and now want to restore it. You want to keep the stash entry in case something goes wrong.",
+                question: "Which command restores stash BUT keeps it in the stack?",
+                options: [
+                    { text: "git stash pop", correct: false },
+                    { text: "git stash apply", correct: true },
+                    { text: "git stash show", correct: false },
+                    { text: "git apply stash", correct: false }
+                ],
+                explanation: "git stash apply restores the stash but keeps it in the stack. git stash pop restores AND removes it.",
+                notes: ["A → ❌ 'git stash pop' restores AND removes from stack — you lose the backup", "C → ❌ 'git stash show' only displays what's in the stash, doesn't restore", "D → ❌ 'git apply stash' is invalid syntax; 'git apply' is for patch files"]
+            },
+            {
+                id: 3, type: "multi", count: 2, category: "stash flags",
+                scenario: "A DevNet exam question asks about git stash flags and what they include.",
+                question: "Which TWO statements about stash flags are correct?",
+                options: [
+                    { text: "-u includes untracked files in the stash", correct: true },
+                    { text: "-a includes only tracked files", correct: false },
+                    { text: "-a includes tracked, untracked, AND ignored files", correct: true },
+                    { text: "No flag is needed to include untracked files", correct: false },
+                    { text: "-u and -a are mutually exclusive", correct: false },
+                    { text: "-m flag automatically includes untracked files", correct: false }
+                ],
+                explanation: "-u = tracked + untracked. -a = tracked + untracked + ignored. Without flags, only tracked modified/staged files are stashed.",
+                notes: ["B → ❌ '-a' (--all) includes MORE, not fewer files", "D → ❌ You MUST use -u or -a to include untracked files", "E → ❌ -a is a superset of -u, not mutually exclusive", "F → ❌ '-m' only adds a message, doesn't change what's stashed"]
+            },
+            {
+                id: 4, type: "single", count: 1, category: "rebase purpose",
+                scenario: "You're on feature-vlan branch. Main has received a hotfix that your branch doesn't have. You want to get the hotfix into your feature branch with a clean linear history.",
+                question: "Which command syncs your feature branch with main while maintaining linear history?",
+                options: [
+                    { text: "git merge main", correct: false },
+                    { text: "git rebase main", correct: true },
+                    { text: "git pull main", correct: false },
+                    { text: "git cherry-pick main", correct: false }
+                ],
+                explanation: "git rebase main replays your feature commits on top of main's latest commit, creating linear history. Merge would create an extra merge commit.",
+                notes: ["A → ❌ 'git merge main' would create a merge commit, not linear history", "C → ❌ 'git pull main' is invalid syntax; pull fetches + merges from remote", "D → ❌ 'git cherry-pick main' would pick main's latest commit only, not sync"]
+            },
+            {
+                id: 5, type: "multi", count: 2, category: "rebase behavior",
+                scenario: "A team member asks about the effects of running 'git rebase main' on a feature branch.",
+                question: "Which TWO statements about rebase are TRUE?",
+                options: [
+                    { text: "Rebase creates new commits with different hashes", correct: true },
+                    { text: "Rebase preserves original commit hashes", correct: false },
+                    { text: "Rebase replays your commits on top of the target branch", correct: true },
+                    { text: "Rebase is safe to use on shared/public branches", correct: false },
+                    { text: "Rebase always creates a merge commit", correct: false },
+                    { text: "Rebase modifies the remote repository automatically", correct: false }
+                ],
+                explanation: "Rebase creates NEW commits (different hashes) by replaying your commits on top of the target. Never rebase shared branches as it rewrites history.",
+                notes: ["B → ❌ Rebase changes parent commits, so hashes MUST change", "D → ❌ Rebase rewrites history — dangerous on shared branches", "E → ❌ Rebase creates LINEAR history, no merge commit", "F → ❌ Rebase only affects local repo until you push"]
+            },
+            {
+                id: 6, type: "single", count: 1, category: "fast-forward",
+                scenario: "After rebasing feature-vlan onto main, you switch to main and run 'git merge feature-vlan'. Git shows 'Fast-forward'.",
+                question: "What does 'Fast-forward' mean in this context?",
+                options: [
+                    { text: "Git created a merge commit with two parents", correct: false },
+                    { text: "Git moved the main pointer forward, no merge commit created", correct: true },
+                    { text: "Git skipped some commits during the merge", correct: false },
+                    { text: "Git automatically resolved conflicts", correct: false }
+                ],
+                explanation: "Fast-forward means main was directly behind feature-vlan (linear), so Git just moved the main pointer forward. No merge commit needed.",
+                notes: ["A → ❌ Fast-forward specifically means NO merge commit was created", "C → ❌ All commits are included, none skipped", "D → ❌ Fast-forward only happens when there are NO conflicts (linear history)"]
+            },
+            {
+                id: 7, type: "single", count: 1, category: "merge --no-ff",
+                scenario: "Your team wants every feature integration to show explicitly in the git history, even when fast-forward is possible.",
+                question: "Which command forces a merge commit even when fast-forward is possible?",
+                options: [
+                    { text: "git merge feature --force", correct: false },
+                    { text: "git merge --no-ff feature", correct: true },
+                    { text: "git merge --commit feature", correct: false },
+                    { text: "git merge -m 'merge' feature", correct: false }
+                ],
+                explanation: "--no-ff (no fast-forward) forces Git to create a merge commit even when the history is linear. Useful for preserving feature branch history.",
+                notes: ["A → ❌ '--force' is not a valid merge option", "C → ❌ '--commit' is default behavior, doesn't force merge commit", "D → ❌ '-m' adds a message but doesn't prevent fast-forward"]
+            },
+            {
+                id: 8, type: "multi", count: 3, category: "stash stack",
+                scenario: "You have multiple stash entries and need to manage them. 'git stash list' shows stash@{0}, stash@{1}, stash@{2}.",
+                question: "Which THREE commands correctly interact with the stash stack?",
+                options: [
+                    { text: "git stash apply stash@{1}", correct: true },
+                    { text: "git stash drop stash@{2}", correct: true },
+                    { text: "git stash pop stash@{0}", correct: true },
+                    { text: "git stash remove stash@{1}", correct: false },
+                    { text: "git stash delete stash@{0}", correct: false },
+                    { text: "git stash restore stash@{2}", correct: false }
+                ],
+                explanation: "Valid stash commands: apply (restore+keep), drop (delete), pop (restore+remove). 'remove', 'delete', 'restore' are not valid stash subcommands.",
+                notes: ["D → ❌ 'git stash remove' is not a valid command; use 'drop'", "E → ❌ 'git stash delete' is not valid; use 'drop'", "F → ❌ 'git stash restore' is not valid; use 'apply' or 'pop'"]
+            },
+            {
+                id: 9, type: "single", count: 1, category: "stash vs apply",
+                scenario: "A junior engineer is confused about 'git apply' vs 'git stash apply'.",
+                question: "What does 'git apply' (without 'stash') do?",
+                options: [
+                    { text: "Restores the latest stash entry", correct: false },
+                    { text: "Applies changes from a patch file created by format-patch", correct: true },
+                    { text: "Applies the last commit to another branch", correct: false },
+                    { text: "Applies staged changes to the working directory", correct: false }
+                ],
+                explanation: "'git apply' applies patch files (from git format-patch or diff). 'git stash apply' restores stashed changes. They are different commands!",
+                notes: ["A → ❌ That's 'git stash apply', not 'git apply'", "C → ❌ That would be 'git cherry-pick'", "D → ❌ Staged changes are already in working directory"]
+            },
+            {
+                id: 10, type: "single", count: 1, category: "rebase warning",
+                scenario: "You pushed your feature branch to remote. A colleague has already pulled it and started working on top of your commits.",
+                question: "Should you rebase this feature branch?",
+                options: [
+                    { text: "Yes, rebase is always safe", correct: false },
+                    { text: "No, rebasing a shared branch rewrites history and causes problems", correct: true },
+                    { text: "Yes, but only with --force flag", correct: false },
+                    { text: "No, use cherry-pick instead of rebase", correct: false }
+                ],
+                explanation: "Never rebase shared/public branches! Rebase rewrites commit history, which causes conflicts for anyone who already has the old commits.",
+                notes: ["A → ❌ Rebase is NOT safe on shared branches", "C → ❌ --force makes it worse by overwriting remote history", "D → ❌ Cherry-pick isn't the alternative; merge is"]
+            },
+            {
+                id: 11, type: "multi", count: 2, category: "merge commit",
+                scenario: "You need to understand when Git creates a merge commit vs fast-forward.",
+                question: "In which TWO situations does Git create a merge commit?",
+                options: [
+                    { text: "When branches have diverged (both have unique commits)", correct: true },
+                    { text: "When using git merge --no-ff", correct: true },
+                    { text: "When the target branch is directly behind the source", correct: false },
+                    { text: "When there are no conflicts", correct: false },
+                    { text: "When merging from a remote branch", correct: false },
+                    { text: "When using git merge --squash", correct: false }
+                ],
+                explanation: "Merge commits are created when: (1) branches diverged (can't fast-forward), or (2) --no-ff flag is used. --squash doesn't create a merge commit.",
+                notes: ["C → ❌ If target is directly behind, Git fast-forwards (no merge commit)", "D → ❌ No conflicts doesn't determine merge commit; branch structure does", "E → ❌ Remote vs local doesn't matter; branch divergence does", "F → ❌ '--squash' combines commits but does NOT create merge commit"]
+            },
+            {
+                id: 12, type: "single", count: 1, category: "stash clear",
+                scenario: "You want to delete all stash entries at once without restoring any of them.",
+                question: "Which command deletes ALL stash entries?",
+                options: [
+                    { text: "git stash drop --all", correct: false },
+                    { text: "git stash clear", correct: true },
+                    { text: "git stash reset", correct: false },
+                    { text: "git stash delete *", correct: false }
+                ],
+                explanation: "'git stash clear' removes all stash entries. There's no --all flag for drop, and 'reset' and 'delete' aren't valid stash subcommands.",
+                notes: ["A → ❌ 'git stash drop --all' is not valid syntax", "C → ❌ 'git stash reset' doesn't exist", "D → ❌ 'git stash delete' is not a valid command"]
+            },
+            {
+                id: 13, type: "single", count: 1, category: "stash show",
+                scenario: "You want to see the full diff of what's in your latest stash without applying it.",
+                question: "Which command shows the complete diff of the latest stash?",
+                options: [
+                    { text: "git stash show", correct: false },
+                    { text: "git stash show -p", correct: true },
+                    { text: "git stash diff", correct: false },
+                    { text: "git diff stash", correct: false }
+                ],
+                explanation: "'git stash show' shows a summary. Add -p (--patch) to see the full diff. 'git stash diff' doesn't exist.",
+                notes: ["A → ❌ 'git stash show' only shows file summary, not full diff", "C → ❌ 'git stash diff' is not a valid command", "D → ❌ 'git diff stash' is not valid syntax"]
+            },
+            {
+                id: 14, type: "single", count: 1, category: "stash lifo",
+                scenario: "You stashed 'change-1', then stashed 'change-2'. You run 'git stash pop'.",
+                question: "Which stash entry is restored?",
+                options: [
+                    { text: "change-1 (first in, first out)", correct: false },
+                    { text: "change-2 (last in, first out)", correct: true },
+                    { text: "Both are restored together", correct: false },
+                    { text: "Neither, you must specify which one", correct: false }
+                ],
+                explanation: "Git stash is a LIFO stack (Last In, First Out). The most recent stash (change-2) is at stash@{0} and is restored first.",
+                notes: ["A → ❌ Stash is LIFO (stack), not FIFO (queue)", "C → ❌ Only one stash entry is restored at a time", "D → ❌ Without specifying, stash@{0} (latest) is used"]
+            },
+            {
+                id: 15, type: "multi", count: 2, category: "workflow best practices",
+                scenario: "Your team is establishing Git workflow guidelines for feature development.",
+                question: "Which TWO practices are recommended for feature branch workflow?",
+                options: [
+                    { text: "Rebase feature onto main before merging to main", correct: true },
+                    { text: "Rebase main onto feature before merging", correct: false },
+                    { text: "Merge feature into main to deliver completed work", correct: true },
+                    { text: "Always use git push --force after rebase", correct: false },
+                    { text: "Rebase shared branches to keep history clean", correct: false },
+                    { text: "Delete feature branch before merging", correct: false }
+                ],
+                explanation: "Best practice: rebase feature onto main (sync), then merge feature into main (deliver). Never force-push shared branches or rebase them.",
+                notes: ["B → ❌ You rebase YOUR feature onto main, not main onto feature", "D → ❌ Force-push after rebase is dangerous on shared branches", "E → ❌ Never rebase shared branches", "F → ❌ Delete feature AFTER merging, not before"]
+            },
+
+            // ===== Q16-Q20: ORDERING WORKFLOW QUESTIONS =====
+            {
+                id: 16, type: "ordering", category: "🔄 Workflow: Stash Interrupt",
+                scenario: "You're working on feature-vlan with modified files and a new untracked file (vlan_data.yaml). An urgent hotfix is needed on main. Complete the workflow to handle the interrupt and return.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git stash push -u -m 'WIP vlan'", order: 1 },
+                    { id: "s2", text: "git checkout main", order: 2 },
+                    { id: "s3", text: "# Edit file, git add, git commit (hotfix)", order: 3 },
+                    { id: "s4", text: "git checkout feature-vlan", order: 4 },
+                    { id: "s5", text: "git stash pop", order: 5 }
+                ],
+                explanation: "Interrupt workflow: Stash everything (-u for untracked) → switch to main → fix bug → return to feature → restore stash with pop.",
+                notes: ["Step 1 → Must stash BEFORE switching branches (or lose uncommitted work)", "Step 2 → Switch to main to handle the urgent fix", "Step 3 → Do the hotfix work and commit it", "Step 4 → Return to your feature branch", "Step 5 → Restore your stashed work with pop"]
+            },
+            {
+                id: 17, type: "ordering", category: "🔄 Workflow: Rebase Sync + Merge Deliver",
+                scenario: "Your feature-vlan branch is behind main (main received a hotfix). You need to sync your feature branch with main using rebase, then deliver to main with merge.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git checkout feature-vlan", order: 1 },
+                    { id: "s2", text: "git rebase main", order: 2 },
+                    { id: "s3", text: "git checkout main", order: 3 },
+                    { id: "s4", text: "git merge feature-vlan", order: 4 }
+                ],
+                explanation: "Sync then deliver: Be on feature → rebase onto main (sync) → switch to main → merge feature (deliver). Results in clean linear history with fast-forward merge.",
+                notes: ["Step 1 → Must be on feature branch to rebase it", "Step 2 → Rebase replays feature commits on top of main's latest", "Step 3 → Switch to main (target branch for merge)", "Step 4 → Merge feature into main (fast-forward since linear)"]
+            },
+            {
+                id: 18, type: "ordering", category: "🔄 Workflow: Complete Feature Lifecycle",
+                scenario: "You need to create a new feature branch, develop it, handle an interrupt with stash, sync with main after a hotfix, deliver to main, and cleanup.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git checkout -b feature-api", order: 1 },
+                    { id: "s2", text: "# Edit files (feature work)", order: 2 },
+                    { id: "s3", text: "git stash push -u -m 'WIP'", order: 3 },
+                    { id: "s4", text: "git checkout main && # hotfix && git commit", order: 4 },
+                    { id: "s5", text: "git checkout feature-api && git stash pop", order: 5 },
+                    { id: "s6", text: "git add . && git commit -m 'feature done'", order: 6 },
+                    { id: "s7", text: "git rebase main", order: 7 },
+                    { id: "s8", text: "git checkout main && git merge feature-api", order: 8 },
+                    { id: "s9", text: "git branch -d feature-api", order: 9 }
+                ],
+                explanation: "Complete lifecycle: Create branch → work → stash (interrupt) → hotfix → restore stash → commit feature → rebase sync → merge deliver → cleanup.",
+                notes: ["Steps 1-2 → Create and work on feature branch", "Steps 3-5 → Handle interrupt with stash workflow", "Steps 6-7 → Commit feature work and sync with main", "Steps 8-9 → Deliver to main and cleanup"]
+            },
+            {
+                id: 19, type: "ordering", category: "🔄 Workflow: Multiple Stash Management",
+                scenario: "You have three stash entries (stash@{0}=change-3, stash@{1}=change-2, stash@{2}=change-1). You want to restore change-2 specifically (stash@{1}), verify it works, then clean up all stashes.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git stash list", order: 1 },
+                    { id: "s2", text: "git stash show -p stash@{1}", order: 2 },
+                    { id: "s3", text: "git stash apply stash@{1}", order: 3 },
+                    { id: "s4", text: "git status", order: 4 },
+                    { id: "s5", text: "git stash clear", order: 5 }
+                ],
+                explanation: "Multiple stash workflow: List to see all → show -p to preview → apply specific stash → verify with status → clear all when done.",
+                notes: ["Step 1 → git stash list shows all entries with indices", "Step 2 → Preview the stash content before applying", "Step 3 → Use apply (not pop) to keep backup until verified", "Step 4 → Verify the restored changes look correct", "Step 5 → Clear all stashes once confirmed"]
+            },
+            {
+                id: 20, type: "ordering", category: "🔄 Workflow: Init → Feature → Hotfix → Sync → Deliver",
+                scenario: "Starting from scratch: Initialize repo, create feature branch, handle hotfix interrupt, sync feature with updated main, deliver, and cleanup.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git init && git add . && git commit -m 'Initial'", order: 1 },
+                    { id: "s2", text: "git checkout -b feature-vlan", order: 2 },
+                    { id: "s3", text: "# Edit app.py, create vlan_data.yaml", order: 3 },
+                    { id: "s4", text: "git stash push -u -m 'WIP vlan'", order: 4 },
+                    { id: "s5", text: "git checkout main", order: 5 },
+                    { id: "s6", text: "# Hotfix edit && git add && git commit", order: 6 },
+                    { id: "s7", text: "git checkout feature-vlan && git stash pop", order: 7 },
+                    { id: "s8", text: "git add . && git commit -m 'VLAN feature'", order: 8 },
+                    { id: "s9", text: "git rebase main", order: 9 },
+                    { id: "s10", text: "git checkout main && git merge feature-vlan", order: 10 },
+                    { id: "s11", text: "git branch -d feature-vlan && git stash clear", order: 11 }
+                ],
+                explanation: "Complete end-to-end: Init repo → create feature → work → stash interrupt → hotfix on main → restore stash → commit feature → rebase sync → merge deliver → cleanup branches and stash.",
+                notes: ["Steps 1-3 → Setup: init, create feature, start working", "Steps 4-6 → Interrupt: stash, switch to main, hotfix", "Steps 7-8 → Resume: restore stash, commit feature work", "Steps 9-10 → Sync + Deliver: rebase then merge", "Step 11 → Cleanup: delete branch and clear stash"]
+            }
+        ];
+
+        let answers = {}, submitted = {}, score = 0;
+        let orderState = {};
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = questions.map((q, idx) => {
+                if (q.type === 'ordering') return renderOrdering(q, idx);
+                return renderMultiChoice(q, idx);
+            }).join('');
+            
+            questions.filter(q => q.type === 'ordering').forEach(q => initOrdering(q.id));
+            updateProgress();
+        }
+
+        function renderMultiChoice(q, idx) {
+            const typeLabel = q.count === 1 ? 'Choose 1' : `Choose ${q.count}`;
+            return `
+                <div class="question-card" id="q${q.id}">
+                    <div class="question-header">
+                        <span class="question-number">Q${idx + 1} • ${q.category}</span>
+                        <span class="question-type">${typeLabel}</span>
+                    </div>
+                    <div class="scenario-box"><strong>Scenario:</strong> ${q.scenario}</div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="options-list">
+                        ${q.options.map((opt, i) => `
+                            <div class="option-item" data-qid="${q.id}" data-idx="${i}" onclick="selectOption(${q.id}, ${i}, '${q.type}', ${q.count})">
+                                <div class="option-checkbox">${String.fromCharCode(65 + i)}</div>
+                                <div class="option-text">${opt.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-btn" id="sub${q.id}" onclick="submitAnswer(${q.id})" disabled>Submit Answer</button>
+                    <div class="explanation" id="exp${q.id}">
+                        <div class="explanation-title">📖 Explanation</div>
+                        <div class="explanation-text">
+                            ${q.explanation}
+                            ${q.notes ? `<ul style="margin-top:10px; padding-left:20px;">${q.notes.map(n => `<li>${n}</li>`).join('')}</ul>` : ""}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOrdering(q, idx) {
+            const shuffled = [...q.steps].sort(() => Math.random() - 0.5);
+            return `
+                <div class="question-card" id="q${q.id}">
+                    <div class="question-header">
+                        <span class="question-number">Q${idx + 1} • ${q.category}</span>
+                        <span class="question-type">Order ${q.steps.length} Steps</span>
+                    </div>
+                    <div class="scenario-box"><strong>Scenario:</strong> ${q.scenario}</div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="ordering-container" id="order${q.id}">
+                        <div class="ordering-target">
+                            <h4>📋 Correct Order (drag here)</h4>
+                            <div class="order-slots" id="slots${q.id}">
+                                ${q.steps.map((_, i) => `
+                                    <div class="order-slot" data-position="${i + 1}" data-qid="${q.id}">
+                                        <span class="slot-number">${i + 1}</span>
+                                        <div class="slot-dropzone" data-pos="${i + 1}" data-qid="${q.id}"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="ordering-source">
+                            <h4>📦 Commands (drag to order)</h4>
+                            <div class="order-items" id="items${q.id}">
+                                ${shuffled.map(step => `
+                                    <div class="order-item" draggable="true" data-id="${step.id}" data-order="${step.order}" data-qid="${q.id}">
+                                        <code>${step.text}</code>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <button class="submit-btn" id="sub${q.id}" onclick="submitOrdering(${q.id})" disabled>Submit Answer</button>
+                    <div class="explanation" id="exp${q.id}">
+                        <div class="explanation-title">📖 Explanation</div>
+                        <div class="explanation-text">
+                            ${q.explanation}
+                            ${q.notes ? `<ul style="margin-top:10px; padding-left:20px;">${q.notes.map(n => `<li>${n}</li>`).join('')}</ul>` : ""}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initOrdering(qid) {
+            orderState[qid] = {};
+            const items = document.querySelectorAll(`.order-item[data-qid="${qid}"]`);
+            const slots = document.querySelectorAll(`.slot-dropzone[data-qid="${qid}"]`);
+            const source = document.getElementById(`items${qid}`);
+
+            items.forEach(item => {
+                item.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', item.dataset.id);
+                    item.classList.add('dragging');
+                });
+                item.addEventListener('dragend', () => item.classList.remove('dragging'));
+            });
+
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag-over'); });
+                slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+                slot.addEventListener('drop', e => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const itemId = e.dataTransfer.getData('text/plain');
+                    const item = document.querySelector(`.order-item[data-id="${itemId}"][data-qid="${qid}"]`);
+                    
+                    if (slot.children.length > 0) {
+                        const existing = slot.children[0];
+                        source.appendChild(existing);
+                        for (let pos in orderState[qid]) {
+                            if (orderState[qid][pos] === existing.dataset.id) delete orderState[qid][pos];
+                        }
+                    }
+                    
+                    slot.appendChild(item);
+                    orderState[qid][slot.dataset.pos] = itemId;
+                    checkOrderingComplete(qid);
+                });
+            });
+
+            source.addEventListener('dragover', e => e.preventDefault());
+            source.addEventListener('drop', e => {
+                e.preventDefault();
+                const itemId = e.dataTransfer.getData('text/plain');
+                const item = document.querySelector(`.order-item[data-id="${itemId}"][data-qid="${qid}"]`);
+                source.appendChild(item);
+                for (let pos in orderState[qid]) {
+                    if (orderState[qid][pos] === itemId) delete orderState[qid][pos];
+                }
+                checkOrderingComplete(qid);
+            });
+        }
+
+        function checkOrderingComplete(qid) {
+            const q = questions.find(x => x.id === qid);
+            const allFilled = Object.keys(orderState[qid]).length === q.steps.length;
+            document.getElementById(`sub${qid}`).disabled = !allFilled;
+        }
+
+        function submitOrdering(qid) {
+            if (submitted[qid]) return;
+            submitted[qid] = true;
+            const q = questions.find(x => x.id === qid);
+            let correctCount = 0;
+            
+            q.steps.forEach(step => {
+                const slot = document.querySelector(`.slot-dropzone[data-pos="${step.order}"][data-qid="${qid}"]`);
+                const item = slot.querySelector('.order-item');
+                if (item) {
+                    item.setAttribute('draggable', 'false');
+                    if (item.dataset.order === String(step.order)) {
+                        slot.classList.add('correct');
+                        item.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        slot.classList.add('incorrect');
+                        item.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            const isCorrect = correctCount === q.steps.length;
+            if (isCorrect) score++;
+            updateScoreDisplay();
+            markQuestion(qid, isCorrect);
+        }
+
+        function selectOption(qid, idx, type, count) {
+            if (submitted[qid]) return;
+            if (!answers[qid]) answers[qid] = [];
+            const i = answers[qid].indexOf(idx);
+            if (type === 'single') answers[qid] = [idx];
+            else {
+                if (i > -1) answers[qid].splice(i, 1);
+                else if (answers[qid].length < count) answers[qid].push(idx);
+                else { answers[qid].shift(); answers[qid].push(idx); }
+            }
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, j) => {
+                el.classList.toggle('selected', answers[qid]?.includes(j));
+            });
+            document.getElementById(`sub${qid}`).disabled = answers[qid].length !== count;
+        }
+
+        function submitAnswer(qid) {
+            if (submitted[qid]) return;
+            submitted[qid] = true;
+            const q = questions.find(x => x.id === qid);
+            const correct = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1);
+            const user = answers[qid] || [];
+            const isCorrect = user.length === q.count && user.every(i => correct.includes(i));
+            if (isCorrect) score++;
+            updateScoreDisplay();
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, i) => {
+                el.classList.add('disabled');
+                el.classList.remove('selected');
+                if (q.options[i].correct) el.classList.add('correct');
+                else if (user.includes(i)) el.classList.add('incorrect');
+            });
+            markQuestion(qid, isCorrect);
+        }
+
+        function markQuestion(qid, isCorrect) {
+            document.getElementById(`q${qid}`).classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            const btn = document.getElementById(`sub${qid}`);
+            btn.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+            btn.style.background = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
+            btn.disabled = true;
+            document.getElementById(`exp${qid}`).classList.add('show');
+            updateProgress();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('totalAnswered').textContent = Object.keys(submitted).length;
+        }
+
+        function updateProgress() {
+            document.getElementById('progressBar').style.width = `${(Object.keys(submitted).length / questions.length) * 100}%`;
+        }
+
+        function resetQuiz() {
+            answers = {}; submitted = {}; score = 0; orderState = {};
+            document.getElementById('correctCount').textContent = '0';
+            document.getElementById('totalAnswered').textContent = '0';
+            initQuiz();
+        }
+
+        function showAllAnswers() {
+            questions.forEach(q => {
+                if (submitted[q.id]) return;
+                if (q.type === 'ordering') {
+                    q.steps.forEach(step => {
+                        orderState[q.id] = orderState[q.id] || {};
+                        orderState[q.id][step.order] = step.id;
+                        const slot = document.querySelector(`.slot-dropzone[data-pos="${step.order}"][data-qid="${q.id}"]`);
+                        const item = document.querySelector(`.order-item[data-id="${step.id}"][data-qid="${q.id}"]`);
+                        if (item && slot) slot.appendChild(item);
+                    });
+                    submitOrdering(q.id);
+                } else {
+                    answers[q.id] = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1).slice(0, q.count);
+                    submitAnswer(q.id);
+                }
+            });
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

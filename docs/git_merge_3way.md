@@ -1,3 +1,8 @@
+---
+layout: default
+title: Git Merge Strategies
+---
+
 # Git Merge Strategies — Practice Lab
 
 > **Lab path:** `~/DevnetExpert/mock3/design/git-ops`

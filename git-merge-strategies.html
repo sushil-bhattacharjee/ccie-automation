@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Git Merge Strategies - DevNet Expert Study Guide</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg-primary: #0d1117;
@@ -21,136 +24,904 @@
             --border-color: #30363d;
             --code-bg: #0d1117;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; }
-        .nav-container { position: fixed; top: 0; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); z-index: 1000; padding: 1rem 2rem; }
-        .nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .nav-title { font-size: 1.25rem; font-weight: 700; color: var(--accent-cyan); }
-        .nav-tabs { display: flex; gap: 0.5rem; }
-        .nav-tab { padding: 0.6rem 1.5rem; border: none; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; }
-        .nav-tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-        .nav-tab.active { background: var(--accent-cyan); color: var(--bg-primary); }
-        .main-content { max-width: 1000px; margin: 0 auto; padding: 6rem 2rem 3rem; }
-        .section { display: none; }
-        .section.active { display: block; }
-        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
-        h2 { font-size: 1.75rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--accent-blue); padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
-        h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--accent-purple); }
-        p { margin-bottom: 1rem; color: var(--text-secondary); }
-        .intro-text { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
-        pre { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.6; white-space: pre; }
-        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
-        pre code { background: none; padding: 0; }
-        .comment { color: var(--text-secondary); }
-        .command { color: var(--accent-green); }
-        .flag { color: var(--accent-orange); }
-        .workflow-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; }
-        .workflow-card h3 { margin-top: 0; display: flex; align-items: center; gap: 0.5rem; }
-        .badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; }
-        .badge-cyan { background: var(--accent-cyan); color: var(--bg-primary); }
-        .badge-orange { background: var(--accent-orange); color: var(--bg-primary); }
-        .badge-red { background: var(--accent-red); color: white; }
-        .badge-green { background: var(--accent-green); color: var(--bg-primary); }
-        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
-        th, td { padding: 0.75rem 1rem; text-align: left; border: 1px solid var(--border-color); }
-        th { background: var(--bg-tertiary); font-weight: 600; color: var(--text-primary); }
-        td { background: var(--bg-secondary); color: var(--text-secondary); }
-        tr:hover td { background: var(--bg-tertiary); }
-        .check { color: var(--accent-green); }
-        .cross { color: var(--accent-red); }
-        .tip-box { background: rgba(88, 166, 255, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-        .tip-box strong { color: var(--accent-blue); }
-        .warning-box { background: rgba(248, 81, 73, 0.1); border: 1px solid var(--accent-red); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-        .warning-box strong { color: var(--accent-red); }
-        .trap-box { background: rgba(210, 153, 34, 0.1); border: 1px solid var(--accent-orange); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-        .trap-box strong { color: var(--accent-orange); }
-        .quiz-header { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .score-display { font-size: 1.25rem; font-weight: 600; }
-        .score-correct { color: var(--accent-green); }
-        .score-total { color: var(--text-secondary); }
-        .quiz-controls { display: flex; gap: 0.75rem; }
-        .btn { padding: 0.6rem 1.25rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-        .btn-primary { background: var(--accent-blue); color: var(--bg-primary); }
-        .btn-primary:hover { background: #79b8ff; }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
-        .btn-secondary:hover { background: var(--border-color); }
-        .question-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
-        .question-card.answered-correct { border-color: var(--accent-green); }
-        .question-card.answered-incorrect { border-color: var(--accent-red); }
-        .question-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
-        .question-number { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 20px; }
-        .question-type { font-size: 0.8rem; font-weight: 500; color: var(--accent-orange); }
-        .scenario-box { font-size: 0.9rem; color: var(--text-secondary); padding: 0.75rem; background: var(--bg-tertiary); border-radius: 8px; margin-bottom: 1rem; line-height: 1.6; border-left: 3px solid var(--accent-purple); }
-        .question-text { font-size: 1.1rem; font-weight: 500; color: var(--text-primary); margin-bottom: 1.25rem; line-height: 1.5; }
-        .options-list { display: flex; flex-direction: column; gap: 0.5rem; }
-        .option-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--bg-tertiary); border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
-        .option-item:hover:not(.disabled) { background: var(--bg-primary); border-color: var(--border-color); }
-        .option-item.selected { border-color: var(--accent-blue); background: rgba(88, 166, 255, 0.1); }
-        .option-item.correct { border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
-        .option-item.incorrect { border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
-        .option-item.disabled { cursor: default; }
-        .option-checkbox { width: 20px; height: 20px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.8rem; font-weight: 600; }
-        .option-item.selected .option-checkbox { border-color: var(--accent-blue); background: var(--accent-blue); color: var(--bg-primary); }
-        .option-item.correct .option-checkbox { border-color: var(--accent-green); background: var(--accent-green); color: var(--bg-primary); }
-        .option-item.incorrect .option-checkbox { border-color: var(--accent-red); background: var(--accent-red); color: white; }
-        .option-text { flex: 1; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
-        .submit-btn { margin-top: 1rem; width: 100%; padding: 0.75rem; background: var(--accent-blue); color: var(--bg-primary); border: none; border-radius: 8px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .submit-btn:hover:not(:disabled) { background: #79b8ff; }
-        .submit-btn:disabled { background: var(--bg-tertiary); color: var(--text-secondary); cursor: not-allowed; }
-        .explanation { margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border-radius: 8px; border-left: 4px solid var(--accent-blue); display: none; }
-        .explanation.show { display: block; }
-        .explanation-title { font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem; }
-        .explanation-text { color: var(--text-secondary); font-size: 0.95rem; }
-        .progress-bar { width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); border-radius: 4px; transition: width 0.3s ease; }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 6rem 2rem 3rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            color: var(--accent-blue);
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--accent-purple);
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .comment {
+            color: var(--text-secondary);
+        }
+
+        .command {
+            color: var(--accent-green);
+        }
+
+        .flag {
+            color: var(--accent-orange);
+        }
+
+        .workflow-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .workflow-card h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-cyan {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .badge-orange {
+            background: var(--accent-orange);
+            color: var(--bg-primary);
+        }
+
+        .badge-red {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .badge-green {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        td {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: var(--bg-tertiary);
+        }
+
+        .check {
+            color: var(--accent-green);
+        }
+
+        .cross {
+            color: var(--accent-red);
+        }
+
+        .tip-box {
+            background: rgba(88, 166, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tip-box strong {
+            color: var(--accent-blue);
+        }
+
+        .warning-box {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .warning-box strong {
+            color: var(--accent-red);
+        }
+
+        .trap-box {
+            background: rgba(210, 153, 34, 0.1);
+            border: 1px solid var(--accent-orange);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .trap-box strong {
+            color: var(--accent-orange);
+        }
+
+        .quiz-header {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .score-display {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .score-correct {
+            color: var(--accent-green);
+        }
+
+        .score-total {
+            color: var(--text-secondary);
+        }
+
+        .quiz-controls {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: #79b8ff;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .question-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-card.answered-correct {
+            border-color: var(--accent-green);
+        }
+
+        .question-card.answered-incorrect {
+            border-color: var(--accent-red);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .question-number {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+        }
+
+        .question-type {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-orange);
+        }
+
+        .scenario-box {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover:not(.disabled) {
+            background: var(--bg-primary);
+            border-color: var(--border-color);
+        }
+
+        .option-item.selected {
+            border-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .option-item.correct {
+            border-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .option-item.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        .option-item.disabled {
+            cursor: default;
+        }
+
+        .option-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .option-item.selected .option-checkbox {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+        }
+
+        .option-item.correct .option-checkbox {
+            border-color: var(--accent-green);
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+
+        .option-item.incorrect .option-checkbox {
+            border-color: var(--accent-red);
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .submit-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #79b8ff;
+        }
+
+        .submit-btn:disabled {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .explanation-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
         /* Drag and Drop Styles */
-        .drag-drop-container { display: flex; gap: 2rem; flex-wrap: wrap; margin: 1rem 0; }
-        .drag-source, .drop-target { flex: 1; min-width: 250px; }
-        .drag-source h4, .drop-target h4 { font-size: 0.9rem; color: var(--accent-purple); margin-bottom: 0.75rem; }
-        .drag-items { display: flex; flex-direction: column; gap: 0.5rem; min-height: 150px; padding: 0.5rem; background: var(--bg-tertiary); border-radius: 8px; }
-        .drag-item { padding: 0.6rem 1rem; background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: 6px; cursor: grab; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; transition: all 0.2s ease; user-select: none; }
-        .drag-item:hover { border-color: var(--accent-blue); }
-        .drag-item.dragging { opacity: 0.5; cursor: grabbing; }
-        .drag-item.correct { border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
-        .drag-item.incorrect { border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
-        .drop-zones { display: flex; flex-direction: column; gap: 0.5rem; }
-        .drop-zone { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; background: var(--bg-tertiary); border-radius: 6px; min-height: 44px; }
-        .drop-zone-label { font-size: 0.85rem; color: var(--text-secondary); min-width: 120px; }
-        .drop-zone-target { flex: 1; min-height: 36px; border: 2px dashed var(--border-color); border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
-        .drop-zone-target.drag-over { border-color: var(--accent-blue); background: rgba(88, 166, 255, 0.1); }
-        .drop-zone-target .drag-item { margin: 0; cursor: pointer; }
-        .drop-zone-target.correct { border-color: var(--accent-green); border-style: solid; }
-        .drop-zone-target.incorrect { border-color: var(--accent-red); border-style: solid; }
+        .drag-drop-container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .drag-source,
+        .drop-target {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .drag-source h4,
+        .drop-target h4 {
+            font-size: 0.9rem;
+            color: var(--accent-purple);
+            margin-bottom: 0.75rem;
+        }
+
+        .drag-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-height: 150px;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .drag-item {
+            padding: 0.6rem 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: grab;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .drag-item:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .drag-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .drag-item.correct {
+            border-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .drag-item.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        .drop-zones {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .drop-zone {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            min-height: 44px;
+        }
+
+        .drop-zone-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 120px;
+        }
+
+        .drop-zone-target {
+            flex: 1;
+            min-height: 36px;
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .drop-zone-target.drag-over {
+            border-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .drop-zone-target .drag-item {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .drop-zone-target.correct {
+            border-color: var(--accent-green);
+            border-style: solid;
+        }
+
+        .drop-zone-target.incorrect {
+            border-color: var(--accent-red);
+            border-style: solid;
+        }
 
         /* Matching Styles */
-        .matching-container { display: flex; gap: 1rem; align-items: stretch; margin: 1rem 0; }
-        .matching-left, .matching-right { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
-        .matching-left h4, .matching-right h4 { font-size: 0.9rem; color: var(--accent-purple); margin-bottom: 0.5rem; text-align: center; }
-        .match-item { padding: 0.6rem 1rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; text-align: center; cursor: pointer; transition: all 0.2s ease; }
-        .match-item:hover:not(.disabled) { border-color: var(--accent-blue); }
-        .match-item.selected { border-color: var(--accent-cyan); background: rgba(57, 197, 207, 0.1); }
-        .match-item.matched { border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
-        .match-item.incorrect { border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
-        .match-item.disabled { cursor: default; opacity: 0.7; }
-        .match-item code { font-family: 'JetBrains Mono', monospace; }
-        .matching-lines { position: relative; width: 60px; flex-shrink: 0; }
-        .match-line { position: absolute; pointer-events: none; }
-        .connections-display { margin-top: 1rem; padding: 0.75rem; background: var(--bg-tertiary); border-radius: 6px; }
-        .connection-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; font-size: 0.85rem; }
-        .connection-item .arrow { color: var(--accent-cyan); }
+        .matching-container {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+            margin: 1rem 0;
+        }
 
-        @media (max-width: 768px) { 
-            .nav-content { flex-direction: column; gap: 1rem; } 
-            .main-content { padding: 8rem 1rem 2rem; } 
-            h1 { font-size: 1.75rem; } 
-            .quiz-header { flex-direction: column; text-align: center; } 
-            .drag-drop-container { flex-direction: column; }
-            .matching-container { flex-direction: column; }
-            .matching-lines { display: none; }
+        .matching-left,
+        .matching-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .matching-left h4,
+        .matching-right h4 {
+            font-size: 0.9rem;
+            color: var(--accent-purple);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .match-item {
+            padding: 0.6rem 1rem;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .match-item:hover:not(.disabled) {
+            border-color: var(--accent-blue);
+        }
+
+        .match-item.selected {
+            border-color: var(--accent-cyan);
+            background: rgba(57, 197, 207, 0.1);
+        }
+
+        .match-item.matched {
+            border-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .match-item.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        .match-item.disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .match-item code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .matching-lines {
+            position: relative;
+            width: 60px;
+            flex-shrink: 0;
+        }
+
+        .match-line {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .connections-display {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+
+        .connection-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0;
+            font-size: 0.85rem;
+        }
+
+        .connection-item .arrow {
+            color: var(--accent-cyan);
+        }
+
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 8rem 1rem 2rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .drag-drop-container {
+                flex-direction: column;
+            }
+
+            .matching-container {
+                flex-direction: column;
+            }
+
+            .matching-lines {
+                display: none;
+            }
+        }
+
+        /* Ordering Question Styles */
+        .ordering-container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .ordering-target,
+        .ordering-source {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .ordering-target h4,
+        .ordering-source h4 {
+            font-size: 0.9rem;
+            color: var(--accent-purple);
+            margin-bottom: 0.75rem;
+        }
+
+        .order-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .order-slot {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            min-height: 50px;
+        }
+
+        .slot-number {
+            width: 28px;
+            height: 28px;
+            background: var(--accent-purple);
+            color: var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .slot-dropzone {
+            flex: 1;
+            min-height: 36px;
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .slot-dropzone.drag-over {
+            border-color: var(--accent-blue);
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .slot-dropzone .order-item {
+            margin: 0;
+            width: 100%;
+        }
+
+        .slot-dropzone.correct {
+            border-color: var(--accent-green);
+            border-style: solid;
+        }
+
+        .slot-dropzone.incorrect {
+            border-color: var(--accent-red);
+            border-style: solid;
+        }
+
+        .order-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-height: 150px;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .order-item {
+            padding: 0.6rem 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            cursor: grab;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .order-item:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .order-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .order-item code {
+            font-family: 'JetBrains Mono', monospace;
+            background: none;
+            padding: 0;
+        }
+
+        .order-item.correct {
+            border-color: var(--accent-green);
+            background: rgba(63, 185, 80, 0.1);
+        }
+
+        .order-item.incorrect {
+            border-color: var(--accent-red);
+            background: rgba(248, 81, 73, 0.1);
         }
     </style>
 </head>
+
 <body>
     <nav class="nav-container">
         <div class="nav-content">
@@ -166,19 +937,37 @@
         <!-- SECTION 1: Learn -->
         <section id="learn" class="section active">
             <h1>Git Merge Strategies & 3-Way Merge</h1>
-            <p class="intro-text">Master merge strategies, options, and the 3-way merge algorithm for CCIE Automation.</p>
+            <p class="intro-text">Master merge strategies, options, and the 3-way merge algorithm for CCIE Automation.
+            </p>
 
             <!-- Strategy vs Option -->
             <h2>🎯 Strategy (-s) vs Option (-X)</h2>
             <div class="workflow-card">
                 <table>
-                    <thead><tr><th>Flag</th><th>Name</th><th>Analogy</th><th>What It Does</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Flag</th>
+                            <th>Name</th>
+                            <th>Analogy</th>
+                            <th>What It Does</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>-s</code></td><td>Strategy</td><td>The recipe</td><td>The entire merge algorithm</td></tr>
-                        <tr><td><code>-X</code></td><td>eXtended option</td><td>A tweak</td><td>Adjusts behavior on edge cases</td></tr>
+                        <tr>
+                            <td><code>-s</code></td>
+                            <td>Strategy</td>
+                            <td>The recipe</td>
+                            <td>The entire merge algorithm</td>
+                        </tr>
+                        <tr>
+                            <td><code>-X</code></td>
+                            <td>eXtended option</td>
+                            <td>A tweak</td>
+                            <td>Adjusts behavior on edge cases</td>
+                        </tr>
                     </tbody>
                 </table>
-<pre><span class="comment"># Combine strategy and option</span>
+                <pre><span class="comment"># Combine strategy and option</span>
 <span class="command">git merge</span> <span class="flag">-s ort -X ours</span> feature
 <span class="comment">#          ^^^^   ^^^^^^</span>
 <span class="comment">#       strategy  option passed to ort</span></pre>
@@ -188,14 +977,65 @@
             <h2>📊 All Merge Strategies (-s)</h2>
             <div class="workflow-card">
                 <table>
-                    <thead><tr><th>Strategy</th><th>Command</th><th>Branches</th><th>Conflicts?</th><th>Rename?</th><th>Default?</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Strategy</th>
+                            <th>Command</th>
+                            <th>Branches</th>
+                            <th>Conflicts?</th>
+                            <th>Rename?</th>
+                            <th>Default?</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>ort</code></td><td><code>git merge -s ort</code></td><td>2</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">Git 2.34+</span></td></tr>
-                        <tr><td><code>recursive</code></td><td><code>git merge -s recursive</code></td><td>2</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td>Pre 2.34</td></tr>
-                        <tr><td><code>ours</code></td><td><code>git merge -s ours</code></td><td>2</td><td>N/A</td><td>N/A</td><td><span class="cross">✗</span></td></tr>
-                        <tr><td><code>subtree</code></td><td><code>git merge -s subtree</code></td><td>2</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
-                        <tr><td><code>resolve</code></td><td><code>git merge -s resolve</code></td><td>2</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td></tr>
-                        <tr><td><code>octopus</code></td><td>Auto for 3+</td><td><strong>3+</strong></td><td><span class="cross">Aborts</span></td><td><span class="cross">✗</span></td><td>Auto</td></tr>
+                        <tr>
+                            <td><code>ort</code></td>
+                            <td><code>git merge -s ort</code></td>
+                            <td>2</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">Git 2.34+</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>recursive</code></td>
+                            <td><code>git merge -s recursive</code></td>
+                            <td>2</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td>Pre 2.34</td>
+                        </tr>
+                        <tr>
+                            <td><code>ours</code></td>
+                            <td><code>git merge -s ours</code></td>
+                            <td>2</td>
+                            <td>N/A</td>
+                            <td>N/A</td>
+                            <td><span class="cross">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>subtree</code></td>
+                            <td><code>git merge -s subtree</code></td>
+                            <td>2</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="cross">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>resolve</code></td>
+                            <td><code>git merge -s resolve</code></td>
+                            <td>2</td>
+                            <td><span class="check">✓</span></td>
+                            <td><span class="cross">✗</span></td>
+                            <td><span class="cross">✗</span></td>
+                        </tr>
+                        <tr>
+                            <td><code>octopus</code></td>
+                            <td>Auto for 3+</td>
+                            <td><strong>3+</strong></td>
+                            <td><span class="cross">Aborts</span></td>
+                            <td><span class="cross">✗</span></td>
+                            <td>Auto</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -204,11 +1044,32 @@
             <h2>⚙️ Merge Options (-X)</h2>
             <div class="workflow-card">
                 <table>
-                    <thead><tr><th>Option</th><th>Command</th><th>Non-Conflicting</th><th>Conflicting</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Option</th>
+                            <th>Command</th>
+                            <th>Non-Conflicting</th>
+                            <th>Conflicting</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>ours</code></td><td><code>git merge -X ours</code></td><td><span class="check">✓ Merged</span></td><td>Pick our side</td></tr>
-                        <tr><td><code>theirs</code></td><td><code>git merge -X theirs</code></td><td><span class="check">✓ Merged</span></td><td>Pick their side</td></tr>
-                        <tr><td><code>subtree=path</code></td><td><code>git merge -X subtree=lib</code></td><td colspan="2">Adjust tree path</td></tr>
+                        <tr>
+                            <td><code>ours</code></td>
+                            <td><code>git merge -X ours</code></td>
+                            <td><span class="check">✓ Merged</span></td>
+                            <td>Pick our side</td>
+                        </tr>
+                        <tr>
+                            <td><code>theirs</code></td>
+                            <td><code>git merge -X theirs</code></td>
+                            <td><span class="check">✓ Merged</span></td>
+                            <td>Pick their side</td>
+                        </tr>
+                        <tr>
+                            <td><code>subtree=path</code></td>
+                            <td><code>git merge -X subtree=lib</code></td>
+                            <td colspan="2">Adjust tree path</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -220,15 +1081,37 @@
             </div>
             <div class="workflow-card">
                 <table>
-                    <thead><tr><th>Aspect</th><th><code>-s ours</code> (Strategy)</th><th><code>-X ours</code> (Option)</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th><code>-s ours</code> (Strategy)</th>
+                            <th><code>-X ours</code> (Option)</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td>Non-conflicting changes</td><td><span class="cross">❌ Discarded</span></td><td><span class="check">✓ Merged normally</span></td></tr>
-                        <tr><td>Conflicting changes</td><td><span class="cross">❌ Discarded</span></td><td>Auto-pick our side</td></tr>
-                        <tr><td>Their work preserved?</td><td><span class="cross">No — thrown away</span></td><td><span class="check">Yes — only conflicts lost</span></td></tr>
-                        <tr><td>Use case</td><td>Abandon branch cleanly</td><td>Auto-resolve in your favor</td></tr>
+                        <tr>
+                            <td>Non-conflicting changes</td>
+                            <td><span class="cross">❌ Discarded</span></td>
+                            <td><span class="check">✓ Merged normally</span></td>
+                        </tr>
+                        <tr>
+                            <td>Conflicting changes</td>
+                            <td><span class="cross">❌ Discarded</span></td>
+                            <td>Auto-pick our side</td>
+                        </tr>
+                        <tr>
+                            <td>Their work preserved?</td>
+                            <td><span class="cross">No — thrown away</span></td>
+                            <td><span class="check">Yes — only conflicts lost</span></td>
+                        </tr>
+                        <tr>
+                            <td>Use case</td>
+                            <td>Abandon branch cleanly</td>
+                            <td>Auto-resolve in your favor</td>
+                        </tr>
                     </tbody>
                 </table>
-<pre><span class="comment"># STRATEGY: Discards ALL their changes (nuclear option)</span>
+                <pre><span class="comment"># STRATEGY: Discards ALL their changes (nuclear option)</span>
 <span class="command">git merge</span> <span class="flag">-s ours</span> feature    <span class="comment"># Nothing from feature is kept!</span>
 
 <span class="comment"># OPTION: Only auto-resolves conflicts in our favor</span>
@@ -238,7 +1121,7 @@
             <!-- Ours vs Theirs -->
             <h2>👆 Ours vs Theirs</h2>
             <div class="workflow-card">
-<pre><span class="command">git checkout</span> main           <span class="comment">← You're standing HERE = OURS</span>
+                <pre><span class="command">git checkout</span> main           <span class="comment">← You're standing HERE = OURS</span>
 <span class="command">git merge</span> feature           <span class="comment">← Pulling THIS in = THEIRS</span></pre>
                 <div class="tip-box">
                     <strong>💡 Remember:</strong> Ours = where I stand. Theirs = what I'm merging in.
@@ -249,16 +1132,34 @@
             <h2>📐 Understanding 3-Way Merge</h2>
             <div class="workflow-card">
                 <p>"3-way" does NOT mean 3 branches. It means Git compares <strong>3 snapshots of the file</strong>:</p>
-<pre>        M1  ← ANCESTOR (version 1) — where branches split
+                <pre>        M1  ← ANCESTOR (version 1) — where branches split
        /  \
     main    feature
   (version 2)  (version 3)</pre>
                 <table>
-                    <thead><tr><th>Version</th><th>What It Is</th><th>Where Git Finds It</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>What It Is</th>
+                            <th>Where Git Finds It</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td>1 — Ancestor</td><td>The fork point</td><td><code>git merge-base main feature</code></td></tr>
-                        <tr><td>2 — Ours</td><td>Branch you're on</td><td><code>HEAD</code></td></tr>
-                        <tr><td>3 — Theirs</td><td>Branch merging in</td><td>The branch name</td></tr>
+                        <tr>
+                            <td>1 — Ancestor</td>
+                            <td>The fork point</td>
+                            <td><code>git merge-base main feature</code></td>
+                        </tr>
+                        <tr>
+                            <td>2 — Ours</td>
+                            <td>Branch you're on</td>
+                            <td><code>HEAD</code></td>
+                        </tr>
+                        <tr>
+                            <td>3 — Theirs</td>
+                            <td>Branch merging in</td>
+                            <td>The branch name</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -266,7 +1167,7 @@
             <!-- Why Ancestor Matters -->
             <div class="workflow-card">
                 <h3>Why Git Needs the Ancestor</h3>
-<pre><span class="comment"># WITH ancestor (3-way — correct):</span>
+                <pre><span class="comment"># WITH ancestor (3-way — correct):</span>
 Ancestor:  snmp_poll("R1")       ← original
 Ours:      snmp_poll("R1")       ← we DIDN'T change it
 Theirs:    snmp_poll("SW1")      ← they DID change it
@@ -283,8 +1184,9 @@ Git: "They're different... CONFLICT!"</pre>
             <!-- Octopus Strategy -->
             <h2>🐙 Octopus Strategy</h2>
             <div class="workflow-card">
-                <p>Merges <strong>more than 2 branches</strong> at once. Git selects it automatically when you pass multiple branches.</p>
-<pre><span class="comment"># Instead of 3 separate merges:</span>
+                <p>Merges <strong>more than 2 branches</strong> at once. Git selects it automatically when you pass
+                    multiple branches.</p>
+                <pre><span class="comment"># Instead of 3 separate merges:</span>
 <span class="command">git merge</span> feature-a
 <span class="command">git merge</span> feature-b
 <span class="command">git merge</span> feature-c
@@ -292,7 +1194,8 @@ Git: "They're different... CONFLICT!"</pre>
 <span class="comment"># Octopus — ONE merge commit, 3 parents:</span>
 <span class="command">git merge</span> feature-a feature-b feature-c</pre>
                 <div class="warning-box">
-                    <strong>⚠️ The Catch:</strong> Octopus <strong>refuses to handle conflicts</strong>. If any branch conflicts, it aborts entirely.
+                    <strong>⚠️ The Catch:</strong> Octopus <strong>refuses to handle conflicts</strong>. If any branch
+                    conflicts, it aborts entirely.
                 </div>
             </div>
 
@@ -300,14 +1203,44 @@ Git: "They're different... CONFLICT!"</pre>
             <h2>📁 Rename Detection</h2>
             <div class="workflow-card">
                 <table>
-                    <thead><tr><th>Strategy</th><th>Rename Detection?</th><th>Notes</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Strategy</th>
+                            <th>Rename Detection?</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>ort</code></td><td><span class="check">✓ Yes (improved)</span></td><td>Better + faster than recursive</td></tr>
-                        <tr><td><code>recursive</code></td><td><span class="check">✓ Yes</span></td><td>Original rename detection</td></tr>
-                        <tr><td><code>subtree</code></td><td><span class="check">✓ Yes</span></td><td>Inherits from ort/recursive</td></tr>
-                        <tr><td><code>resolve</code></td><td><span class="cross">✗ No</span></td><td>Simple 3-way</td></tr>
-                        <tr><td><code>octopus</code></td><td><span class="cross">✗ No</span></td><td>Lightweight multi-branch</td></tr>
-                        <tr><td><code>ours</code></td><td>N/A</td><td>Discards their changes</td></tr>
+                        <tr>
+                            <td><code>ort</code></td>
+                            <td><span class="check">✓ Yes (improved)</span></td>
+                            <td>Better + faster than recursive</td>
+                        </tr>
+                        <tr>
+                            <td><code>recursive</code></td>
+                            <td><span class="check">✓ Yes</span></td>
+                            <td>Original rename detection</td>
+                        </tr>
+                        <tr>
+                            <td><code>subtree</code></td>
+                            <td><span class="check">✓ Yes</span></td>
+                            <td>Inherits from ort/recursive</td>
+                        </tr>
+                        <tr>
+                            <td><code>resolve</code></td>
+                            <td><span class="cross">✗ No</span></td>
+                            <td>Simple 3-way</td>
+                        </tr>
+                        <tr>
+                            <td><code>octopus</code></td>
+                            <td><span class="cross">✗ No</span></td>
+                            <td>Lightweight multi-branch</td>
+                        </tr>
+                        <tr>
+                            <td><code>ours</code></td>
+                            <td>N/A</td>
+                            <td>Discards their changes</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -317,13 +1250,33 @@ Git: "They're different... CONFLICT!"</pre>
             <div class="workflow-card">
                 <h3>Common Exam Traps</h3>
                 <table>
-                    <thead><tr><th>Trap</th><th>Correct Answer</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Trap</th>
+                            <th>Correct Answer</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td><code>-s ours</code> vs <code>-X ours</code></td><td>Strategy discards ALL; Option only resolves conflicts</td></tr>
-                        <tr><td>3-way merge means 3 branches?</td><td>No! 3 file snapshots (ancestor + ours + theirs)</td></tr>
-                        <tr><td>Default strategy Git 2.34+?</td><td><code>ort</code> (replaced <code>recursive</code>)</td></tr>
-                        <tr><td>Which supports 3+ branches?</td><td><code>octopus</code> (auto-selected)</td></tr>
-                        <tr><td>Rename detection strategies?</td><td><code>ort</code>, <code>recursive</code>, <code>subtree</code></td></tr>
+                        <tr>
+                            <td><code>-s ours</code> vs <code>-X ours</code></td>
+                            <td>Strategy discards ALL; Option only resolves conflicts</td>
+                        </tr>
+                        <tr>
+                            <td>3-way merge means 3 branches?</td>
+                            <td>No! 3 file snapshots (ancestor + ours + theirs)</td>
+                        </tr>
+                        <tr>
+                            <td>Default strategy Git 2.34+?</td>
+                            <td><code>ort</code> (replaced <code>recursive</code>)</td>
+                        </tr>
+                        <tr>
+                            <td>Which supports 3+ branches?</td>
+                            <td><code>octopus</code> (auto-selected)</td>
+                        </tr>
+                        <tr>
+                            <td>Rename detection strategies?</td>
+                            <td><code>ort</code>, <code>recursive</code>, <code>subtree</code></td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -332,7 +1285,8 @@ Git: "They're different... CONFLICT!"</pre>
         <!-- SECTION 2: MCQ Practice -->
         <section id="quiz" class="section">
             <h1>MCQ Practice</h1>
-            <p class="intro-text">20 scenario-based questions including drag-drop and matching — CCIE Automation style.</p>
+            <p class="intro-text">20 scenario-based questions including drag-drop and matching — CCIE Automation style.
+            </p>
 
             <div class="quiz-header">
                 <div>
@@ -382,7 +1336,13 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "It only works with the resolve strategy", correct: false },
                     { text: "3-way means 3 developers must approve the merge", correct: false }
                 ],
-                explanation: "3-way merge compares THREE file snapshots: (1) ancestor/fork point, (2) ours/HEAD, (3) theirs/merging branch. This helps Git determine WHO changed WHAT."
+                explanation: "3-way merge compares THREE file snapshots: (1) ancestor/fork point, (2) ours/HEAD, (3) theirs/merging branch. This helps Git determine WHO changed WHAT.",
+                notes: [
+                    "A → ❌ Not merging 3 branches, only 2 branches + 1 base",
+                    "C → ❌ Octopus merge is separate (used for multiple branches)",
+                    "E → ❌ Works with multiple strategies (recursive, ort, etc.)",
+                    "F → ❌ Nothing to do with approvals"
+                ]
             },
             // Q3 - Single choice
             {
@@ -395,7 +1355,12 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "git merge -s ort --multi feature-auth feature-snmp feature-logging", correct: false },
                     { text: "git merge -s resolve feature-auth feature-snmp feature-logging", correct: false }
                 ],
-                explanation: "When you pass multiple branches to git merge, Git automatically selects the octopus strategy. No -s flag needed. Note: octopus aborts if there are conflicts."
+                explanation: "When you pass multiple branches to git merge, Git automatically selects the octopus strategy. No -s flag needed. Note: octopus aborts if there are conflicts.",
+                notes: [
+                    "A → ❌ 'recursive' strategy is only for 2-branch merge; it does NOT handle multiple branches in one command",
+                    "C → ❌ 'ort' does not support a '--multi' flag; this is not a valid Git command",
+                    "D → ❌ 'resolve' strategy works only for 2 branches and has limited capabilities (no multi-branch support)"
+                ]
             },
             // Q4 - Multi choice 2/6
             {
@@ -410,7 +1375,13 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "git merge -s ours feature", correct: false },
                     { text: "git merge -s fast-forward feature", correct: false }
                 ],
-                explanation: "Only 'ort' and 'recursive' (and subtree, which builds on them) support rename detection. 'ort' is the improved version with better rename handling."
+                explanation: "Only 'ort' and 'recursive' (and subtree, which builds on them) support rename detection. 'ort' is the improved version with better rename handling.",
+                notes: [
+                    "B → ❌ 'resolve' strategy does NOT support rename detection; it is a simpler 3-way merge algorithm",
+                    "D → ❌ 'octopus' strategy is for merging multiple branches and does NOT support rename detection",
+                    "E → ❌ 'ours' strategy discards ALL changes from the incoming branch, so rename handling is irrelevant",
+                    "F → ❌ 'fast-forward' is NOT a merge strategy (-s); it is a merge behavior and does not involve rename detection"
+                ]
             },
             // Q5 - Single choice
             {
@@ -423,7 +1394,12 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "git merge --discard experimental", correct: false },
                     { text: "git merge -s ignore experimental", correct: false }
                 ],
-                explanation: "-s ours is the STRATEGY that discards ALL their changes entirely. It creates a merge commit but keeps your version unchanged. Use case: abandoning a branch cleanly."
+                explanation: "-s ours is the STRATEGY that discards ALL their changes entirely. It creates a merge commit but keeps your version unchanged. Use case: abandoning a branch cleanly.",
+                notes: [
+                    "A → ❌ '-X ours' is an OPTION, not a strategy; it only resolves conflicts in our favor and still keeps non-conflicting changes from the experimental branch",
+                    "C → ❌ '--discard' is NOT a valid Git merge option or command",
+                    "D → ❌ '-s ignore' is NOT a valid Git merge strategy"
+                ]
             },
             // Q6 - Multi choice 3/6
             {
@@ -438,7 +1414,12 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "git merge -s resolve", correct: true },
                     { text: "git merge -s auto", correct: false }
                 ],
-                explanation: "Valid strategies: ort, recursive, ours, subtree, resolve, octopus. Note: 'theirs' is an OPTION (-X theirs), not a strategy. There's no -s theirs!"
+                explanation: "Valid strategies: ort, recursive, ours, subtree, resolve, octopus. Note: 'theirs' is an OPTION (-X theirs), not a strategy. There's no -s theirs!",
+                notes: [
+                    "B → ❌ '-s theirs' is NOT a valid strategy; 'theirs' is an OPTION (-X theirs), not a strategy",
+                    "D → ❌ 'fast-forward' is NOT a merge strategy (-s); it is a merge behavior (--ff)",
+                    "F → ❌ 'auto' is NOT a valid Git merge strategy"
+                ]
             },
             // Q7 - Single choice
             {
@@ -451,7 +1432,12 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "resolve", correct: false },
                     { text: "octopus", correct: false }
                 ],
-                explanation: "'ort' became the default in Git 2.34+ (2021). It replaced 'recursive' with faster performance and improved rename detection. For Git <2.34, 'recursive' was default."
+                explanation: "'ort' became the default in Git 2.34+ (2021). It replaced 'recursive' with faster performance and improved rename detection. For Git <2.34, 'recursive' was default.",
+                notes: [
+                    "A → ❌ 'recursive' was the default BEFORE Git 2.34; it was replaced by 'ort'",
+                    "C → ❌ 'resolve' is an older/simple strategy with limited capabilities and is NOT the default",
+                    "D → ❌ 'octopus' is only used automatically when merging 3+ branches, not for standard 2-branch merges"
+                ]
             },
             // Q8 - Multi choice 2/6
             {
@@ -466,7 +1452,13 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "It prevents any merge commit from being created", correct: false },
                     { text: "It requires manual conflict resolution afterward", correct: false }
                 ],
-                explanation: "-X theirs is an OPTION that only affects CONFLICTS — it picks their version. Non-conflicting changes from BOTH branches still merge normally."
+                explanation: "-X theirs is an OPTION that only affects CONFLICTS — it picks their version. Non-conflicting changes from BOTH branches still merge normally.",
+                notes: [
+                    "A → ❌ '-X theirs' does NOT discard all changes from main; non-conflicting changes from both branches are still merged",
+                    "D → ❌ '-X theirs' is an OPTION, not a merge strategy (-s); it modifies conflict behavior only",
+                    "E → ❌ It does NOT prevent a merge commit; merge proceeds normally with a commit created",
+                    "F → ❌ It does NOT require manual resolution; conflicts are automatically resolved using the incoming branch's version"
+                ]
             },
             // Q9 - Drag and Drop
             {
@@ -517,7 +1509,12 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "git merge -s recursive --subdir shared-library", correct: false },
                     { text: "git merge -X subtree=lib shared-library", correct: false }
                 ],
-                explanation: "-s subtree is the strategy for merging branches that represent a subdirectory of your project. -X subtree=path is an option that can adjust the path mapping."
+                explanation: "-s subtree is the strategy for merging branches that represent a subdirectory of your project. -X subtree=path is an option that can adjust the path mapping.",
+                notes: [
+                    "A → ❌ '--prefix' is NOT a valid option with 'ort' strategy; this command is invalid",
+                    "C → ❌ '--subdir' is NOT a valid option for 'recursive' strategy; subtree handling is not done this way",
+                    "D → ❌ '-X subtree=lib' is an OPTION, not a strategy; it adjusts path mapping but does not replace '-s subtree'"
+                ]
             },
             // Q12 - Multi choice 2/6
             {
@@ -532,7 +1529,13 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "The -s octopus flag was not specified", correct: false },
                     { text: "Octopus requires --allow-unrelated-histories", correct: false }
                 ],
-                explanation: "Octopus refuses to handle ANY conflicts. If even one branch conflicts with another, the entire merge aborts. This is by design — octopus is for clean merges only."
+                explanation: "Octopus refuses to handle ANY conflicts. If even one branch conflicts with another, the entire merge aborts. This is by design — octopus is for clean merges only.",
+                notes: [
+                    "A → ❌ Octopus CAN merge more than 3 branches; it is specifically designed for 3+ branches",
+                    "C → ❌ Branch not pushed to remote is irrelevant; Git merge works on local branches",
+                    "E → ❌ '-s octopus' flag is NOT required; Git automatically selects octopus when multiple branches are provided",
+                    "F → ❌ '--allow-unrelated-histories' is only needed when histories are unrelated, not for normal octopus merges"
+                ]
             },
             // Q13 - Single choice
             {
@@ -545,7 +1548,12 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "ort can handle conflicts automatically", correct: false },
                     { text: "ort works with older Git versions", correct: false }
                 ],
-                explanation: "'ort' (Ostensibly Recursive's Twin) improves on 'recursive' with faster rename detection (O(n) vs O(n²)), better directory rename handling, and improved performance on large repos."
+                explanation: "'ort' (Ostensibly Recursive's Twin) improves on 'recursive' with faster rename detection (O(n) vs O(n²)), better directory rename handling, and improved performance on large repos.",
+                notes: [
+                    "A → ❌ Merging 3+ branches is handled by 'octopus' strategy, not 'ort'",
+                    "C → ❌ 'ort' does NOT automatically resolve conflicts; manual resolution is still required (unless using options like -X)",
+                    "D → ❌ 'ort' is available only in newer Git versions (2.34+), not older ones"
+                ]
             },
             // Q14 - Drag and Drop
             {
@@ -579,7 +1587,12 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "git merge --force", correct: false },
                     { text: "git push --force", correct: false }
                 ],
-                explanation: "After resolving conflicts: (1) git status to verify, (2) git add resolved files, (3) git merge --continue (or git commit). No force flags needed for normal merges."
+                explanation: "After resolving conflicts: (1) git status to verify, (2) git add resolved files, (3) git merge --continue (or git commit). No force flags needed for normal merges.",
+                notes: [
+                    "C → ❌ 'git commit --amend' is used to modify the previous commit, not part of normal merge conflict resolution",
+                    "E → ❌ 'git merge --force' is NOT a valid command; force is not used for completing merges",
+                    "F → ❌ 'git push --force' is unrelated to conflict resolution; it rewrites remote history and is not needed here"
+                ]
             },
             // Q16 - Matching
             {
@@ -611,7 +1624,16 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "git diff --ancestor main feature", correct: false },
                     { text: "git show --fork main feature", correct: false }
                 ],
-                explanation: "git merge-base finds the best common ancestor between two commits. This is the 'ancestor' in 3-way merge — the point where branches diverged."
+                explanation: "git merge-base finds the best common ancestor between two commits. This is the 'ancestor' in 3-way merge — the point where branches diverged.",
+                notes: [
+                    "A → ❌ 'git log --merge main feature' is used to show commits involved in a merge conflict; it does NOT find the common ancestor (merge base)",
+
+                    "B → ✅ 'git merge-base main feature' is the correct command; it finds the BEST common ancestor commit (fork point) between two branches, which Git uses in 3-way merge",
+
+                    "C → ❌ 'git diff --ancestor main feature' is NOT a valid Git command; there is no '--ancestor' option in git diff",
+
+                    "D → ❌ 'git show --fork main feature' is NOT a valid command; 'git show' displays commit details, but cannot calculate branch divergence points"
+                ]
             },
             // Q18 - Multi choice 2/6
             {
@@ -660,7 +1682,126 @@ Git: "They're different... CONFLICT!"</pre>
                     { text: "Octopus strategy aborts if ANY conflict exists", correct: true },
                     { text: "-s theirs is the opposite of -s ours", correct: false }
                 ],
-                explanation: "Correct: -X ours preserves non-conflicts; ort is new default; octopus aborts on conflict. Wrong: -s ours discards ALL; resolve has no rename; there's no -s theirs!"
+                explanation: "Correct: -X ours preserves non-conflicts; ort is new default; octopus aborts on conflict. Wrong: -s ours discards ALL; resolve has no rename; there's no -s theirs!",
+                notes: [
+                    "A → ✅ '-X ours' is an OPTION that only affects conflicts; non-conflicting changes from BOTH branches are merged normally",
+
+                    "B → ❌ '-s ours' is a STRATEGY that discards ALL changes from the incoming branch, including non-conflicting ones",
+
+                    "C → ✅ 'ort' replaced 'recursive' as the default merge strategy in Git 2.34+ (faster and better rename detection)",
+
+                    "D → ❌ 'resolve' strategy does NOT support rename detection; it is a simpler merge algorithm",
+
+                    "E → ✅ 'octopus' strategy aborts if ANY conflict exists; it is designed only for clean multi-branch merges",
+
+                    "F → ❌ '-s theirs' does NOT exist; 'theirs' is only available as an OPTION (-X theirs), not a strategy"
+                ]
+            },
+            // Q21 - Ordering: Conflict Resolution Workflow
+            {
+                id: 21, type: "ordering", category: "conflict resolution workflow",
+                scenario: "You're on main branch and run 'git merge feature-b', which results in a conflict in app.py. You need to resolve the conflict and complete the merge.",
+                question: "Arrange these commands in the correct order (first step at top):",
+                steps: [
+                    { id: "s1", text: "git merge feature-b", order: 1 },
+                    { id: "s2", text: "# Edit app.py to resolve conflict markers", order: 2 },
+                    { id: "s3", text: "git add app.py", order: 3 },
+                    { id: "s4", text: "git merge --continue", order: 4 }
+                ],
+                explanation: "Conflict resolution workflow: (1) Start merge → conflict occurs, (2) Manually edit file to resolve <<<< ==== >>>> markers, (3) Stage resolved file with git add, (4) Complete merge with --continue.",
+                notes: [
+                    "Step 1 → git merge feature-b initiates the merge and Git detects conflict",
+                    "Step 2 → Manual edit removes conflict markers (<<<<<<, ======, >>>>>>)",
+                    "Step 3 → git add marks file as resolved (required before continuing)",
+                    "Step 4 → git merge --continue (or git commit) finalizes the merge commit"
+                ]
+            },
+
+            // Q22 - Ordering: Create Feature Branch and Merge
+            {
+                id: 22, type: "ordering", category: "feature branch workflow",
+                scenario: "You need to create a new feature branch from main, make changes to app.py, commit, then merge back to main.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git checkout main  # ensure on main", order: 1 },
+                    { id: "s2", text: "git checkout -b feature-a", order: 2 },
+                    { id: "s3", text: "# Make changes to app.py", order: 3 },
+                    { id: "s4", text: "git add app.py", order: 4 },
+                    { id: "s5", text: "git commit -m 'FA1: Add feature'", order: 5 },
+                    { id: "s6", text: "git checkout main  # return to main", order: 6 },
+                    { id: "s7", text: "git merge feature-a", order: 7 }
+                ],
+                explanation: "Feature branch workflow: Start on main → create branch → make changes → stage → commit → switch back to main → merge feature branch.",
+                notes: [
+                    "Step 1 → Ensure you're on main before creating feature branch",
+                    "Step 2 → git checkout -b creates AND switches to new branch",
+                    "Steps 3-5 → Standard edit-add-commit cycle on feature branch",
+                    "Step 6 → Must switch back to main (target branch) before merge",
+                    "Step 7 → Merge brings feature-a changes INTO main"
+                ]
+            },
+
+            // Q23 - Ordering: Subtree Merge Setup
+            {
+                id: 23, type: "ordering", category: "subtree merge workflow",
+                scenario: "You need to create a library branch with code in a lib/ subdirectory, then merge it into main using subtree strategy.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git checkout -b library", order: 1 },
+                    { id: "s2", text: "mkdir -p lib", order: 2 },
+                    { id: "s3", text: "# Create lib/helpers.py", order: 3 },
+                    { id: "s4", text: "git add lib/", order: 4 },
+                    { id: "s5", text: "git commit -m 'LIB1: Add helpers'", order: 5 },
+                    { id: "s6", text: "git checkout main", order: 6 },
+                    { id: "s7", text: "git merge -s subtree library", order: 7 }
+                ],
+                explanation: "Subtree merge: Create branch → setup subdirectory structure → commit → switch to main → merge with -s subtree strategy.",
+                notes: [
+                    "Steps 1-5 → Create library branch with code inside lib/ subdirectory",
+                    "Step 6 → Switch to main (the branch receiving the merge)",
+                    "Step 7 → -s subtree tells Git to handle subdirectory path mapping automatically"
+                ]
+            },
+
+            // Q24 - Ordering: Octopus Merge (3+ branches)
+            {
+                id: 24, type: "ordering", category: "octopus merge workflow",
+                scenario: "You have three feature branches (feature-a, feature-b, feature-c) ready to merge. They all modify different sections with no conflicts. You want to merge all three in one commit.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git checkout main", order: 1 },
+                    { id: "s2", text: "git log --oneline --graph --all", order: 2 },
+                    { id: "s3", text: "git merge feature-a feature-b feature-c", order: 3 },
+                    { id: "s4", text: "git log --oneline --graph -5", order: 4 }
+                ],
+                explanation: "Octopus merge: Ensure on main → verify branch state → merge multiple branches in single command (Git auto-selects octopus strategy) → verify result.",
+                notes: [
+                    "Step 1: git checkout main | Must be on main before merging",
+                    "Step 2: git log --oneline --graph --all | Verify all branches exist (pre-merge check)",
+                    "Step 3: git merge feature-a feature-b feature-c | Perform the octopus merge",
+                    "Step 4: git log --oneline --graph -5 | Verify result (post-merge check)"
+                ]
+            },
+
+            // Q25 - Ordering: Reset and Retry with Different Strategy
+            {
+                id: 25, type: "ordering", category: "strategy comparison workflow",
+                scenario: "You merged feature-b into main but want to undo it and retry with -X theirs option to auto-resolve conflicts in their favor.",
+                question: "Arrange these commands in the correct order:",
+                steps: [
+                    { id: "s1", text: "git log --oneline -3", order: 1 },
+                    { id: "s2", text: "git reset --hard HEAD~1", order: 2 },
+                    { id: "s3", text: "git merge -X theirs feature-b", order: 3 },
+                    { id: "s4", text: "cat app.py", order: 4 }
+                ],
+                explanation: "Undo and retry: Check current state → reset to before merge → retry merge with different option → verify result.",
+                notes: [
+                    "Step 1 → Check history to confirm merge commit exists",
+                    "Step 2 → git reset --hard HEAD~1 removes last commit (the merge)",
+                    "Step 3 → -X theirs auto-picks THEIR version on conflicts (non-conflicts still merge normally)",
+                    "Step 4 → Verify the file has their changes where conflicts existed",
+                    "⚠️ -X theirs is an OPTION, not strategy — different from -s ours!"
+                ]
             }
         ];
 
@@ -672,20 +1813,117 @@ Git: "They're different... CONFLICT!"</pre>
             container.innerHTML = questions.map((q, idx) => {
                 if (q.type === 'dragdrop') return renderDragDrop(q, idx);
                 if (q.type === 'matching') return renderMatching(q, idx);
+                if (q.type === 'ordering') return renderOrdering(q, idx);
                 return renderMultiChoice(q, idx);
             }).join('');
-            
-            // Initialize drag-drop functionality
-            questions.filter(q => q.type === 'dragdrop').forEach(q => {
-                initDragDrop(q.id);
-            });
-            
-            // Initialize matching functionality
-            questions.filter(q => q.type === 'matching').forEach(q => {
-                initMatching(q.id);
-            });
-            
+
+            // Initialize drag-drop
+            questions.filter(q => q.type === 'dragdrop').forEach(q => initDragDrop(q.id));
+
+            // Initialize matching
+            questions.filter(q => q.type === 'matching').forEach(q => initMatching(q.id));
+
+            // Initialize ordering
+            questions.filter(q => q.type === 'ordering').forEach(q => initOrdering(q.id));
+
             updateProgress();
+        }
+        let orderState = {};
+
+        function initOrdering(qid) {
+            orderState[qid] = {};
+            const items = document.querySelectorAll(`.order-item[data-qid="${qid}"]`);
+            const slots = document.querySelectorAll(`.slot-dropzone[data-qid="${qid}"]`);
+            const source = document.getElementById(`items${qid}`);
+
+            items.forEach(item => {
+                item.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', item.dataset.id);
+                    item.classList.add('dragging');
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                });
+            });
+
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    slot.classList.add('drag-over');
+                });
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                slot.addEventListener('drop', e => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const itemId = e.dataTransfer.getData('text/plain');
+                    const item = document.querySelector(`.order-item[data-id="${itemId}"][data-qid="${qid}"]`);
+
+                    // Return existing item to source
+                    if (slot.children.length > 0) {
+                        const existingItem = slot.children[0];
+                        source.appendChild(existingItem);
+                        // Remove from state
+                        for (let pos in orderState[qid]) {
+                            if (orderState[qid][pos] === existingItem.dataset.id) {
+                                delete orderState[qid][pos];
+                            }
+                        }
+                    }
+
+                    slot.appendChild(item);
+                    orderState[qid][slot.dataset.pos] = itemId;
+                    checkOrderingComplete(qid);
+                });
+            });
+
+            source.addEventListener('dragover', e => e.preventDefault());
+            source.addEventListener('drop', e => {
+                e.preventDefault();
+                const itemId = e.dataTransfer.getData('text/plain');
+                const item = document.querySelector(`.order-item[data-id="${itemId}"][data-qid="${qid}"]`);
+                source.appendChild(item);
+                // Remove from state
+                for (let pos in orderState[qid]) {
+                    if (orderState[qid][pos] === itemId) delete orderState[qid][pos];
+                }
+                checkOrderingComplete(qid);
+            });
+        }
+
+        function checkOrderingComplete(qid) {
+            const q = questions.find(x => x.id === qid);
+            const allFilled = Object.keys(orderState[qid]).length === q.steps.length;
+            document.getElementById(`sub${qid}`).disabled = !allFilled;
+        }
+
+        function submitOrdering(qid) {
+            if (submitted[qid]) return;
+            submitted[qid] = true;
+            const q = questions.find(x => x.id === qid);
+            let correctCount = 0;
+
+            q.steps.forEach(step => {
+                const slot = document.querySelector(`.slot-dropzone[data-pos="${step.order}"][data-qid="${qid}"]`);
+                const item = slot.querySelector('.order-item');
+                if (item) {
+                    item.setAttribute('draggable', 'false');
+                    if (item.dataset.order === String(step.order)) {
+                        slot.classList.add('correct');
+                        item.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        slot.classList.add('incorrect');
+                        item.classList.add('incorrect');
+                    }
+                }
+            });
+
+            const isCorrect = correctCount === q.steps.length;
+            if (isCorrect) score++;
+            updateScoreDisplay();
+            markQuestion(qid, isCorrect);
         }
 
         function renderMultiChoice(q, idx) {
@@ -709,7 +1947,14 @@ Git: "They're different... CONFLICT!"</pre>
                     <button class="submit-btn" id="sub${q.id}" onclick="submitAnswer(${q.id})" disabled>Submit Answer</button>
                     <div class="explanation" id="exp${q.id}">
                         <div class="explanation-title">📖 Explanation</div>
-                        <div class="explanation-text">${q.explanation}</div>
+                        <div class="explanation-text">
+    ${q.explanation}
+    ${q.notes ? `
+        <ul style="margin-top:10px; padding-left:20px;">
+            ${q.notes.map(n => `<li>${n}</li>`).join('')}
+        </ul>
+    ` : ""}
+</div>
                     </div>
                 </div>
             `;
@@ -748,50 +1993,113 @@ Git: "They're different... CONFLICT!"</pre>
                     <button class="submit-btn" id="sub${q.id}" onclick="submitDragDrop(${q.id})" disabled>Submit Answer</button>
                     <div class="explanation" id="exp${q.id}">
                         <div class="explanation-title">📖 Explanation</div>
-                        <div class="explanation-text">${q.explanation}</div>
+                        <div class="explanation-text">
+    ${q.explanation}
+    ${q.notes ? `
+        <ul style="margin-top:10px; padding-left:20px;">
+            ${q.notes.map(n => `<li>${n}</li>`).join('')}
+        </ul>
+    ` : ""}
+</div>
                     </div>
                 </div>
             `;
         }
-
         function renderMatching(q, idx) {
             return `
-                <div class="question-card" id="q${q.id}">
-                    <div class="question-header">
-                        <span class="question-number">Q${idx + 1} • ${q.category}</span>
-                        <span class="question-type">Matching</span>
-                    </div>
-                    <div class="scenario-box"><strong>Scenario:</strong> ${q.scenario}</div>
-                    <div class="question-text">${q.question}</div>
-                    <div class="matching-container">
-                        <div class="matching-left">
-                            <h4>Terms</h4>
-                            ${q.leftItems.map(item => `
-                                <div class="match-item" data-id="${item.id}" data-qid="${q.id}" data-side="left" onclick="selectMatch(${q.id}, '${item.id}', 'left')">
-                                    <code>${item.text}</code>
-                                </div>
-                            `).join('')}
+        <div class="question-card" id="q${q.id}">
+            <div class="question-header">
+                <span class="question-number">Q${idx + 1} • ${q.category}</span>
+                <span class="question-type">Matching</span>
+            </div>
+            <div class="scenario-box"><strong>Scenario:</strong> ${q.scenario}</div>
+            <div class="question-text">${q.question}</div>
+            <div class="matching-container">
+                <div class="matching-left">
+                    <h4>Terms</h4>
+                    ${q.leftItems.map(item => `
+                        <div class="match-item" data-id="${item.id}" data-qid="${q.id}" data-side="left" onclick="selectMatch(${q.id}, '${item.id}', 'left')">
+                            <code>${item.text}</code>
                         </div>
-                        <div class="matching-lines"></div>
-                        <div class="matching-right">
-                            <h4>Definitions</h4>
-                            ${q.rightItems.map(item => `
-                                <div class="match-item" data-id="${item.id}" data-qid="${q.id}" data-side="right" data-match="${item.matchId}" onclick="selectMatch(${q.id}, '${item.id}', 'right')">
-                                    ${item.text}
-                                </div>
-                            `).join('')}
+                    `).join('')}
+                </div>
+                <div class="matching-right">
+                    <h4>Definitions</h4>
+                    ${q.rightItems.map(item => `
+                        <div class="match-item" data-id="${item.id}" data-qid="${q.id}" data-side="right" onclick="selectMatch(${q.id}, '${item.id}', 'right')">
+                            ${item.text}
                         </div>
-                    </div>
-                    <div class="connections-display" id="connections${q.id}">
-                        <strong>Your Matches:</strong> <span id="matchList${q.id}">None yet</span>
-                    </div>
-                    <button class="submit-btn" id="sub${q.id}" onclick="submitMatching(${q.id})" disabled>Submit Answer</button>
-                    <div class="explanation" id="exp${q.id}">
-                        <div class="explanation-title">📖 Explanation</div>
-                        <div class="explanation-text">${q.explanation}</div>
+                    `).join('')}
+                </div>
+            </div>
+            <div class="connections-display">
+                <strong>Your Matches:</strong>
+                <div id="matchList${q.id}">None yet</div>
+            </div>
+            <button class="submit-btn" id="sub${q.id}" onclick="submitMatching(${q.id})" disabled>Submit Answer</button>
+            <div class="explanation" id="exp${q.id}">
+                <div class="explanation-title">📖 Explanation</div>
+                <div class="explanation-text">
+                    ${q.explanation}
+                    ${q.notes ? `
+                        <ul style="margin-top:10px; padding-left:20px;">
+                            ${q.notes.map(n => `<li>${n}</li>`).join('')}
+                        </ul>
+                    ` : ""}
+                </div>
+            </div>
+        </div>
+    `;
+        }
+
+        function renderOrdering(q, idx) {
+            // Shuffle steps for display
+            const shuffled = [...q.steps].sort(() => Math.random() - 0.5);
+            return `
+        <div class="question-card" id="q${q.id}">
+            <div class="question-header">
+                <span class="question-number">Q${idx + 1} • ${q.category}</span>
+                <span class="question-type">Order Steps</span>
+            </div>
+            <div class="scenario-box"><strong>Scenario:</strong> ${q.scenario}</div>
+            <div class="question-text">${q.question}</div>
+            <div class="ordering-container" id="order${q.id}">
+                <div class="ordering-target">
+                    <h4>📋 Correct Order (drag here, first at top)</h4>
+                    <div class="order-slots" id="slots${q.id}">
+                        ${q.steps.map((_, i) => `
+                            <div class="order-slot" data-position="${i + 1}" data-qid="${q.id}">
+                                <span class="slot-number">${i + 1}</span>
+                                <div class="slot-dropzone" data-pos="${i + 1}" data-qid="${q.id}"></div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
-            `;
+                <div class="ordering-source">
+                    <h4>📦 Commands (drag to order)</h4>
+                    <div class="order-items" id="items${q.id}">
+                        ${shuffled.map(step => `
+                            <div class="order-item" draggable="true" data-id="${step.id}" data-order="${step.order}" data-qid="${q.id}">
+                                <code>${step.text}</code>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            <button class="submit-btn" id="sub${q.id}" onclick="submitOrdering(${q.id})" disabled>Submit Answer</button>
+            <div class="explanation" id="exp${q.id}">
+                <div class="explanation-title">📖 Explanation</div>
+                <div class="explanation-text">
+                    ${q.explanation}
+                    ${q.notes ? `
+                        <ul style="margin-top:10px; padding-left:20px;">
+                            ${q.notes.map(n => `<li>${n}</li>`).join('')}
+                        </ul>
+                    ` : ""}
+                </div>
+            </div>
+        </div>
+    `;
         }
 
         function initDragDrop(qid) {
@@ -823,12 +2131,12 @@ Git: "They're different... CONFLICT!"</pre>
                     zone.classList.remove('drag-over');
                     const itemId = e.dataTransfer.getData('text/plain');
                     const item = document.querySelector(`.drag-item[data-id="${itemId}"][data-qid="${qid}"]`);
-                    
+
                     // Return existing item to source
                     if (zone.children.length > 0) {
                         source.appendChild(zone.children[0]);
                     }
-                    
+
                     zone.appendChild(item);
                     dragState[qid][zone.dataset.zone] = itemId;
                     checkDragDropComplete(qid);
@@ -856,40 +2164,85 @@ Git: "They're different... CONFLICT!"</pre>
         }
 
         function initMatching(qid) {
-            matchState[qid] = { selected: null, matches: {} };
+            matchState[qid] = { selectedLeft: null, selectedRight: null, matches: {} };
         }
 
         function selectMatch(qid, itemId, side) {
             if (submitted[qid]) return;
             const state = matchState[qid];
             const item = document.querySelector(`.match-item[data-id="${itemId}"][data-qid="${qid}"]`);
-            
-            // If already matched, ignore
-            if (item.classList.contains('matched')) return;
-            
+
+            // If already matched, UNMATCH it (allow changing)
+            if (item.classList.contains('matched')) {
+                // Find and remove this match
+                if (side === 'left') {
+                    const rightId = state.matches[itemId];
+                    delete state.matches[itemId];
+                    item.classList.remove('matched');
+                    if (rightId) {
+                        document.querySelector(`.match-item[data-id="${rightId}"][data-qid="${qid}"]`).classList.remove('matched');
+                    }
+                } else {
+                    // Find which left item matched to this right item
+                    for (let leftId in state.matches) {
+                        if (state.matches[leftId] === itemId) {
+                            delete state.matches[leftId];
+                            document.querySelector(`.match-item[data-id="${leftId}"][data-qid="${qid}"]`).classList.remove('matched');
+                            break;
+                        }
+                    }
+                    item.classList.remove('matched');
+                }
+                updateMatchDisplay(qid);
+                checkMatchingComplete(qid);
+                return;
+            }
+
             // Clear previous selection on same side
             document.querySelectorAll(`.match-item[data-qid="${qid}"][data-side="${side}"]`).forEach(el => {
                 if (!el.classList.contains('matched')) el.classList.remove('selected');
             });
-            
+
             item.classList.add('selected');
-            
+
             if (side === 'left') {
-                state.selected = itemId;
-            } else if (state.selected) {
-                // Make match
-                state.matches[state.selected] = itemId;
-                
-                // Mark both as matched
-                document.querySelector(`.match-item[data-id="${state.selected}"][data-qid="${qid}"]`).classList.add('matched');
-                document.querySelector(`.match-item[data-id="${state.selected}"][data-qid="${qid}"]`).classList.remove('selected');
-                item.classList.add('matched');
-                item.classList.remove('selected');
-                
-                state.selected = null;
-                updateMatchDisplay(qid);
-                checkMatchingComplete(qid);
+                state.selectedLeft = itemId;
+                // If right already selected, make match
+                if (state.selectedRight) {
+                    makeMatch(qid);
+                }
+            } else {
+                state.selectedRight = itemId;
+                // If left already selected, make match
+                if (state.selectedLeft) {
+                    makeMatch(qid);
+                }
             }
+        }
+
+        function makeMatch(qid) {
+            const state = matchState[qid];
+            const leftId = state.selectedLeft;
+            const rightId = state.selectedRight;
+
+            // Store match
+            state.matches[leftId] = rightId;
+
+            // Mark both as matched
+            const leftEl = document.querySelector(`.match-item[data-id="${leftId}"][data-qid="${qid}"]`);
+            const rightEl = document.querySelector(`.match-item[data-id="${rightId}"][data-qid="${qid}"]`);
+
+            leftEl.classList.add('matched');
+            leftEl.classList.remove('selected');
+            rightEl.classList.add('matched');
+            rightEl.classList.remove('selected');
+
+            // Clear selections
+            state.selectedLeft = null;
+            state.selectedRight = null;
+
+            updateMatchDisplay(qid);
+            checkMatchingComplete(qid);
         }
 
         function updateMatchDisplay(qid) {
@@ -948,7 +2301,7 @@ Git: "They're different... CONFLICT!"</pre>
             submitted[qid] = true;
             const q = questions.find(x => x.id === qid);
             let correctCount = 0;
-            
+
             q.dropZones.forEach(zone => {
                 const zoneEl = document.querySelector(`.drop-zone-target[data-zone="${zone.id}"]`);
                 const itemEl = zoneEl.querySelector('.drag-item');
@@ -964,7 +2317,7 @@ Git: "They're different... CONFLICT!"</pre>
                     }
                 }
             });
-            
+
             const isCorrect = correctCount === q.dropZones.length;
             if (isCorrect) score++;
             updateScoreDisplay();
@@ -977,16 +2330,16 @@ Git: "They're different... CONFLICT!"</pre>
             const q = questions.find(x => x.id === qid);
             const state = matchState[qid];
             let correctCount = 0;
-            
+
             q.leftItems.forEach(left => {
                 const userMatch = state.matches[left.id];
                 const rightItem = q.rightItems.find(r => r.matchId === left.id);
                 const leftEl = document.querySelector(`.match-item[data-id="${left.id}"][data-qid="${qid}"]`);
                 const rightEl = document.querySelector(`.match-item[data-id="${userMatch}"][data-qid="${qid}"]`);
-                
+
                 leftEl.classList.add('disabled');
                 if (rightEl) rightEl.classList.add('disabled');
-                
+
                 if (userMatch === rightItem.id) {
                     leftEl.classList.remove('matched');
                     leftEl.classList.add('correct');
@@ -1004,7 +2357,7 @@ Git: "They're different... CONFLICT!"</pre>
                     }
                 }
             });
-            
+
             const isCorrect = correctCount === q.leftItems.length;
             if (isCorrect) score++;
             updateScoreDisplay();
@@ -1031,7 +2384,8 @@ Git: "They're different... CONFLICT!"</pre>
         }
 
         function resetQuiz() {
-            answers = {}; submitted = {}; score = 0; dragState = {}; matchState = {};
+            answers = {}; submitted = {}; score = 0;
+            dragState = {}; matchState = {}; orderState = {};
             document.getElementById('correctCount').textContent = '0';
             document.getElementById('totalAnswered').textContent = '0';
             initQuiz();
@@ -1073,4 +2427,5 @@ Git: "They're different... CONFLICT!"</pre>
         initQuiz();
     </script>
 </body>
+
 </html>

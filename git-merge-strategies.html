@@ -935,164 +935,154 @@
 
     <main class="main-content">
         <!-- SECTION 1: Learn -->
-        <section id="learn" class="section active">
-            <h1>Git Merge Strategies & 3-Way Merge</h1>
-            <p class="intro-text">Master merge strategies, options, and the 3-way merge algorithm for CCIE Automation.
-            </p>
+        <!-- REPLACE YOUR ENTIRE <section id="learn" class="section active"> ... </section> WITH THIS -->
 
-            <!-- Strategy vs Option -->
-            <h2>🎯 Strategy (-s) vs Option (-X)</h2>
+        <section id="learn" class="section active">
+            <h1>Git Merge Strategies — Practice Lab</h1>
+            <p class="intro-text">Master merge strategies with hands-on CLI practice for CCIE DevNet Expert.</p>
+
+            <div class="tip-box">
+                <strong>📂 Lab Path:</strong> <code>~/DevnetExpert/mock3/design/git-ops</code>
+            </div>
+
+            <!-- Theory Section -->
+            <h2>🎯 Theory — Merge Strategies vs Merge Options</h2>
             <div class="workflow-card">
+                <p>Git merge has two separate flags that sound similar but do very different things:</p>
+                <p><strong><code>-s</code> = Strategy</strong> — The overall merge algorithm. Tells Git
+                    <strong>how</strong> to perform the entire merge.</p>
+                <p><strong><code>-X</code> = eXtended option</strong> — A tweak passed TO the strategy. Doesn't change
+                    the algorithm, just adjusts behavior on edge cases.</p>
+
+                <h3>Cooking Analogy</h3>
                 <table>
                     <thead>
                         <tr>
                             <th>Flag</th>
-                            <th>Name</th>
                             <th>Analogy</th>
-                            <th>What It Does</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><code>-s</code></td>
-                            <td>Strategy</td>
-                            <td>The recipe</td>
-                            <td>The entire merge algorithm</td>
+                            <td><strong>The recipe</strong> — "make a stir-fry" vs "make a soup" (completely different
+                                approach)</td>
                         </tr>
                         <tr>
                             <td><code>-X</code></td>
-                            <td>eXtended option</td>
-                            <td>A tweak</td>
-                            <td>Adjusts behavior on edge cases</td>
+                            <td><strong>A tweak</strong> — "make a stir-fry, but use extra chili" (same recipe, small
+                                adjustment)</td>
                         </tr>
                     </tbody>
                 </table>
-                <pre><span class="comment"># Combine strategy and option</span>
-<span class="command">git merge</span> <span class="flag">-s ort -X ours</span> feature
-<span class="comment">#          ^^^^   ^^^^^^</span>
-<span class="comment">#       strategy  option passed to ort</span></pre>
+
+                <p>You can combine them:</p>
+                <pre><span class="command">git merge</span> <span class="flag">-s ort -X ours</span> feature
+<span class="comment">#          ^^^^  ^^^^^^</span>
+<span class="comment">#        strategy  option passed to ort</span></pre>
             </div>
 
             <!-- All Strategies -->
-            <h2>📊 All Merge Strategies (-s)</h2>
+            <h2>📊 Strategies (<code>-s</code>) — The Entire Algorithm</h2>
             <div class="workflow-card">
                 <table>
                     <thead>
                         <tr>
                             <th>Strategy</th>
                             <th>Command</th>
-                            <th>Branches</th>
-                            <th>Conflicts?</th>
-                            <th>Rename?</th>
-                            <th>Default?</th>
+                            <th>What It Does</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><code>ort</code></td>
                             <td><code>git merge -s ort</code></td>
-                            <td>2</td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="check">Git 2.34+</span></td>
+                            <td><strong>New default</strong> (Git 2.34+). 3-way merge with rename detection. Replaced
+                                <code>recursive</code></td>
                         </tr>
                         <tr>
                             <td><code>recursive</code></td>
                             <td><code>git merge -s recursive</code></td>
-                            <td>2</td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="check">✓</span></td>
-                            <td>Pre 2.34</td>
+                            <td><strong>Old default</strong> (pre 2.34). Same as <code>ort</code> but slower on edge
+                                cases</td>
                         </tr>
                         <tr>
                             <td><code>ours</code></td>
                             <td><code>git merge -s ours</code></td>
-                            <td>2</td>
-                            <td>N/A</td>
-                            <td>N/A</td>
-                            <td><span class="cross">✗</span></td>
+                            <td><strong>Discards ALL</strong> their changes entirely. Records merge but keeps our
+                                version</td>
                         </tr>
                         <tr>
                             <td><code>subtree</code></td>
                             <td><code>git merge -s subtree</code></td>
-                            <td>2</td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="cross">✗</span></td>
+                            <td>Merges when one branch is a <strong>subdirectory</strong> of another</td>
                         </tr>
                         <tr>
                             <td><code>resolve</code></td>
                             <td><code>git merge -s resolve</code></td>
-                            <td>2</td>
-                            <td><span class="check">✓</span></td>
-                            <td><span class="cross">✗</span></td>
-                            <td><span class="cross">✗</span></td>
+                            <td>Simple 3-way merge. Only works with <strong>one</strong> common ancestor</td>
                         </tr>
                         <tr>
                             <td><code>octopus</code></td>
                             <td>Auto for 3+</td>
-                            <td><strong>3+</strong></td>
-                            <td><span class="cross">Aborts</span></td>
-                            <td><span class="cross">✗</span></td>
-                            <td>Auto</td>
+                            <td>Merges <strong>3+ branches</strong> in one commit. Aborts on ANY conflict</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Options -->
-            <h2>⚙️ Merge Options (-X)</h2>
+            <h2>⚙️ Options (<code>-X</code>) — Tweaks to the Strategy</h2>
             <div class="workflow-card">
                 <table>
                     <thead>
                         <tr>
                             <th>Option</th>
                             <th>Command</th>
-                            <th>Non-Conflicting</th>
-                            <th>Conflicting</th>
+                            <th>What It Does</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><code>ours</code></td>
                             <td><code>git merge -X ours</code></td>
-                            <td><span class="check">✓ Merged</span></td>
-                            <td>Pick our side</td>
+                            <td>On <strong>conflicts only</strong>, auto-pick our side</td>
                         </tr>
                         <tr>
                             <td><code>theirs</code></td>
                             <td><code>git merge -X theirs</code></td>
-                            <td><span class="check">✓ Merged</span></td>
-                            <td>Pick their side</td>
+                            <td>On <strong>conflicts only</strong>, auto-pick their side</td>
                         </tr>
                         <tr>
                             <td><code>subtree=path</code></td>
                             <td><code>git merge -X subtree=lib</code></td>
-                            <td colspan="2">Adjust tree path</td>
+                            <td>Adjust tree path for subdirectory matching</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- The Critical Trap -->
+            <!-- Critical Trap -->
             <h2>⚠️ The Critical Exam Trap</h2>
             <div class="trap-box">
                 <strong>🎯 -s ours ≠ -X ours — They look similar but behave completely differently!</strong>
             </div>
             <div class="workflow-card">
+                <pre><span class="flag">-s ours</span>  →  Discards ALL their changes (nuclear option)
+<span class="flag">-X ours</span>  →  Only resolves CONFLICTS in our favor (non-conflicting changes still merge)</pre>
                 <table>
                     <thead>
                         <tr>
                             <th>Aspect</th>
-                            <th><code>-s ours</code> (Strategy)</th>
-                            <th><code>-X ours</code> (Option)</th>
+                            <th><code>-s ours</code> (strategy)</th>
+                            <th><code>-X ours</code> (option)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>Non-conflicting changes</td>
                             <td><span class="cross">❌ Discarded</span></td>
-                            <td><span class="check">✓ Merged normally</span></td>
+                            <td><span class="check">✅ Merged normally</span></td>
                         </tr>
                         <tr>
                             <td>Conflicting changes</td>
@@ -1101,37 +1091,536 @@
                         </tr>
                         <tr>
                             <td>Their work preserved?</td>
-                            <td><span class="cross">No — thrown away</span></td>
-                            <td><span class="check">Yes — only conflicts lost</span></td>
+                            <td>No — thrown away entirely</td>
+                            <td>Yes — only conflicts lost</td>
                         </tr>
                         <tr>
                             <td>Use case</td>
-                            <td>Abandon branch cleanly</td>
-                            <td>Auto-resolve in your favor</td>
+                            <td>Abandon a branch cleanly</td>
+                            <td>Auto-resolve conflicts in your favor</td>
                         </tr>
                     </tbody>
                 </table>
-                <pre><span class="comment"># STRATEGY: Discards ALL their changes (nuclear option)</span>
-<span class="command">git merge</span> <span class="flag">-s ours</span> feature    <span class="comment"># Nothing from feature is kept!</span>
-
-<span class="comment"># OPTION: Only auto-resolves conflicts in our favor</span>
-<span class="command">git merge</span> <span class="flag">-X ours</span> feature    <span class="comment"># Non-conflicting changes still merge</span></pre>
             </div>
 
-            <!-- Ours vs Theirs -->
-            <h2>👆 Ours vs Theirs</h2>
+            <!-- Practice Setup -->
+            <h2>🔬 Practice Setup</h2>
             <div class="workflow-card">
-                <pre><span class="command">git checkout</span> main           <span class="comment">← You're standing HERE = OURS</span>
-<span class="command">git merge</span> feature           <span class="comment">← Pulling THIS in = THEIRS</span></pre>
-                <div class="tip-box">
-                    <strong>💡 Remember:</strong> Ours = where I stand. Theirs = what I'm merging in.
+                <h3>The Scenario</h3>
+                <p>Four branches from one shared file (<code>app.py</code>):</p>
+                <pre>main:       M1 (base)
+feature-a:  FA1 (changes Section A + D)
+feature-b:  FB1 (changes Section B + D) ← will CONFLICT with feature-a on Section D
+feature-c:  FC1 (changes Section C only) ← no conflict with anyone</pre>
+                <p>We merge them into main one by one using different strategies to see the difference.</p>
+            </div>
+
+            <!-- Step 1 -->
+            <h2>Step 1 — Clean Start</h2>
+            <div class="workflow-card">
+                <pre><span class="command">cd</span> ~/DevnetExpert/mock3/design/git-ops
+<span class="command">rm</span> -rf .git *.py *.yaml *.md
+<span class="command">git init</span>
+
+<span class="command">cat</span> > app.py << 'EOF'
+# === Network App v1.0 ===
+
+# --- Section A: Auth ---
+def authenticate(user):
+    print("Auth v1")
+
+# --- Section B: SNMP ---
+def snmp_poll(device):
+    print("SNMP v1")
+
+# --- Section C: Logging ---
+def log_event(msg):
+    print("LOG v1")
+
+# --- Section D: Main ---
+if __name__ == "__main__":
+    authenticate("admin")
+    snmp_poll("R1")
+    log_event("started")
+EOF
+
+<span class="command">git add</span> app.py
+<span class="command">git commit</span> -m "M1: Base app v1.0"
+<span class="command">git log</span> --oneline</pre>
+            </div>
+
+            <!-- Step 2 -->
+            <h2>Step 2 — Create feature-a (Changes Section A + D)</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git checkout</span> -b feature-a
+
+<span class="command">sed</span> -i 's/print("Auth v1")/print("Auth v2 TACACS")/' app.py
+<span class="command">sed</span> -i 's/authenticate("admin")/authenticate("netadmin")/' app.py
+
+<span class="command">git add</span> app.py
+<span class="command">git commit</span> -m "FA1: Upgrade auth to TACACS"
+<span class="command">git log</span> --oneline</pre>
+            </div>
+
+            <!-- Step 3 -->
+            <h2>Step 3 — Create feature-b from main (Changes Section B + D)</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git checkout</span> main
+<span class="command">git checkout</span> -b feature-b
+
+<span class="command">sed</span> -i 's/print("SNMP v1")/print("SNMP v3")/' app.py
+<span class="command">sed</span> -i 's/snmp_poll("R1")/snmp_poll("SW1")/' app.py
+
+<span class="command">git add</span> app.py
+<span class="command">git commit</span> -m "FB1: Upgrade SNMP to v3"
+<span class="command">git log</span> --oneline</pre>
+                <div class="warning-box">
+                    <strong>⚠️ Note:</strong> Both feature-a and feature-b changed Section D — this is where conflicts
+                    will happen.
                 </div>
+            </div>
+
+            <!-- Step 4 -->
+            <h2>Step 4 — Create feature-c from main (Changes Section C only)</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git checkout</span> main
+<span class="command">git checkout</span> -b feature-c
+
+<span class="command">sed</span> -i 's/print("LOG v1")/print("LOG v2 with timestamp")/' app.py
+
+<span class="command">git add</span> app.py
+<span class="command">git commit</span> -m "FC1: Add timestamp to logging"
+<span class="command">git log</span> --oneline</pre>
+            </div>
+
+            <!-- Step 5 -->
+            <h2>Step 5 — Verify Branch Graph</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git log</span> --oneline --graph --all</pre>
+                <p>Expected:</p>
+                <pre>* &lt;hash&gt; (feature-c) FC1: Add timestamp to logging
+| * &lt;hash&gt; (feature-b) FB1: Upgrade SNMP to v3
+|/
+| * &lt;hash&gt; (feature-a) FA1: Upgrade auth to TACACS
+|/
+* &lt;hash&gt; (main) M1: Base app v1.0</pre>
+                <pre>feature-a:  M1 ── FA1  (Section A + D changed)
+feature-b:  M1 ── FB1  (Section B + D changed)
+feature-c:  M1 ── FC1  (Section C changed)
+main:       M1</pre>
+            </div>
+
+            <!-- Test 1 -->
+            <h2>Test 1 — Default Strategy (<code>ort</code>) — Clean Merge</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git checkout</span> main
+
+<span class="command">git merge</span> feature-c -m "Merge FC1: logging upgrade"
+
+<span class="command">cat</span> app.py
+<span class="comment"># Section C now shows: LOG v2 with timestamp</span>
+<span class="comment"># Everything else unchanged</span>
+
+<span class="command">git log</span> --oneline</pre>
+                <div class="tip-box">
+                    <strong>✅ Result:</strong> No conflict — feature-c only touched Section C. Git used <code>ort</code>
+                    (default) automatically.
+                </div>
+            </div>
+
+            <!-- Test 2 -->
+            <h2>Test 2 — Default Strategy (<code>ort</code>) — Another Clean Merge</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git merge</span> feature-a -m "Merge FA1: auth upgrade"
+
+<span class="command">cat</span> app.py
+<span class="comment"># Section A now shows: Auth v2 TACACS</span>
+<span class="comment"># Section D now shows: authenticate("netadmin")</span>
+
+<span class="command">git log</span> --oneline</pre>
+                <p>Still no conflict — feature-a touched Section A + D, feature-c touched Section C. No overlap.</p>
+
+                <div class="tip-box">
+                    <strong>📌 Save this point — reset here for each test:</strong>
+                    <pre><span class="command">git log</span> --oneline -1
+<span class="comment"># Note this hash — this is your SAFE_POINT (after FC1 + FA1 merged)</span></pre>
+                </div>
+            </div>
+
+            <!-- Test 3 -->
+            <h2>Test 3 — Default Strategy (<code>ort</code>) — CONFLICT</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git merge</span> feature-b</pre>
+                <div class="warning-box">
+                    <strong>❌ CONFLICT on Section D</strong> — both feature-a and feature-b modified lines in the main
+                    block:
+                    <pre>CONFLICT (content): Merge conflict in app.py
+Automatic merge failed; fix conflicts and then commit the result.</pre>
+                </div>
+                <pre><span class="comment"># See the conflict markers</span>
+<span class="command">cat</span> app.py</pre>
+                <p>You'll see:</p>
+                <pre>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+    authenticate("netadmin")
+    snmp_poll("R1")
+=======
+    authenticate("admin")
+    snmp_poll("SW1")
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-b</pre>
+                <p>Resolve manually:</p>
+                <pre><span class="comment"># Edit in VSCode — keep both changes, remove markers</span>
+<span class="command">code</span> app.py</pre>
+                <p>Should become:</p>
+                <pre>    authenticate("netadmin")
+    snmp_poll("SW1")</pre>
+                <pre><span class="command">git add</span> app.py
+<span class="command">git merge</span> --continue
+
+<span class="command">git log</span> --oneline --graph -5</pre>
+                <p>Reset for next test:</p>
+                <pre><span class="command">git reset</span> --hard &lt;SAFE_POINT hash&gt;</pre>
+            </div>
+
+            <!-- Test 4 -->
+            <h2>Test 4 — <code>-X ours</code> (Auto-Pick Our Side on Conflicts)</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git merge</span> <span class="flag">-X ours</span> feature-b -m "Merge FB1 with -X ours"
+
+<span class="command">cat</span> app.py</pre>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>What Happened</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Section B</td>
+                            <td><code>SNMP v3</code> <span class="check">✅ Merged</span> (no conflict here)</td>
+                        </tr>
+                        <tr>
+                            <td>Section D <code>authenticate</code></td>
+                            <td><code>authenticate("netadmin")</code> — <strong>OUR</strong> version kept (conflict)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Section D <code>snmp_poll</code></td>
+                            <td><code>snmp_poll("R1")</code> — feature-b's change <strong>LOST</strong> (conflict)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="tip-box">
+                    <strong>Key Point:</strong> Non-conflicting changes came through. Only conflicts picked our side.
+                </div>
+                <pre><span class="comment"># Verify</span>
+<span class="command">grep</span> SNMP app.py    <span class="comment"># v3 — merged (non-conflicting)</span>
+<span class="command">grep</span> admin app.py   <span class="comment"># netadmin — ours kept (conflict)</span>
+<span class="command">grep</span> snmp app.py    <span class="comment"># R1 — ours kept, SW1 lost (conflict)</span></pre>
+                <p>Reset:</p>
+                <pre><span class="command">git reset</span> --hard &lt;SAFE_POINT hash&gt;</pre>
+            </div>
+
+            <!-- Test 5 -->
+            <h2>Test 5 — <code>-X theirs</code> (Auto-Pick Their Side on Conflicts)</h2>
+            <div class="workflow-card">
+                <pre><span class="command">git merge</span> <span class="flag">-X theirs</span> feature-b -m "Merge FB1 with -X theirs"
+
+<span class="command">cat</span> app.py</pre>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section</th>
+                            <th>What Happened</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Section B</td>
+                            <td><code>SNMP v3</code> <span class="check">✅ Merged</span> (no conflict here)</td>
+                        </tr>
+                        <tr>
+                            <td>Section D <code>authenticate</code></td>
+                            <td><code>authenticate("admin")</code> — <strong>THEIR</strong> version kept (conflict)</td>
+                        </tr>
+                        <tr>
+                            <td>Section D <code>snmp_poll</code></td>
+                            <td><code>snmp_poll("SW1")</code> — feature-b's change <strong>KEPT</strong> (conflict)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Opposite of <code>-X ours</code> — conflicts resolved in feature-b's favor.</p>
+                <pre><span class="command">grep</span> admin app.py   <span class="comment"># admin — theirs kept (our netadmin lost)</span>
+<span class="command">grep</span> snmp app.py    <span class="comment"># SW1 — theirs kept</span></pre>
+                <p>Reset:</p>
+                <pre><span class="command">git reset</span> --hard &lt;SAFE_POINT hash&gt;</pre>
+            </div>
+
+            <!-- Test 6 -->
+            <h2>Test 6 — <code>-s ours</code> (Discard EVERYTHING from Feature)</h2>
+            <div class="workflow-card">
+                <div class="trap-box">
+                    <strong>🎯 EXAM TRAP:</strong> <code>-s ours</code> discards EVERYTHING from feature-b!
+                </div>
+                <pre><span class="command">git merge</span> <span class="flag">-s ours</span> feature-b -m "Merge FB1 with -s ours (discard all)"
+
+<span class="command">cat</span> app.py</pre>
+                <p><strong>NOTHING from feature-b</strong> — no SNMP v3, no SW1, absolutely nothing changed.</p>
+                <pre><span class="command">grep</span> SNMP app.py    <span class="comment"># Still "SNMP v1" — even non-conflicting changes discarded!</span>
+<span class="command">grep</span> snmp app.py    <span class="comment"># Still "R1" — everything from feature-b thrown away</span></pre>
+                <p>But the merge commit exists in history:</p>
+                <pre><span class="command">git log</span> --oneline --graph -5
+<span class="comment"># Shows merge commit, but file is unchanged</span></pre>
+                <div class="tip-box">
+                    <strong>Use case:</strong> Branch is abandoned or already handled manually. You want Git to record
+                    it as "merged" so it stops appearing as unmerged.
+                </div>
+
+                <h3>This is why <code>-s ours</code> ≠ <code>-X ours</code>:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th><code>-s ours</code> (this test)</th>
+                            <th><code>-X ours</code> (Test 4)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SNMP v3 (non-conflicting)</td>
+                            <td><span class="cross">❌ Lost</span></td>
+                            <td><span class="check">✅ Merged</span></td>
+                        </tr>
+                        <tr>
+                            <td>Section D (conflicting)</td>
+                            <td><span class="cross">❌ Lost</span></td>
+                            <td>Ours kept</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Reset:</p>
+                <pre><span class="command">git reset</span> --hard &lt;SAFE_POINT hash&gt;</pre>
+            </div>
+
+            <!-- Test 7 -->
+            <h2>Test 7 — <code>-s recursive</code> vs <code>-s ort</code></h2>
+            <div class="workflow-card">
+                <pre><span class="comment"># Old default (pre Git 2.34)</span>
+<span class="command">git merge</span> <span class="flag">-s recursive</span> feature-b -m "Merge FB1 with recursive"
+
+<span class="comment"># Will conflict same as Test 3 — resolve it</span>
+<span class="command">cat</span> app.py
+<span class="comment"># Fix conflicts same way</span>
+<span class="command">git add</span> app.py
+<span class="command">git merge</span> --continue</pre>
+                <pre><span class="command">git reset</span> --hard &lt;SAFE_POINT hash&gt;
+
+<span class="comment"># New default (Git 2.34+)</span>
+<span class="command">git merge</span> <span class="flag">-s ort</span> feature-b -m "Merge FB1 with ort"
+
+<span class="comment"># Same conflict, same resolution</span></pre>
+                <div class="tip-box">
+                    <strong>Exam Answer:</strong> Both produce identical results — <code>ort</code> is faster and
+                    handles rename detection better. <code>ort</code> replaced <code>recursive</code> as the default in
+                    Git 2.34+.
+                </div>
+                <pre><span class="comment"># Check your Git version</span>
+<span class="command">git version</span>
+
+<span class="comment"># If 2.34+ → default is ort</span>
+<span class="comment"># If older → default is recursive</span></pre>
+                <p>Reset:</p>
+                <pre><span class="command">git reset</span> --hard &lt;SAFE_POINT hash&gt;</pre>
+            </div>
+
+            <!-- Test 8 -->
+            <h2>Test 8 — <code>-s subtree</code> (Subdirectory Merge)</h2>
+            <div class="workflow-card">
+                <p>Different setup — one branch has files in a subdirectory:</p>
+                <pre><span class="comment"># Create a branch from main with code inside a subdirectory</span>
+<span class="command">git checkout</span> -b library
+
+<span class="command">mkdir</span> -p lib
+<span class="command">cat</span> > lib/helpers.py << 'EOF'
+def net_helper():
+    print("Library helper v1")
+EOF
+
+<span class="command">git add</span> lib/
+<span class="command">git commit</span> -m "LIB1: Add helpers library"
+
+<span class="comment"># Back to main</span>
+<span class="command">git checkout</span> main
+
+<span class="comment"># Subtree merge — maps library's content into main</span>
+<span class="command">git merge</span> <span class="flag">-s subtree</span> library -m "Merge library using subtree strategy"
+
+<span class="command">ls</span> lib/
+<span class="comment"># helpers.py</span>
+
+<span class="command">cat</span> lib/helpers.py
+<span class="comment"># Library helper v1</span></pre>
+                <div class="tip-box">
+                    <strong>Use case:</strong> Merging a branch that represents a subdirectory of your project (like
+                    pulling in a shared library from another repo).
+                </div>
+                <pre><span class="command">git log</span> --oneline --graph -5</pre>
+            </div>
+
+            <!-- Summary -->
+            <h2>📋 Summary — All Strategies Tested</h2>
+            <div class="workflow-card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Test</th>
+                            <th>Command</th>
+                            <th>Conflict Handling</th>
+                            <th>Their Changes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Test 1</td>
+                            <td><code>git merge feature-c</code></td>
+                            <td>Default <code>ort</code>, no conflict</td>
+                            <td><span class="check">✅ All merged</span></td>
+                        </tr>
+                        <tr>
+                            <td>Test 2</td>
+                            <td><code>git merge feature-a</code></td>
+                            <td>Default <code>ort</code>, no conflict</td>
+                            <td><span class="check">✅ All merged</span></td>
+                        </tr>
+                        <tr>
+                            <td>Test 3</td>
+                            <td><code>git merge feature-b</code></td>
+                            <td>Default <code>ort</code>, <strong>manual resolve</strong></td>
+                            <td><span class="check">✅ All merged (after fix)</span></td>
+                        </tr>
+                        <tr>
+                            <td>Test 4</td>
+                            <td><code>git merge -X ours feature-b</code></td>
+                            <td>Auto-pick ours on conflict</td>
+                            <td><span class="check">✅ Non-conflicting merged</span></td>
+                        </tr>
+                        <tr>
+                            <td>Test 5</td>
+                            <td><code>git merge -X theirs feature-b</code></td>
+                            <td>Auto-pick theirs on conflict</td>
+                            <td><span class="check">✅ Non-conflicting merged</span></td>
+                        </tr>
+                        <tr>
+                            <td>Test 6</td>
+                            <td><code>git merge -s ours feature-b</code></td>
+                            <td>No conflicts possible</td>
+                            <td><span class="cross">❌ ALL discarded</span></td>
+                        </tr>
+                        <tr>
+                            <td>Test 7</td>
+                            <td><code>git merge -s recursive</code> / <code>-s ort</code></td>
+                            <td>Same as Test 3</td>
+                            <td><span class="check">✅ All merged (after fix)</span></td>
+                        </tr>
+                        <tr>
+                            <td>Test 8</td>
+                            <td><code>git merge -s subtree library</code></td>
+                            <td>Subdirectory path adjustment</td>
+                            <td><span class="check">✅ Mapped into directory</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Octopus Strategy -->
+            <h2>🐙 Octopus Strategy</h2>
+            <div class="workflow-card">
+                <p>Merges <strong>more than 2 branches</strong> at once in a single merge commit. Git selects it
+                    automatically when you pass multiple branches:</p>
+                <pre><span class="comment"># Instead of 3 separate merges:</span>
+<span class="command">git merge</span> feature-a
+<span class="command">git merge</span> feature-b
+<span class="command">git merge</span> feature-c
+
+<span class="comment"># Octopus — ONE merge commit, 3 parents:</span>
+<span class="command">git merge</span> feature-a feature-b feature-c</pre>
+                <div class="warning-box">
+                    <strong>⚠️ The Catch:</strong> Octopus <strong>refuses to handle conflicts</strong>. If any branch
+                    conflicts with another, it aborts entirely. Only works when all branches merge cleanly.
+                </div>
+            </div>
+
+            <!-- Rename Detection -->
+            <h2>📁 Which Strategy Supports Rename Detection?</h2>
+            <div class="workflow-card">
+                <p>Only <code>ort</code> and <code>recursive</code> (and <code>subtree</code> which is built on top of
+                    them). This is one of the key reasons <code>ort</code> became the new default in Git 2.34+.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Strategy</th>
+                            <th>Rename Detection?</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ort</code></td>
+                            <td><span class="check">✅ Yes (improved)</span></td>
+                            <td>Better and faster rename handling than recursive</td>
+                        </tr>
+                        <tr>
+                            <td><code>recursive</code></td>
+                            <td><span class="check">✅ Yes</span></td>
+                            <td>Original rename detection</td>
+                        </tr>
+                        <tr>
+                            <td><code>resolve</code></td>
+                            <td><span class="cross">❌ No</span></td>
+                            <td>Simple 3-way, no rename awareness</td>
+                        </tr>
+                        <tr>
+                            <td><code>ours</code></td>
+                            <td>N/A</td>
+                            <td>Discards their changes entirely — doesn't need it</td>
+                        </tr>
+                        <tr>
+                            <td><code>subtree</code></td>
+                            <td><span class="check">✅ Yes</span></td>
+                            <td>Built on top of recursive/ort, inherits rename detection</td>
+                        </tr>
+                        <tr>
+                            <td><code>octopus</code></td>
+                            <td><span class="cross">❌ No</span></td>
+                            <td>Lightweight multi-branch merge, no rename support</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>What "Rename Detection" Means in Practice</h3>
+                <pre><span class="comment"># feature-a renamed auth.py → authentication.py and edited it</span>
+<span class="command">git mv</span> auth.py authentication.py
+<span class="comment"># edited authentication.py</span>
+
+<span class="comment"># main edited the same file but still called auth.py</span>
+<span class="comment"># edited auth.py</span>
+
+<span class="comment"># WITHOUT rename detection (resolve/octopus):</span>
+<span class="command">git merge</span> -s resolve feature-a
+<span class="comment"># Treats it as: auth.py DELETED + authentication.py CREATED</span>
+<span class="comment"># Your edits on main's auth.py are LOST</span>
+
+<span class="comment"># WITH rename detection (ort/recursive):</span>
+<span class="command">git merge</span> feature-a
+<span class="comment"># Git recognizes: "auth.py was renamed to authentication.py"</span>
+<span class="comment"># Merges BOTH sets of changes into authentication.py</span></pre>
             </div>
 
             <!-- 3-Way Merge -->
             <h2>📐 Understanding 3-Way Merge</h2>
             <div class="workflow-card">
-                <p>"3-way" does NOT mean 3 branches. It means Git compares <strong>3 snapshots of the file</strong>:</p>
+                <p><strong>"3-way" does NOT mean 3 branches.</strong> It means Git compares <strong>3 snapshots of the
+                        file</strong> to decide what changed:</p>
                 <pre>        M1  ← ANCESTOR (version 1) — where branches split
        /  \
     main    feature
@@ -1147,18 +1636,18 @@
                     <tbody>
                         <tr>
                             <td>1 — Ancestor</td>
-                            <td>The fork point</td>
+                            <td>The <strong>fork point</strong> — last common commit</td>
                             <td><code>git merge-base main feature</code></td>
                         </tr>
                         <tr>
                             <td>2 — Ours</td>
-                            <td>Branch you're on</td>
+                            <td>The branch you're <strong>standing on</strong></td>
                             <td><code>HEAD</code></td>
                         </tr>
                         <tr>
                             <td>3 — Theirs</td>
-                            <td>Branch merging in</td>
-                            <td>The branch name</td>
+                            <td>The branch you're <strong>merging in</strong></td>
+                            <td>The branch name after <code>git merge</code></td>
                         </tr>
                     </tbody>
                 </table>
@@ -1167,6 +1656,7 @@
             <!-- Why Ancestor Matters -->
             <div class="workflow-card">
                 <h3>Why Git Needs the Ancestor</h3>
+                <p>Without it, Git can't tell <strong>who changed what</strong>.</p>
                 <pre><span class="comment"># WITH ancestor (3-way — correct):</span>
 Ancestor:  snmp_poll("R1")       ← original
 Ours:      snmp_poll("R1")       ← we DIDN'T change it
@@ -1178,108 +1668,174 @@ Git: "Only theirs changed → take theirs. No conflict."
 Ours:      snmp_poll("R1")
 Theirs:    snmp_poll("SW1")
 
-Git: "They're different... CONFLICT!"</pre>
+Git: "They're different... but who changed it? CONFLICT!"</pre>
+                <p>The ancestor is the <strong>tiebreaker</strong>.</p>
             </div>
 
-            <!-- Octopus Strategy -->
-            <h2>🐙 Octopus Strategy</h2>
+            <!-- Ours vs Theirs -->
+            <h2>👆 Ours vs Theirs — How to Remember</h2>
             <div class="workflow-card">
-                <p>Merges <strong>more than 2 branches</strong> at once. Git selects it automatically when you pass
-                    multiple branches.</p>
-                <pre><span class="comment"># Instead of 3 separate merges:</span>
-<span class="command">git merge</span> feature-a
-<span class="command">git merge</span> feature-b
-<span class="command">git merge</span> feature-c
-
-<span class="comment"># Octopus — ONE merge commit, 3 parents:</span>
-<span class="command">git merge</span> feature-a feature-b feature-c</pre>
-                <div class="warning-box">
-                    <strong>⚠️ The Catch:</strong> Octopus <strong>refuses to handle conflicts</strong>. If any branch
-                    conflicts, it aborts entirely.
+                <pre><span class="command">git checkout</span> main           <span class="comment">← You're standing HERE = OURS</span>
+<span class="command">git merge</span> feature-b          <span class="comment">← Pulling THIS in = THEIRS</span></pre>
+                <div class="tip-box">
+                    <strong>💡 Remember:</strong> Ours = where I stand. Theirs = what I'm merging in.
                 </div>
             </div>
 
-            <!-- Rename Detection -->
-            <h2>📁 Rename Detection</h2>
+            <!-- 3-way vs 3+ branches -->
+            <div class="workflow-card">
+                <h3>"3-way" vs "3+ branches" — Different Concepts</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Term</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>3-way merge</strong></td>
+                            <td>The <strong>algorithm</strong> — compares 3 file snapshots (ancestor + ours + theirs)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>3+ branches</strong></td>
+                            <td><strong>Octopus</strong> — merges multiple branches in one commit</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <pre><span class="comment"># 3-way merge (2 branches, 3 file versions)</span>
+<span class="command">git merge</span> feature-a              <span class="comment"># ort compares: ancestor, ours, theirs</span>
+
+<span class="comment"># 3+ branches (octopus, 1 merge commit)</span>
+<span class="command">git merge</span> feature-a feature-b feature-c    <span class="comment"># multiple branches at once</span></pre>
+            </div>
+
+            <!-- Unified Cheat Sheet -->
+            <h2>📋 Unified Cheat Sheet — All Strategies at a Glance</h2>
             <div class="workflow-card">
                 <table>
                     <thead>
                         <tr>
                             <th>Strategy</th>
-                            <th>Rename Detection?</th>
-                            <th>Notes</th>
+                            <th>Flag</th>
+                            <th>Branches</th>
+                            <th>Conflicts?</th>
+                            <th>Rename?</th>
+                            <th>Default?</th>
+                            <th>Use Case</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td><code>ort</code></td>
-                            <td><span class="check">✓ Yes (improved)</span></td>
-                            <td>Better + faster than recursive</td>
+                            <td><code>-s ort</code></td>
+                            <td>2</td>
+                            <td><span class="check">✅</span></td>
+                            <td><span class="check">✅</span></td>
+                            <td><span class="check">Git 2.34+</span></td>
+                            <td>Standard merge</td>
                         </tr>
                         <tr>
                             <td><code>recursive</code></td>
-                            <td><span class="check">✓ Yes</span></td>
-                            <td>Original rename detection</td>
+                            <td><code>-s recursive</code></td>
+                            <td>2</td>
+                            <td><span class="check">✅</span></td>
+                            <td><span class="check">✅</span></td>
+                            <td>Pre 2.34</td>
+                            <td>Legacy</td>
+                        </tr>
+                        <tr>
+                            <td><code>ours</code></td>
+                            <td><code>-s ours</code></td>
+                            <td>2</td>
+                            <td>N/A</td>
+                            <td>N/A</td>
+                            <td><span class="cross">✗</span></td>
+                            <td>Abandon branch</td>
                         </tr>
                         <tr>
                             <td><code>subtree</code></td>
-                            <td><span class="check">✓ Yes</span></td>
-                            <td>Inherits from ort/recursive</td>
+                            <td><code>-s subtree</code></td>
+                            <td>2</td>
+                            <td><span class="check">✅</span></td>
+                            <td><span class="check">✅</span></td>
+                            <td><span class="cross">✗</span></td>
+                            <td>Subdirectory merge</td>
                         </tr>
                         <tr>
                             <td><code>resolve</code></td>
-                            <td><span class="cross">✗ No</span></td>
+                            <td><code>-s resolve</code></td>
+                            <td>2</td>
+                            <td><span class="check">✅</span></td>
+                            <td><span class="cross">✗</span></td>
+                            <td><span class="cross">✗</span></td>
                             <td>Simple 3-way</td>
                         </tr>
                         <tr>
                             <td><code>octopus</code></td>
-                            <td><span class="cross">✗ No</span></td>
-                            <td>Lightweight multi-branch</td>
-                        </tr>
-                        <tr>
-                            <td><code>ours</code></td>
-                            <td>N/A</td>
-                            <td>Discards their changes</td>
+                            <td>auto</td>
+                            <td><strong>3+</strong></td>
+                            <td><span class="cross">Aborts</span></td>
+                            <td><span class="cross">✗</span></td>
+                            <td>Auto</td>
+                            <td>Multi-branch</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Cheat Sheet -->
-            <h2>📋 Quick Reference</h2>
             <div class="workflow-card">
-                <h3>Common Exam Traps</h3>
+                <h3>Options Summary</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Trap</th>
-                            <th>Correct Answer</th>
+                            <th>Option</th>
+                            <th>Flag</th>
+                            <th>Non-Conflicting</th>
+                            <th>Conflicting</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><code>-s ours</code> vs <code>-X ours</code></td>
-                            <td>Strategy discards ALL; Option only resolves conflicts</td>
+                            <td><em>(default)</em></td>
+                            <td><em>(none)</em></td>
+                            <td><span class="check">✅ Merged</span></td>
+                            <td>⏸️ Manual resolve</td>
                         </tr>
                         <tr>
-                            <td>3-way merge means 3 branches?</td>
-                            <td>No! 3 file snapshots (ancestor + ours + theirs)</td>
+                            <td><code>ours</code></td>
+                            <td><code>-X ours</code></td>
+                            <td><span class="check">✅ Merged</span></td>
+                            <td>Ours kept, theirs lost</td>
                         </tr>
                         <tr>
-                            <td>Default strategy Git 2.34+?</td>
-                            <td><code>ort</code> (replaced <code>recursive</code>)</td>
-                        </tr>
-                        <tr>
-                            <td>Which supports 3+ branches?</td>
-                            <td><code>octopus</code> (auto-selected)</td>
-                        </tr>
-                        <tr>
-                            <td>Rename detection strategies?</td>
-                            <td><code>ort</code>, <code>recursive</code>, <code>subtree</code></td>
+                            <td><code>theirs</code></td>
+                            <td><code>-X theirs</code></td>
+                            <td><span class="check">✅ Merged</span></td>
+                            <td>Theirs kept, ours lost</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            <!-- The Traps -->
+            <h2>⚠️ The Exam Traps</h2>
+            <div class="workflow-card">
+                <pre><span class="flag">-s ours</span>  ≠  <span class="flag">-X ours</span>
+
+-s ours   =  "Throw away ALL their work"           (STRATEGY — entire algorithm)
+-X ours   =  "On conflicts, prefer our version"    (OPTION — tweak to the algorithm)</pre>
+                <pre>3-way merge  ≠  3+ branches
+
+3-way merge   =  Algorithm comparing 3 file snapshots (ancestor + ours + theirs)
+3+ branches   =  Octopus merging multiple branches in one commit</pre>
+                <pre>Ours  ≠  Theirs
+
+<span class="command">git checkout</span> main         ← OURS (where you stand)
+<span class="command">git merge</span> feature         ← THEIRS (what you merge in)</pre>
+            </div>
+
         </section>
 
         <!-- SECTION 2: MCQ Practice -->

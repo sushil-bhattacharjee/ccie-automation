@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Cherry-Pick, Rebase & Merge - DevNet Expert Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39c5cf;
+            --accent-yellow: #f0e68c;
+            --border-color: #30363d;
+            --code-bg: #0d1117;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; }
+        .nav-container { position: fixed; top: 0; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); z-index: 1000; padding: 1rem 2rem; }
+        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-title { font-size: 1.25rem; font-weight: 700; color: var(--accent-orange); }
+        .nav-tabs { display: flex; gap: 0.5rem; align-items: center; }
+        .nav-tab { padding: 0.6rem 1.5rem; border: none; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; text-decoration: none; }
+        .nav-tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-tab.active { background: var(--accent-orange); color: var(--bg-primary); }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 6rem 2rem 3rem; }
+        .section { display: none; }
+        .section.active { display: block; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 1.75rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--accent-blue); padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--accent-purple); }
+        h4 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--accent-cyan); }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        .intro-text { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .lab-path { background: var(--bg-tertiary); border-left: 4px solid var(--accent-orange); padding: 0.75rem 1rem; margin-bottom: 2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+        pre { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.5; white-space: pre; }
+        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+        pre code { background: none; padding: 0; }
+        .keyword { color: var(--accent-purple); }
+        .string { color: var(--accent-green); }
+        .comment { color: var(--text-secondary); }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-tertiary); font-weight: 600; color: var(--text-primary); }
+        td { background: var(--bg-secondary); color: var(--text-secondary); }
+        tr:hover td { background: var(--bg-tertiary); }
+        .check { color: var(--accent-green); }
+        .cross { color: var(--accent-red); }
+        .tip-box { background: rgba(88, 166, 255, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .tip-box strong { color: var(--accent-blue); }
+        .warning-box { background: rgba(248, 81, 73, 0.1); border: 1px solid var(--accent-red); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .warning-box strong { color: var(--accent-red); }
+        .golden-box { background: rgba(210, 153, 34, 0.15); border: 2px solid var(--accent-orange); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+        .golden-box strong { color: var(--accent-orange); }
+        .cherry-box { background: rgba(248, 81, 73, 0.1); border: 2px solid var(--accent-red); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+        .cherry-box strong { color: var(--accent-red); }
+        .rebase-box { background: rgba(57, 197, 207, 0.1); border: 2px solid var(--accent-cyan); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+        .rebase-box strong { color: var(--accent-cyan); }
+        .merge-box { background: rgba(63, 185, 80, 0.1); border: 2px solid var(--accent-green); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+        .merge-box strong { color: var(--accent-green); }
+        .graph-box { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; white-space: pre; overflow-x: auto; }
+        .step-header { background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary)); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; margin: 2rem 0 1rem; }
+        .step-header h3 { margin: 0; color: var(--accent-orange); }
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-secondary); }
+        li { margin-bottom: 0.25rem; }
+        blockquote { border-left: 4px solid var(--accent-purple); padding-left: 1rem; margin: 1rem 0; color: var(--text-secondary); font-style: italic; }
+
+        /* Quiz Styles */
+        .quiz-header { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .score-display { font-size: 1.25rem; font-weight: 600; }
+        .score-correct { color: var(--accent-green); }
+        .score-total { color: var(--text-secondary); }
+        .quiz-controls { display: flex; gap: 0.75rem; }
+        .btn { padding: 0.6rem 1.25rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .btn-primary { background: var(--accent-blue); color: var(--bg-primary); }
+        .btn-primary:hover { background: #79b8ff; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--border-color); }
+        .question-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .question-card.answered-correct { border-color: var(--accent-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); }
+        .question-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+        .question-number { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 20px; }
+        .question-type { font-size: 0.8rem; font-weight: 500; color: var(--accent-orange); }
+        .question-text { font-size: 1.05rem; font-weight: 500; color: var(--text-primary); margin-bottom: 1.25rem; line-height: 1.5; }
+        .options-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .option-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--bg-tertiary); border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        .option-item:hover:not(.disabled) { background: var(--bg-primary); border-color: var(--border-color); }
+        .option-item.selected { border-color: var(--accent-blue); background: rgba(88, 166, 255, 0.1); }
+        .option-item.correct { border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
+        .option-item.incorrect { border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
+        .option-item.disabled { cursor: default; }
+        .option-checkbox { min-width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem; font-weight: 600; }
+        .option-item.selected .option-checkbox { border-color: var(--accent-blue); background: var(--accent-blue); color: var(--bg-primary); }
+        .option-item.correct .option-checkbox { border-color: var(--accent-green); background: var(--accent-green); color: var(--bg-primary); }
+        .option-item.incorrect .option-checkbox { border-color: var(--accent-red); background: var(--accent-red); color: white; }
+        .option-text { flex: 1; color: var(--text-primary); }
+        .submit-btn { margin-top: 1rem; width: 100%; padding: 0.75rem; background: var(--accent-blue); color: var(--bg-primary); border: none; border-radius: 8px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .submit-btn:hover:not(:disabled) { background: #79b8ff; }
+        .submit-btn:disabled { background: var(--bg-tertiary); color: var(--text-secondary); cursor: not-allowed; }
+        .explanation { margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border-radius: 8px; border-left: 4px solid var(--accent-blue); display: none; }
+        .explanation.show { display: block; }
+        .explanation-title { font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem; }
+        .explanation-text { color: var(--text-secondary); font-size: 0.9rem; }
+        .progress-bar { width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-orange), var(--accent-red)); border-radius: 4px; transition: width 0.3s ease; }
+
+        @media (max-width: 768px) { 
+            .nav-content { flex-direction: column; gap: 1rem; } 
+            .main-content { padding: 8rem 1rem 2rem; } 
+            h1 { font-size: 1.75rem; } 
+            .quiz-header { flex-direction: column; text-align: center; }
+            pre { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="nav-title">🍒 Git Cherry-Pick, Rebase & Merge - DevNet Expert</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
+                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+                <a href="docs/cherry_pick_rebase.md" class="nav-tab" target="_blank">📄 Lab Guide</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- ==================== SECTION 1: LEARN ==================== -->
+        <section id="learn" class="section active">
+            <h1>Git Cherry-Pick, Rebase & Merge</h1>
+            <p class="intro-text">Master selective commit transfer, branch synchronization, and merge strategies for the CCIE DevNet Expert exam.</p>
+            <div class="lab-path"><strong>Lab path:</strong> ~/DevnetExpert/mock3/design/git-ops</div>
+
+            <!-- The Scenario -->
+            <h2>🎯 The Scenario</h2>
+            <p>A realistic release workflow with three branches and one shared file (<code>app.py</code>):</p>
+            
+            <div class="graph-box">1. main:      M1 (initial app v1.0)
+2. bugfix:    B1, B2, B3 (bug fixes — different sections of app.py)
+3. release:   R1, R2, R3 (release prep — version bump, logging)
+4. main:      M2 (new BGP feature added)
+5. Cherry-pick B2 onto release (critical SNMP fix needed for release)
+6. Sync release with main (rebase — get M2 onto release)
+7. Merge release into main (final software release)</div>
+
+            <div class="cherry-box">
+                <strong>🍒 The Key Constraint:</strong> Release needs the SNMP fix (B2) from bugfix, but NOT B1 or B3. That's why we cherry-pick — surgical, single commit transfer.
+            </div>
+
+            <!-- Step 1 -->
+            <div class="step-header"><h3>Step 1 — Initialize and Create M1</h3></div>
+<pre>cd ~/DevnetExpert/mock3/design/git-ops
+git init
+
+cat > app.py << 'EOF'
+# === Network Automation App v1.0 ===
+
+# --- Auth Section ---
+def authenticate(user, password):
+    print(f"Authenticating {user}")
+    return True
+
+# --- SNMP Section ---
+def snmp_poll(device):
+    print(f"Polling {device} via SNMPv2")
+    return {"status": "ok"}
+
+# --- OSPF Section ---
+def configure_ospf(router, area):
+    print(f"Configuring OSPF area {area} on {router}")
+
+# --- Telemetry Section ---
+def push_telemetry(target):
+    print(f"Pushing telemetry to {target}")
+
+# --- Main ---
+if __name__ == "__main__":
+    authenticate("admin", "cisco123")
+    snmp_poll("192.168.89.71")
+    configure_ospf("R1", 0)
+    push_telemetry("10.0.0.1")
+EOF
+
+git add app.py
+git commit -m "M1: Initial app v1.0"</pre>
+
+            <div class="graph-box">* a033e3a (HEAD -> main) M1: Initial app v1.0</div>
+
+            <!-- Step 2 -->
+            <div class="step-header"><h3>Step 2 — Create Bugfix Branch (B1, B2, B3)</h3></div>
+            <p>Each commit fixes a different section of <code>app.py</code>:</p>
+<pre># Create bugfix branch
+git checkout -b bugfix
+
+# B1 — Fix auth (enforce min password length)
+sed -i 's/return True/return len(password) >= 8/' app.py
+git add app.py
+git commit -m "B1: Fix auth - enforce min password length"
+
+# B2 — Fix SNMP (upgrade v2 to v3) ← CRITICAL — needed on release
+sed -i 's/SNMPv2/SNMPv3/' app.py
+sed -i 's/return {"status": "ok"}/return {"status": "ok", "version": "v3"}/' app.py
+git add app.py
+git commit -m "B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)"
+
+# B3 — Fix OSPF (add area validation)
+sed -i 's/print(f"Configuring OSPF area {area} on {router}")/if area < 0: raise ValueError("Invalid area")\n    print(f"Configuring OSPF area {area} on {router}")/' app.py
+git add app.py
+git commit -m "B3: Fix OSPF - add area validation"</pre>
+
+            <div class="graph-box">* 125dbbc (HEAD -> bugfix) B3: Fix OSPF - add area validation
+* ba64768 B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)    ← NOTE THIS HASH
+* 7d83c52 B1: Fix auth - enforce min password length
+* a033e3a (main) M1: Initial app v1.0</div>
+
+            <!-- Step 3 -->
+            <div class="step-header"><h3>Step 3 — Create Release Branch from Main (R1, R2, R3)</h3></div>
+            <div class="warning-box">
+                <strong>⚠️ Important:</strong> Create release from <code>main</code>, NOT from <code>bugfix</code>. Release should start clean from M1.
+            </div>
+<pre>git checkout main
+git checkout -b release
+
+# R1 — Bump version
+sed -i 's/v1.0/v2.0-rc1/' app.py
+git add app.py
+git commit -m "R1: Bump version to v2.0-rc1"
+
+# R2 — Add release logging function
+sed -i 's/if __name__ == "__main__":/def log_release():\n    print("Release v2.0-rc1 initialized")\n\nif __name__ == "__main__":/' app.py
+git add app.py
+git commit -m "R2: Add release logging function"
+
+# R3 — Call log_release() in main block
+sed -i 's/push_telemetry("10.0.0.1")/push_telemetry("10.0.0.1")\n    log_release()/' app.py
+git add app.py
+git commit -m "R3: Call release logging in main"</pre>
+
+            <div class="graph-box">* e18ce3c (HEAD -> release) R3: Call release logging in main
+* 47ed3af R2: Add release logging function
+* 92745e5 R1: Bump version to v2.0-rc1
+* a033e3a (main) M1: Initial app v1.0</div>
+
+            <!-- Step 4 -->
+            <div class="step-header"><h3>Step 4 — Add M2 on Main (New Feature)</h3></div>
+<pre>git checkout main
+
+sed -i '/# --- Main ---/i # --- BGP Section ---\ndef configure_bgp(asn, neighbor):\n    print(f"BGP AS{asn} peer {neighbor}")\n' app.py
+git add app.py
+git commit -m "M2: Add BGP configuration feature"</pre>
+
+            <!-- Step 5 -->
+            <div class="step-header"><h3>Step 5 — Verify Graph (3 Branches Diverged)</h3></div>
+<pre>git log --oneline --graph --all</pre>
+
+            <div class="graph-box">* f51e864 (HEAD -> main) M2: Add BGP configuration feature
+| * e18ce3c (release) R3: Call release logging in main
+| * 47ed3af R2: Add release logging function
+| * 92745e5 R1: Bump version to v2.0-rc1
+|/
+| * 125dbbc (bugfix) B3: Fix OSPF - add area validation
+| * ba64768 B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)
+| * 7d83c52 B1: Fix auth - enforce min password length
+|/
+* a033e3a M1: Initial app v1.0</div>
+
+            <div class="graph-box">bugfix:   M1 ── B1 ── B2 ── B3
+
+main:     M1 ── M2
+
+release:  M1 ── R1 ── R2 ── R3</div>
+
+            <!-- Step 6 — Cherry-Pick -->
+            <div class="step-header"><h3>Step 6 — Cherry-Pick B2 onto Release 🍒</h3></div>
+            <p>Only the SNMP fix. Not B1, not B3 — just B2:</p>
+<pre>git checkout release
+git cherry-pick ba64768</pre>
+
+            <div class="graph-box">Auto-merging app.py
+[release 780e1c5] B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)</div>
+
+<pre>git log --oneline</pre>
+            <div class="graph-box">780e1c5 (HEAD -> release) B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)
+e18ce3c R3: Call release logging in main
+47ed3af R2: Add release logging function
+92745e5 R1: Bump version to v2.0-rc1
+a033e3a M1: Initial app v1.0</div>
+
+            <div class="cherry-box">
+                <strong>🍒 Key Point:</strong> B2 copied to release as <code>780e1c5</code> (new hash). Original <code>ba64768</code> still on bugfix — untouched.
+            </div>
+
+            <!-- Step 7 — Rebase -->
+            <div class="step-header"><h3>Step 7 — Sync Release with Main (Rebase) 🔄</h3></div>
+            <p>Release needs M2 (BGP feature) before final merge. Rebase replays R1, R2, R3, B2' on top of main's latest commit:</p>
+<pre>git rebase main</pre>
+            <div class="graph-box">Successfully rebased and updated refs/heads/release.</div>
+
+            <div class="rebase-box">
+                <strong>🔄 All hashes changed</strong> — rebase creates new commits because the parent changed:
+            </div>
+
+            <table>
+                <thead>
+                    <tr><th>Before Rebase</th><th>After Rebase</th><th>Content</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>92745e5</code> R1</td><td><code>3a7376f</code> R1'</td><td>Same — version bump</td></tr>
+                    <tr><td><code>47ed3af</code> R2</td><td><code>71c528e</code> R2'</td><td>Same — logging function</td></tr>
+                    <tr><td><code>e18ce3c</code> R3</td><td><code>201fbf4</code> R3'</td><td>Same — call log_release</td></tr>
+                    <tr><td><code>780e1c5</code> B2'</td><td><code>bf524a1</code> B2''</td><td>Same — SNMP v3 fix</td></tr>
+                </tbody>
+            </table>
+
+<pre>git log --oneline --graph --all</pre>
+            <div class="graph-box">* bf524a1 (HEAD -> release) B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)
+* 201fbf4 R3: Call release logging in main
+* 71c528e R2: Add release logging function
+* 3a7376f R1: Bump version to v2.0-rc1
+* f51e864 (main) M2: Add BGP configuration feature
+| * 125dbbc (bugfix) B3: Fix OSPF - add area validation
+| * ba64768 B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)
+| * 7d83c52 B1: Fix auth - enforce min password length
+|/
+* a033e3a M1: Initial app v1.0</div>
+
+            <p><strong>Release is now linear on top of main. Ready to merge.</strong></p>
+
+            <!-- Step 8 — Merge -->
+            <div class="step-header"><h3>Step 8 — Merge Release into Main (Final Release) ✅</h3></div>
+<pre>git checkout main
+git merge release</pre>
+
+            <div class="graph-box">Updating f51e864..bf524a1
+Fast-forward</div>
+
+            <div class="merge-box">
+                <strong>✅ Fast-forward</strong> — no merge commit needed because release sits linearly ahead of main.
+            </div>
+
+<pre>git log --oneline --graph --all</pre>
+            <div class="graph-box">* bf524a1 (HEAD -> main, release) B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)
+* 201fbf4 R3: Call release logging in main
+* 71c528e R2: Add release logging function
+* 3a7376f R1: Bump version to v2.0-rc1
+* f51e864 M2: Add BGP configuration feature
+| * 125dbbc (bugfix) B3: Fix OSPF - add area validation
+| * ba64768 B2: Fix SNMP - upgrade v2 to v3 (CRITICAL)
+| * 7d83c52 B1: Fix auth - enforce min password length
+|/
+* a033e3a M1: Initial app v1.0</div>
+
+            <!-- Step 9 — Verify Final State -->
+            <div class="step-header"><h3>Step 9 — Verify Final State</h3></div>
+<pre># SNMP upgraded to v3 (from cherry-picked B2)
+grep -i snmp app.py
+# Polling {device} via SNMPv3
+
+# BGP feature present (from M2)
+grep -i bgp app.py
+# BGP AS{asn} peer {neighbor}
+
+# Release logging present (from R2/R3)
+grep -i release app.py
+# Release v2.0-rc1 initialized</pre>
+
+            <h4>What main has vs what it doesn't</h4>
+            <table>
+                <thead>
+                    <tr><th>Content</th><th>Source</th><th>On main?</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>SNMPv3 fix</td><td>B2 (cherry-picked)</td><td><span class="check">✅ Yes</span></td></tr>
+                    <tr><td>BGP feature</td><td>M2</td><td><span class="check">✅ Yes</span></td></tr>
+                    <tr><td>Version v2.0-rc1</td><td>R1</td><td><span class="check">✅ Yes</span></td></tr>
+                    <tr><td>Release logging</td><td>R2, R3</td><td><span class="check">✅ Yes</span></td></tr>
+                    <tr><td>Auth password check</td><td>B1</td><td><span class="cross">❌ No — stayed on bugfix</span></td></tr>
+                    <tr><td>OSPF area validation</td><td>B3</td><td><span class="cross">❌ No — stayed on bugfix</span></td></tr>
+                </tbody>
+            </table>
+
+            <!-- Fixing Commit Mistakes -->
+            <h2>🔧 Fixing Commit Mistakes</h2>
+            
+            <h3>Scenario: Wrong Commit Message</h3>
+            <p>Committed R2's work with message "R3: Call release logging in main" — wrong label.</p>
+
+            <h4>Method 1: <code>git commit --amend</code> (Fix the Last Commit)</h4>
+<pre>git commit --amend -m "R2: Add release logging function"</pre>
+            <p>Rewrites the last commit's message (or content if you <code>git add</code> first). Only works for the <strong>most recent</strong> commit.</p>
+
+            <h4>Method 2: <code>git rebase -i HEAD~N</code> (Fix Older Commits)</h4>
+            <p>When the commit you need to fix isn't the latest one, use interactive rebase:</p>
+<pre>git rebase -i HEAD~1</pre>
+            <p>Editor opens with:</p>
+<pre>pick 47ed3af R3: Call release logging in main</pre>
+            <p>Change <code>pick</code> to <code>reword</code>:</p>
+<pre>reword 47ed3af R3: Call release logging in main</pre>
+
+            <h4>Interactive Rebase Keywords</h4>
+            <table>
+                <thead>
+                    <tr><th>Keyword</th><th>What It Does</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>pick</code></td><td>Keep commit as-is</td></tr>
+                    <tr><td><code>reword</code></td><td>Keep changes, edit the <strong>message</strong></td></tr>
+                    <tr><td><code>edit</code></td><td>Pause at this commit — lets you amend content + message</td></tr>
+                    <tr><td><code>squash</code></td><td>Merge this commit into the one above it, combine messages</td></tr>
+                    <tr><td><code>fixup</code></td><td>Merge into above, <strong>discard</strong> this commit's message</td></tr>
+                    <tr><td><code>drop</code></td><td>Delete the commit entirely</td></tr>
+                </tbody>
+            </table>
+
+            <h4>Method 3: <code>git reset --soft HEAD~N</code> (Undo and Redo)</h4>
+<pre># Undo last commit, keep changes staged
+git reset --soft HEAD~1
+
+# Now recommit with correct message
+git commit -m "R2: Add release logging function"</pre>
+
+            <table>
+                <thead>
+                    <tr><th>Reset Flag</th><th>Changes</th><th>Staging Area</th><th>Commit</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>--soft</code></td><td>✅ Kept</td><td>✅ Kept (staged)</td><td>❌ Undone</td></tr>
+                    <tr><td><code>--mixed</code> (default)</td><td>✅ Kept</td><td>❌ Unstaged</td><td>❌ Undone</td></tr>
+                    <tr><td><code>--hard</code></td><td>❌ Deleted</td><td>❌ Deleted</td><td>❌ Undone</td></tr>
+                </tbody>
+            </table>
+
+            <h4>Method 4: <code>git revert HEAD</code> (Safe Undo for Shared Branches)</h4>
+<pre>git revert HEAD</pre>
+            <p>Creates a <strong>new commit</strong> that reverses the last one. Original commit stays in history. Safe for branches that are already pushed/shared — doesn't rewrite history.</p>
+
+            <div class="graph-box">BEFORE revert:
+M1 ── M2 ── BAD
+
+AFTER revert:
+M1 ── M2 ── BAD ── UNDO-BAD    ← new commit, BAD still in history</div>
+
+            <h4>When to Use Which</h4>
+            <table>
+                <thead>
+                    <tr><th>Situation</th><th>Command</th><th>Why</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Fix the <strong>last</strong> commit (message or content)</td><td><code>git commit --amend</code></td><td>Simplest — rewrites in place</td></tr>
+                    <tr><td>Fix an <strong>older</strong> commit's message</td><td><code>git rebase -i HEAD~N</code> → <code>reword</code></td><td>Can reach back N commits</td></tr>
+                    <tr><td>Fix an <strong>older</strong> commit's content</td><td><code>git rebase -i HEAD~N</code> → <code>edit</code></td><td>Pauses for you to amend</td></tr>
+                    <tr><td>Undo last commit, redo it entirely</td><td><code>git reset --soft HEAD~1</code></td><td>Keeps changes staged</td></tr>
+                    <tr><td>Undo on a <strong>shared/pushed</strong> branch</td><td><code>git revert HEAD</code></td><td>Safe — no history rewrite</td></tr>
+                </tbody>
+            </table>
+
+            <div class="golden-box">
+                <strong>🔑 Golden Rule:</strong> If it's already pushed — use <code>revert</code>. If it's local — <code>amend</code>, <code>rebase -i</code>, or <code>reset</code>.
+            </div>
+
+            <!-- Cherry-Pick Command Reference -->
+            <h2>🍒 Cherry-Pick Command Reference</h2>
+            <table>
+                <thead>
+                    <tr><th>Command</th><th>What It Does</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>git cherry-pick &lt;hash&gt;</code></td><td>Copy <strong>one</strong> commit to current branch</td></tr>
+                    <tr><td><code>git cherry-pick &lt;A&gt; &lt;B&gt; &lt;C&gt;</code></td><td>Copy <strong>multiple specific</strong> commits</td></tr>
+                    <tr><td><code>git cherry-pick A^..C</code></td><td>Copy a <strong>range</strong> A through C (inclusive)</td></tr>
+                    <tr><td><code>git cherry-pick --no-commit &lt;hash&gt;</code></td><td>Apply changes but <strong>don't auto-commit</strong></td></tr>
+                    <tr><td><code>git cherry-pick --continue</code></td><td>After resolving conflict, continue</td></tr>
+                    <tr><td><code>git cherry-pick --abort</code></td><td>Cancel and go back to before cherry-pick</td></tr>
+                    <tr><td><code>git cherry-pick --skip</code></td><td>Skip current conflicting commit, move to next</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Cherry-Pick vs Format-Patch -->
+            <h2>📧 Cherry-Pick vs Format-Patch (Offline Cherry-Pick)</h2>
+            <p><code>git format-patch</code> solves the same problem as cherry-pick — move specific commits to another branch — but via <strong>patch files</strong> instead of direct Git commands. Use it when branches are in different repos, different machines, or you can't access the other branch directly.</p>
+
+            <h3>Cherry-pick (same repo — direct)</h3>
+<pre>git checkout release
+git cherry-pick ba64768
+# Done.</pre>
+
+            <h3>Format-patch (cross-repo — via file transfer)</h3>
+<pre># On the bugfix machine — export B2 as a patch file
+git checkout bugfix
+git format-patch -1 ba64768
+# Creates: 0001-B2-Fix-SNMP-upgrade-v2-to-v3-CRITICAL.patch
+
+# Transfer the .patch file (email, USB, SCP, whatever)
+scp 0001-B2-Fix-SNMP*.patch user@release-server:~/
+
+# On the release machine — apply it
+git checkout release
+git am 0001-B2-Fix-SNMP-upgrade-v2-to-v3-CRITICAL.patch
+# Done. Commit created automatically.</pre>
+
+            <h4>What <code>-1</code> means in <code>git format-patch -1 ba64768</code></h4>
+            <p><code>-1</code> = how many commits to export (just one):</p>
+<pre>git format-patch -1 ba64768    # Export 1 commit (just B2)
+git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
+
+            <h4>What <code>am</code> means in <code>git am</code></h4>
+            <p><code>am</code> = <strong>"apply mailbox"</strong>. Named because <code>format-patch</code> was originally designed for emailing patches via mailing lists (how the Linux kernel is developed). <code>git am</code> reads the patch "mail" and applies it.</p>
+
+            <h4><code>git am</code> vs <code>git apply</code> — They're Different</h4>
+            <table>
+                <thead>
+                    <tr><th></th><th><code>git am</code></th><th><code>git apply</code></th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Applies patch?</strong></td><td>Yes</td><td>Yes</td></tr>
+                    <tr><td><strong>Creates commit?</strong></td><td>✅ Yes — preserves author, date, message</td><td>❌ No — just modifies files</td></tr>
+                    <tr><td><strong>Works with</strong></td><td><code>format-patch</code> output (has commit metadata)</td><td>Raw diff / plain <code>.patch</code> files</td></tr>
+                    <tr><td><strong>After running</strong></td><td>Done — commit already made</td><td>You still need <code>git add</code> + <code>git commit</code></td></tr>
+                </tbody>
+            </table>
+
+            <div class="tip-box">
+                <strong>💡 Rule:</strong> <code>git format-patch</code> pairs with <code>git am</code>. Use <code>git apply</code> only for raw diffs (like output from <code>git diff > changes.patch</code>).
+            </div>
+
+            <h4>Side by Side</h4>
+            <table>
+                <thead>
+                    <tr><th></th><th>Cherry-Pick</th><th>Format-Patch + Am</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Same repo?</strong></td><td>Yes — required</td><td>Not required</td></tr>
+                    <tr><td><strong>Command</strong></td><td><code>git cherry-pick &lt;hash&gt;</code></td><td><code>git format-patch</code> → transfer → <code>git am</code></td></tr>
+                    <tr><td><strong>Result</strong></td><td>New commit, new hash</td><td>New commit, new hash</td></tr>
+                    <tr><td><strong>Use case</strong></td><td>Branches in same repo</td><td>Cross-repo, email, offline transfer</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Cherry-Pick vs Merge vs Rebase -->
+            <h2>⚖️ Cherry-Pick vs Merge vs Rebase (Exam Summary)</h2>
+            <table>
+                <thead>
+                    <tr><th></th><th>Cherry-Pick</th><th>Merge</th><th>Rebase</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>What moves</strong></td><td>One specific commit</td><td>All commits from a branch</td><td>All commits replayed on new base</td></tr>
+                    <tr><td><strong>Selective?</strong></td><td>Yes — pick exactly which</td><td>No — all or nothing</td><td>No — entire branch</td></tr>
+                    <tr><td><strong>New hash?</strong></td><td>Yes</td><td>Merge commit gets new hash</td><td>Yes — all replayed commits</td></tr>
+                    <tr><td><strong>Original branch</strong></td><td>Unchanged</td><td>Unchanged</td><td>Unchanged (but your branch rewrites)</td></tr>
+                    <tr><td><strong>Use case</strong></td><td>Hotfix from bugfix to release</td><td>Deliver finished feature</td><td>Sync feature with main</td></tr>
+                </tbody>
+            </table>
+
+            <!-- Golden Rules -->
+            <h2>🏆 Golden Rules</h2>
+            <div class="golden-box">
+                <strong>🍒 Cherry-pick</strong> to grab specific commits across branches.<br><br>
+                <strong>🔄 Rebase</strong> to sync — replay your branch on top of latest main.<br><br>
+                <strong>✅ Merge</strong> to deliver — integrate finished work into main.<br><br>
+                <strong>⚠️ Break things on your branch, not on main.</strong>
+            </div>
+
+        </section>
+
+        <!-- ==================== SECTION 2: MCQ PRACTICE ==================== -->
+        <section id="quiz" class="section">
+            <h1>MCQ Practice — Cherry-Pick, Rebase & Merge</h1>
+            <p class="intro-text">20 questions covering cherry-pick, rebase, merge, format-patch, and commit fixing strategies.</p>
+
+            <div class="quiz-header">
+                <div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <span class="score-display">
+                        Score: <span class="score-correct" id="correctCount">0</span>
+                        <span class="score-total">/ <span id="totalAnswered">0</span> answered</span>
+                    </span>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
+                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+                </div>
+            </div>
+
+            <div id="quizContainer"></div>
+        </section>
+    </main>
+
+    <script>
+        const questions = [
+            {
+                id: 1, type: "single", count: 1,
+                question: "What does git cherry-pick do?",
+                options: [
+                    { text: "Moves a commit from one branch to another (original is deleted)", correct: false },
+                    { text: "Copies a specific commit to the current branch with a new hash", correct: true },
+                    { text: "Merges all commits from a feature branch", correct: false },
+                    { text: "Rebases the current branch onto another branch", correct: false }
+                ],
+                explanation: "Cherry-pick COPIES a specific commit to your current branch. The original commit remains on its source branch. The new commit gets a new hash because it has a different parent."
+            },
+            {
+                id: 2, type: "single", count: 1,
+                question: "After cherry-picking commit abc123 from bugfix to release, what happens to abc123 on bugfix?",
+                options: [
+                    { text: "It is deleted", correct: false },
+                    { text: "It is moved to release", correct: false },
+                    { text: "It remains unchanged on bugfix", correct: true },
+                    { text: "It is marked as 'picked'", correct: false }
+                ],
+                explanation: "Cherry-pick is a COPY operation, not a move. The original commit stays exactly where it was on the bugfix branch."
+            },
+            {
+                id: 3, type: "single", count: 1,
+                question: "Why does a cherry-picked commit get a new hash?",
+                options: [
+                    { text: "Because the commit content changes", correct: false },
+                    { text: "Because Git randomly generates new hashes", correct: false },
+                    { text: "Because the parent commit is different", correct: true },
+                    { text: "Because the author changes", correct: false }
+                ],
+                explanation: "Git commit hashes are calculated from content + metadata + PARENT. Since the cherry-picked commit has a different parent on the new branch, it gets a new hash even though the content is identical."
+            },
+            {
+                id: 4, type: "single", count: 1,
+                question: "Which command copies commits B2, B3, and B4 to your current branch?",
+                options: [
+                    { text: "git cherry-pick B2-B4", correct: false },
+                    { text: "git cherry-pick B2..B4", correct: false },
+                    { text: "git cherry-pick B2^..B4", correct: true },
+                    { text: "git cherry-pick B2 B3 B4", correct: true }
+                ],
+                explanation: "Both 'git cherry-pick B2^..B4' (range, inclusive) and 'git cherry-pick B2 B3 B4' (explicit list) work. Note: B2..B4 would EXCLUDE B2!"
+            },
+            {
+                id: 5, type: "single", count: 1,
+                question: "What does 'git rebase main' do when run on a feature branch?",
+                options: [
+                    { text: "Merges main into feature", correct: false },
+                    { text: "Replays feature commits on top of main's latest commit", correct: true },
+                    { text: "Deletes the feature branch", correct: false },
+                    { text: "Creates a merge commit on main", correct: false }
+                ],
+                explanation: "Rebase takes your feature commits and replays them one by one on top of main's HEAD, creating a linear history. Your feature branch moves forward to sit on top of main."
+            },
+            {
+                id: 6, type: "single", count: 1,
+                question: "After rebasing, why do ALL feature branch commits have new hashes?",
+                options: [
+                    { text: "Because rebase modifies commit content", correct: false },
+                    { text: "Because each commit's parent changes during replay", correct: true },
+                    { text: "Because Git encrypts commits during rebase", correct: false },
+                    { text: "Because the author timestamp changes", correct: false }
+                ],
+                explanation: "Each replayed commit has a new parent (the previous rebased commit), which changes the hash. This cascades through all commits being rebased."
+            },
+            {
+                id: 7, type: "single", count: 1,
+                question: "What is a 'fast-forward' merge?",
+                options: [
+                    { text: "A merge that creates a merge commit with two parents", correct: false },
+                    { text: "A merge that simply moves the branch pointer forward (no merge commit)", correct: true },
+                    { text: "A merge that happens very quickly", correct: false },
+                    { text: "A merge that skips conflict resolution", correct: false }
+                ],
+                explanation: "Fast-forward occurs when the target branch is a direct ancestor of the source branch. Git just moves the pointer forward — no merge commit needed because history is already linear."
+            },
+            {
+                id: 8, type: "single", count: 1,
+                question: "When would you use 'git merge --no-ff'?",
+                options: [
+                    { text: "To speed up the merge process", correct: false },
+                    { text: "To force a merge commit even when fast-forward is possible", correct: true },
+                    { text: "To prevent conflicts", correct: false },
+                    { text: "To delete the source branch after merge", correct: false }
+                ],
+                explanation: "--no-ff forces Git to create a merge commit even when the history is linear. This preserves branch history and makes it clear that a feature was developed on a separate branch."
+            },
+            {
+                id: 9, type: "single", count: 1,
+                question: "What does 'git commit --amend' do?",
+                options: [
+                    { text: "Creates a new commit that undoes the last commit", correct: false },
+                    { text: "Rewrites the most recent commit (message and/or content)", correct: true },
+                    { text: "Amends all commits in the branch", correct: false },
+                    { text: "Merges the last two commits", correct: false }
+                ],
+                explanation: "--amend replaces the last commit with a new one. You can change the message, add forgotten files, or both. The old commit is replaced (new hash)."
+            },
+            {
+                id: 10, type: "single", count: 1,
+                question: "To fix a commit message that is NOT the most recent, which command should you use?",
+                options: [
+                    { text: "git commit --amend", correct: false },
+                    { text: "git rebase -i HEAD~N with 'reword'", correct: true },
+                    { text: "git reset --hard", correct: false },
+                    { text: "git revert HEAD~N", correct: false }
+                ],
+                explanation: "Interactive rebase (rebase -i) lets you go back N commits and change 'pick' to 'reword' for any commit whose message you want to edit."
+            },
+            {
+                id: 11, type: "single", count: 1,
+                question: "What is the difference between 'git reset --soft HEAD~1' and 'git reset --hard HEAD~1'?",
+                options: [
+                    { text: "--soft keeps changes staged; --hard deletes changes entirely", correct: true },
+                    { text: "--soft is faster; --hard is slower", correct: false },
+                    { text: "--soft creates a backup; --hard doesn't", correct: false },
+                    { text: "There is no difference", correct: false }
+                ],
+                explanation: "--soft undoes the commit but keeps your changes staged (ready to recommit). --hard undoes the commit AND deletes all changes — use with caution!"
+            },
+            {
+                id: 12, type: "single", count: 1,
+                question: "When should you use 'git revert' instead of 'git reset'?",
+                options: [
+                    { text: "When the branch has never been pushed", correct: false },
+                    { text: "When the branch has been pushed/shared with others", correct: true },
+                    { text: "When you want to delete the commit permanently", correct: false },
+                    { text: "When you want to squash commits", correct: false }
+                ],
+                explanation: "Revert creates a NEW commit that undoes changes — safe for shared branches because it doesn't rewrite history. Reset rewrites history, which breaks others who pulled the original commits."
+            },
+            {
+                id: 13, type: "single", count: 1,
+                question: "What does 'git format-patch -1 abc123' create?",
+                options: [
+                    { text: "A new branch with commit abc123", correct: false },
+                    { text: "A .patch file containing commit abc123's changes and metadata", correct: true },
+                    { text: "A backup of the entire repository", correct: false },
+                    { text: "A compressed archive of the commit", correct: false }
+                ],
+                explanation: "format-patch exports commits as patch files (email format) that can be transferred and applied elsewhere. -1 means export just one commit."
+            },
+            {
+                id: 14, type: "single", count: 1,
+                question: "What is the correct command to apply a format-patch file AND create a commit?",
+                options: [
+                    { text: "git apply", correct: false },
+                    { text: "git am", correct: true },
+                    { text: "git patch", correct: false },
+                    { text: "git import", correct: false }
+                ],
+                explanation: "'git am' (apply mailbox) applies format-patch output and automatically creates a commit with the original author, date, and message preserved. 'git apply' only changes files — no commit."
+            },
+            {
+                id: 15, type: "single", count: 1,
+                question: "In interactive rebase, what does 'squash' do?",
+                options: [
+                    { text: "Deletes the commit", correct: false },
+                    { text: "Combines the commit with the one above it, keeping both messages", correct: true },
+                    { text: "Renames the commit", correct: false },
+                    { text: "Moves the commit to a different position", correct: false }
+                ],
+                explanation: "Squash merges a commit into the previous one and lets you edit the combined commit message. Useful for cleaning up 'WIP' commits before merging to main."
+            },
+            {
+                id: 16, type: "single", count: 1,
+                question: "What is the difference between 'squash' and 'fixup' in interactive rebase?",
+                options: [
+                    { text: "squash keeps both messages; fixup discards the fixup commit's message", correct: true },
+                    { text: "squash is faster than fixup", correct: false },
+                    { text: "fixup creates a backup; squash doesn't", correct: false },
+                    { text: "They are identical", correct: false }
+                ],
+                explanation: "Both combine commits, but 'squash' opens an editor to combine messages, while 'fixup' automatically discards the fixup commit's message (keeps only the target's message)."
+            },
+            {
+                id: 17, type: "multi", count: 2,
+                question: "Which TWO statements about rebase are TRUE?",
+                options: [
+                    { text: "Rebase rewrites commit hashes", correct: true },
+                    { text: "Rebase should be used on shared/public branches", correct: false },
+                    { text: "Rebase creates a linear history", correct: true },
+                    { text: "Rebase preserves original commit hashes", correct: false }
+                ],
+                explanation: "Rebase replays commits with new parents, creating new hashes and a linear history. Never rebase shared branches — it rewrites history that others have already pulled."
+            },
+            {
+                id: 18, type: "multi", count: 2,
+                question: "Which TWO are valid use cases for cherry-pick?",
+                options: [
+                    { text: "Apply a hotfix from develop to a release branch", correct: true },
+                    { text: "Merge all commits from a feature branch", correct: false },
+                    { text: "Backport a security fix to an older version branch", correct: true },
+                    { text: "Synchronize a feature branch with main", correct: false }
+                ],
+                explanation: "Cherry-pick is for selective commit transfer — perfect for hotfixes and backports. For merging all commits, use merge. For syncing, use rebase."
+            },
+            {
+                id: 19, type: "single", count: 1,
+                question: "What happens if you run 'git cherry-pick --no-commit abc123'?",
+                options: [
+                    { text: "The cherry-pick is cancelled", correct: false },
+                    { text: "The changes are applied but NOT committed (staged only)", correct: true },
+                    { text: "The commit is moved instead of copied", correct: false },
+                    { text: "The original commit is deleted", correct: false }
+                ],
+                explanation: "--no-commit applies the changes to your working directory and staging area but doesn't automatically create a commit. Useful when you want to modify the changes before committing."
+            },
+            {
+                id: 20, type: "single", count: 1,
+                question: "Your release branch has diverged from main. You want release to include main's latest commits before merging. What's the recommended approach?",
+                options: [
+                    { text: "git merge main (on release branch)", correct: false },
+                    { text: "git rebase main (on release branch), then merge release into main", correct: true },
+                    { text: "git cherry-pick all main commits onto release", correct: false },
+                    { text: "Delete release and recreate it from main", correct: false }
+                ],
+                explanation: "Rebase release onto main to get a linear history, then merge (fast-forward) into main. This is the 'rebase to sync, merge to deliver' pattern."
+            }
+        ];
+
+        let answers = {}, submitted = {}, score = 0;
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = questions.map((q, idx) => renderQuestion(q, idx)).join('');
+            updateProgress();
+        }
+
+        function renderQuestion(q, idx) {
+            const typeLabel = q.count === 1 ? 'Choose 1' : `Choose ${q.count}`;
+            return `
+                <div class="question-card" id="q${q.id}">
+                    <div class="question-header">
+                        <span class="question-number">Q${idx + 1}</span>
+                        <span class="question-type">${typeLabel}</span>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="options-list">
+                        ${q.options.map((opt, i) => `
+                            <div class="option-item" data-qid="${q.id}" data-idx="${i}" onclick="selectOption(${q.id}, ${i}, '${q.type}', ${q.count})">
+                                <div class="option-checkbox">${String.fromCharCode(65 + i)}</div>
+                                <div class="option-text">${opt.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-btn" id="sub${q.id}" onclick="submitAnswer(${q.id})" disabled>Submit Answer</button>
+                    <div class="explanation" id="exp${q.id}">
+                        <div class="explanation-title">📖 Explanation</div>
+                        <div class="explanation-text">${q.explanation}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectOption(qid, idx, type, count) {
+            if (submitted[qid]) return;
+            if (!answers[qid]) answers[qid] = [];
+            const i = answers[qid].indexOf(idx);
+            if (type === 'single') answers[qid] = [idx];
+            else {
+                if (i > -1) answers[qid].splice(i, 1);
+                else if (answers[qid].length < count) answers[qid].push(idx);
+                else { answers[qid].shift(); answers[qid].push(idx); }
+            }
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, j) => {
+                el.classList.toggle('selected', answers[qid]?.includes(j));
+            });
+            document.getElementById(`sub${qid}`).disabled = answers[qid].length !== count;
+        }
+
+        function submitAnswer(qid) {
+            if (submitted[qid]) return;
+            submitted[qid] = true;
+            const q = questions.find(x => x.id === qid);
+            const correct = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1);
+            const user = answers[qid] || [];
+            const isCorrect = user.length === q.count && user.every(i => correct.includes(i)) && correct.every(i => user.includes(i));
+            if (isCorrect) score++;
+            updateScoreDisplay();
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, i) => {
+                el.classList.add('disabled');
+                el.classList.remove('selected');
+                if (q.options[i].correct) el.classList.add('correct');
+                else if (user.includes(i)) el.classList.add('incorrect');
+            });
+            markQuestion(qid, isCorrect);
+        }
+
+        function markQuestion(qid, isCorrect) {
+            document.getElementById(`q${qid}`).classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            const btn = document.getElementById(`sub${qid}`);
+            btn.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+            btn.style.background = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
+            btn.disabled = true;
+            document.getElementById(`exp${qid}`).classList.add('show');
+            updateProgress();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('totalAnswered').textContent = Object.keys(submitted).length;
+        }
+
+        function updateProgress() {
+            document.getElementById('progressBar').style.width = `${(Object.keys(submitted).length / questions.length) * 100}%`;
+        }
+
+        function resetQuiz() {
+            answers = {}; submitted = {}; score = 0;
+            document.getElementById('correctCount').textContent = '0';
+            document.getElementById('totalAnswered').textContent = '0';
+            initQuiz();
+        }
+
+        function showAllAnswers() {
+            questions.forEach(q => {
+                if (submitted[q.id]) return;
+                answers[q.id] = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1).slice(0, q.count);
+                submitAnswer(q.id);
+            });
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

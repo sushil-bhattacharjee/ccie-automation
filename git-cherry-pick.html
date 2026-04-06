@@ -128,7 +128,8 @@
             <div class="nav-title">🍒 Git Cherry-Pick, Rebase & Merge - DevNet Expert</div>
             <div class="nav-tabs">
                 <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
-                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+                <button class="nav-tab" onclick="showSection('quiz1')">📝 MCQ-1 Practice</button>
+                <button class="nav-tab" onclick="showSection('quiz2')">📝 MCQ-2 Practice</button>
                 <a href="docs/cherry_pick_rebase.md" class="nav-tab" target="_blank">📄 Lab Guide</a>
             </div>
         </div>
@@ -572,33 +573,58 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
 
         </section>
 
-        <!-- ==================== SECTION 2: MCQ PRACTICE ==================== -->
-        <section id="quiz" class="section">
-            <h1>MCQ Practice — Cherry-Pick, Rebase & Merge</h1>
+        <!-- ==================== SECTION 2: MCQ-1 PRACTICE ==================== -->
+        <section id="quiz1" class="section">
+            <h1>MCQ-1 Practice — Cherry-Pick, Rebase & Merge</h1>
             <p class="intro-text">20 questions covering cherry-pick, rebase, merge, format-patch, and commit fixing strategies.</p>
 
             <div class="quiz-header">
                 <div>
                     <div class="progress-bar">
-                        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                        <div class="progress-fill" id="progressBar1" style="width: 0%"></div>
                     </div>
                     <span class="score-display">
-                        Score: <span class="score-correct" id="correctCount">0</span>
-                        <span class="score-total">/ <span id="totalAnswered">0</span> answered</span>
+                        Score: <span class="score-correct" id="correctCount1">0</span>
+                        <span class="score-total">/ <span id="totalAnswered1">0</span> answered</span>
                     </span>
                 </div>
                 <div class="quiz-controls">
-                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
-                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+                    <button class="btn btn-secondary" onclick="resetQuiz('q1')">🔄 Reset</button>
+                    <button class="btn btn-primary" onclick="showAllAnswers('q1')">👁 Show All</button>
                 </div>
             </div>
 
-            <div id="quizContainer"></div>
+            <div id="quizContainer1"></div>
+        </section>
+
+        <!-- ==================== SECTION 3: MCQ-2 PRACTICE ==================== -->
+        <section id="quiz2" class="section">
+            <h1>MCQ-2 Practice — Cherry-Pick, Rebase & Merge</h1>
+            <p class="intro-text">20 questions covering cherry-pick, rebase, merge, format-patch, and commit fixing strategies.</p>
+
+            <div class="quiz-header">
+                <div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar2" style="width: 0%"></div>
+                    </div>
+                    <span class="score-display">
+                        Score: <span class="score-correct" id="correctCount2">0</span>
+                        <span class="score-total">/ <span id="totalAnswered2">0</span> answered</span>
+                    </span>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="resetQuiz('q2')">🔄 Reset</button>
+                    <button class="btn btn-primary" onclick="showAllAnswers('q2')">👁 Show All</button>
+                </div>
+            </div>
+
+            <div id="quizContainer2"></div>
         </section>
     </main>
 
     <script>
-        const questions = [
+        // ==================== MCQ-1 QUESTIONS ====================
+        const questions1 = [
             {
                 id: 1, type: "single", count: 1,
                 question: "What does git cherry-pick do?",
@@ -608,7 +634,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Merges all commits from a feature branch", correct: false },
                     { text: "Rebases the current branch onto another branch", correct: false }
                 ],
-                explanation: "Cherry-pick COPIES a specific commit to your current branch. The original commit remains on its source branch. The new commit gets a new hash because it has a different parent."
+                explanation: "Cherry-pick COPIES a specific commit to your current branch. The original commit remains on its source branch. The new commit gets a new hash because it has a different parent.\n\n    A → ❌ Cherry-pick does NOT move or delete — it copies. The original commit stays intact on the source branch.\n    C → ❌ Merging all commits is what 'git merge' does. Cherry-pick is surgical — one (or few) specific commits only.\n    D → ❌ Rebasing replays an entire branch on a new base. Cherry-pick targets individual commits, not whole branches."
             },
             {
                 id: 2, type: "single", count: 1,
@@ -619,7 +645,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "It remains unchanged on bugfix", correct: true },
                     { text: "It is marked as 'picked'", correct: false }
                 ],
-                explanation: "Cherry-pick is a COPY operation, not a move. The original commit stays exactly where it was on the bugfix branch."
+                explanation: "Cherry-pick is a COPY operation, not a move. The original commit stays exactly where it was on the bugfix branch — same hash, same content, untouched.\n\n    A → ❌ Nothing is deleted. Cherry-pick never removes the source commit.\n    B → ❌ 'Moved' implies deletion from source — cherry-pick creates a copy with a new hash on the target.\n    D → ❌ Git has no 'picked' marker or status. There is no metadata trail linking the original to the cherry-picked copy."
             },
             {
                 id: 3, type: "single", count: 1,
@@ -630,7 +656,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Because the parent commit is different", correct: true },
                     { text: "Because the author changes", correct: false }
                 ],
-                explanation: "Git commit hashes are calculated from content + metadata + PARENT. Since the cherry-picked commit has a different parent on the new branch, it gets a new hash even though the content is identical."
+                explanation: "Git commit hashes are calculated from content + metadata + PARENT. Since the cherry-picked commit has a different parent on the new branch, it gets a new hash even though the diff content is identical.\n\n    A → ❌ The actual code changes (diff) are the same — it's the parent pointer that differs.\n    B → ❌ Hashes are deterministic SHA-1/SHA-256 calculations, not random.\n    D → ❌ The author and committer fields are preserved from the original commit."
             },
             {
                 id: 4, type: "single", count: 1,
@@ -641,7 +667,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "git cherry-pick B2^..B4", correct: true },
                     { text: "git cherry-pick B2 B3 B4", correct: true }
                 ],
-                explanation: "Both 'git cherry-pick B2^..B4' (range, inclusive) and 'git cherry-pick B2 B3 B4' (explicit list) work. Note: B2..B4 would EXCLUDE B2!"
+                explanation: "Two valid syntaxes: 'B2^..B4' uses caret to make the range inclusive of B2, and 'B2 B3 B4' lists each commit explicitly. Both produce the same result.\n\n    A → ❌ 'B2-B4' is not valid Git syntax — Git uses '..' for ranges, not dashes.\n    B → ❌ 'B2..B4' is exclusive of B2 — it would only pick B3 and B4, missing B2."
             },
             {
                 id: 5, type: "single", count: 1,
@@ -652,7 +678,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Deletes the feature branch", correct: false },
                     { text: "Creates a merge commit on main", correct: false }
                 ],
-                explanation: "Rebase takes your feature commits and replays them one by one on top of main's HEAD, creating a linear history. Your feature branch moves forward to sit on top of main."
+                explanation: "Rebase takes your feature commits and replays them one by one on top of main's HEAD, creating a linear history. Your feature branch moves forward to sit on top of main.\n\n    A → ❌ Merge creates a merge commit combining two histories. Rebase rewrites history to be linear — no merge commit.\n    C → ❌ Rebase does not delete anything. It replays commits and moves the branch pointer.\n    D → ❌ No merge commit is created on main. Rebase operates on the current branch (feature), not the target (main)."
             },
             {
                 id: 6, type: "single", count: 1,
@@ -663,7 +689,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Because Git encrypts commits during rebase", correct: false },
                     { text: "Because the author timestamp changes", correct: false }
                 ],
-                explanation: "Each replayed commit has a new parent (the previous rebased commit), which changes the hash. This cascades through all commits being rebased."
+                explanation: "Each replayed commit has a new parent (the previous rebased commit), which changes the hash. This cascades — the first commit gets a new parent (main's HEAD), then the second commit's parent is the new first, and so on.\n\n    A → ❌ The diff/content of each commit remains the same — only the parent pointer changes.\n    C → ❌ Git does not encrypt commits. Hashing (SHA) is for integrity, not encryption.\n    D → ❌ The author timestamp is preserved. The committer timestamp may update, but that alone doesn't explain why ALL hashes change — the parent chain does."
             },
             {
                 id: 7, type: "single", count: 1,
@@ -674,7 +700,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "A merge that happens very quickly", correct: false },
                     { text: "A merge that skips conflict resolution", correct: false }
                 ],
-                explanation: "Fast-forward occurs when the target branch is a direct ancestor of the source branch. Git just moves the pointer forward — no merge commit needed because history is already linear."
+                explanation: "Fast-forward occurs when the target branch is a direct ancestor of the source branch. Git just moves the pointer forward — no merge commit needed because history is already linear.\n\n    A → ❌ A merge commit with two parents is a 'true merge' or 'three-way merge', not a fast-forward.\n    C → ❌ 'Fast-forward' refers to the pointer movement strategy, not execution speed.\n    D → ❌ Fast-forward is only possible when there are NO divergent changes, so conflicts can't exist — it doesn't 'skip' them."
             },
             {
                 id: 8, type: "single", count: 1,
@@ -685,7 +711,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "To prevent conflicts", correct: false },
                     { text: "To delete the source branch after merge", correct: false }
                 ],
-                explanation: "--no-ff forces Git to create a merge commit even when the history is linear. This preserves branch history and makes it clear that a feature was developed on a separate branch."
+                explanation: "--no-ff forces Git to create a merge commit even when the history is linear. This preserves branch history and makes it clear that a feature was developed on a separate branch.\n\n    A → ❌ --no-ff actually adds a step (creating a merge commit) — it doesn't speed anything up.\n    C → ❌ --no-ff has no effect on conflicts. Conflicts depend on file changes, not merge strategy flags.\n    D → ❌ Branch deletion requires 'git branch -d'. --no-ff only controls whether a merge commit is created."
             },
             {
                 id: 9, type: "single", count: 1,
@@ -696,7 +722,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Amends all commits in the branch", correct: false },
                     { text: "Merges the last two commits", correct: false }
                 ],
-                explanation: "--amend replaces the last commit with a new one. You can change the message, add forgotten files, or both. The old commit is replaced (new hash)."
+                explanation: "--amend replaces the last commit with a new one. You can change the message, add forgotten files, or both. The old commit is replaced (new hash) because the content or metadata changed.\n\n    A → ❌ That describes 'git revert', which creates a new undo commit. --amend replaces in place.\n    C → ❌ --amend only affects the MOST RECENT commit. For older commits, use 'git rebase -i'.\n    D → ❌ Merging commits is 'squash' in interactive rebase. --amend modifies a single commit."
             },
             {
                 id: 10, type: "single", count: 1,
@@ -707,7 +733,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "git reset --hard", correct: false },
                     { text: "git revert HEAD~N", correct: false }
                 ],
-                explanation: "Interactive rebase (rebase -i) lets you go back N commits and change 'pick' to 'reword' for any commit whose message you want to edit."
+                explanation: "Interactive rebase (rebase -i) lets you go back N commits and change 'pick' to 'reword' for any commit whose message you want to edit. Git will pause at that commit and let you edit the message.\n\n    A → ❌ --amend only works on the MOST RECENT commit. It cannot reach older commits.\n    C → ❌ 'git reset --hard' discards commits and changes entirely — it doesn't edit messages.\n    D → ❌ 'git revert' creates a new commit undoing changes. It doesn't fix messages — it reverses content."
             },
             {
                 id: 11, type: "single", count: 1,
@@ -718,7 +744,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "--soft creates a backup; --hard doesn't", correct: false },
                     { text: "There is no difference", correct: false }
                 ],
-                explanation: "--soft undoes the commit but keeps your changes staged (ready to recommit). --hard undoes the commit AND deletes all changes — use with caution!"
+                explanation: "--soft undoes the commit but keeps your changes staged (ready to recommit). --hard undoes the commit AND deletes all changes from working directory and staging area — destructive and irreversible.\n\n    B → ❌ Speed is identical. The difference is what happens to your files, not performance.\n    C → ❌ Neither creates a backup. If you need recovery after --hard, you'd need 'git reflog'.\n    D → ❌ They are fundamentally different — --soft preserves work, --hard destroys it."
             },
             {
                 id: 12, type: "single", count: 1,
@@ -729,7 +755,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "When you want to delete the commit permanently", correct: false },
                     { text: "When you want to squash commits", correct: false }
                 ],
-                explanation: "Revert creates a NEW commit that undoes changes — safe for shared branches because it doesn't rewrite history. Reset rewrites history, which breaks others who pulled the original commits."
+                explanation: "Revert creates a NEW commit that undoes changes — safe for shared branches because it doesn't rewrite history. Reset rewrites history, which breaks others who pulled the original commits.\n\n    A → ❌ If the branch was never pushed, reset is actually fine — no one else has the history.\n    C → ❌ Revert doesn't delete anything — it adds a new commit. Reset is what removes commits from history.\n    D → ❌ Squashing commits is done with 'git rebase -i' using the 'squash' or 'fixup' action."
             },
             {
                 id: 13, type: "single", count: 1,
@@ -740,7 +766,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "A backup of the entire repository", correct: false },
                     { text: "A compressed archive of the commit", correct: false }
                 ],
-                explanation: "format-patch exports commits as patch files (email format) that can be transferred and applied elsewhere. -1 means export just one commit."
+                explanation: "format-patch exports commits as .patch files in email/mbox format containing the diff, author, date, and commit message. '-1' means export just one commit (abc123).\n\n    A → ❌ Creating branches is 'git branch' or 'git checkout -b'. format-patch produces files, not branches.\n    C → ❌ Repository backups are done with 'git clone --mirror' or 'git bundle'. format-patch exports individual commits.\n    D → ❌ It's a plain-text patch file, not a compressed archive like .tar.gz or .zip."
             },
             {
                 id: 14, type: "single", count: 1,
@@ -751,7 +777,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "git patch", correct: false },
                     { text: "git import", correct: false }
                 ],
-                explanation: "'git am' (apply mailbox) applies format-patch output and automatically creates a commit with the original author, date, and message preserved. 'git apply' only changes files — no commit."
+                explanation: "'git am' (apply mailbox) applies format-patch output and automatically creates a commit with the original author, date, and message preserved. It's the counterpart to format-patch.\n\n    A → ❌ 'git apply' only modifies files in the working directory — it does NOT create a commit or preserve metadata.\n    C → ❌ 'git patch' is not a valid Git command.\n    D → ❌ 'git import' is not a valid Git command. You may be thinking of 'git am' or 'git apply'."
             },
             {
                 id: 15, type: "single", count: 1,
@@ -762,7 +788,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Renames the commit", correct: false },
                     { text: "Moves the commit to a different position", correct: false }
                 ],
-                explanation: "Squash merges a commit into the previous one and lets you edit the combined commit message. Useful for cleaning up 'WIP' commits before merging to main."
+                explanation: "Squash merges a commit into the previous one (the one above in the rebase todo list) and opens an editor to combine both commit messages. Great for cleaning up 'WIP' commits.\n\n    A → ❌ 'drop' deletes a commit in interactive rebase, not 'squash'.\n    C → ❌ 'reword' changes a commit message. Squash combines commits.\n    D → ❌ Reordering commits is done by changing line order in the rebase todo list, not by the squash action."
             },
             {
                 id: 16, type: "single", count: 1,
@@ -773,7 +799,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "fixup creates a backup; squash doesn't", correct: false },
                     { text: "They are identical", correct: false }
                 ],
-                explanation: "Both combine commits, but 'squash' opens an editor to combine messages, while 'fixup' automatically discards the fixup commit's message (keeps only the target's message)."
+                explanation: "Both combine commits into the previous one. 'squash' opens an editor showing both messages for you to edit. 'fixup' silently discards the fixup commit's message, keeping only the target's message.\n\n    B → ❌ Speed is the same. The only difference is message handling.\n    C → ❌ Neither creates backups. Both are history-rewriting operations.\n    D → ❌ They differ in how commit messages are handled — squash lets you edit, fixup auto-discards."
             },
             {
                 id: 17, type: "multi", count: 2,
@@ -784,7 +810,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Rebase creates a linear history", correct: true },
                     { text: "Rebase preserves original commit hashes", correct: false }
                 ],
-                explanation: "Rebase replays commits with new parents, creating new hashes and a linear history. Never rebase shared branches — it rewrites history that others have already pulled."
+                explanation: "Rebase replays commits with new parents → new hashes (A is true) and produces a straight-line history without merge commits (C is true).\n\n    B → ❌ The Golden Rule of Rebase: NEVER rebase shared/public branches. It rewrites history that others depend on, causing divergence and conflicts.\n    D → ❌ Directly contradicts A. Rebase always creates new hashes because parent pointers change during replay."
             },
             {
                 id: 18, type: "multi", count: 2,
@@ -795,7 +821,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "Backport a security fix to an older version branch", correct: true },
                     { text: "Synchronize a feature branch with main", correct: false }
                 ],
-                explanation: "Cherry-pick is for selective commit transfer — perfect for hotfixes and backports. For merging all commits, use merge. For syncing, use rebase."
+                explanation: "Cherry-pick is for selective, surgical commit transfer — perfect for hotfixes (A) and backports (C) where you need specific commits, not entire branches.\n\n    B → ❌ Merging all commits is what 'git merge' does. Cherry-picking every commit individually would be tedious and create duplicate commits.\n    D → ❌ Synchronizing a feature branch with main is what 'git rebase main' does — it replays your entire branch on top of main's latest."
             },
             {
                 id: 19, type: "single", count: 1,
@@ -806,7 +832,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "The commit is moved instead of copied", correct: false },
                     { text: "The original commit is deleted", correct: false }
                 ],
-                explanation: "--no-commit applies the changes to your working directory and staging area but doesn't automatically create a commit. Useful when you want to modify the changes before committing."
+                explanation: "--no-commit applies the cherry-picked changes to your working directory and staging area but skips the automatic commit. Useful when you want to modify the changes or combine multiple cherry-picks into one commit.\n\n    A → ❌ The changes ARE applied — the cherry-pick is not cancelled. Only the commit step is skipped.\n    C → ❌ --no-commit has nothing to do with move vs copy. Cherry-pick is always a copy.\n    D → ❌ The original commit is never deleted by cherry-pick, regardless of flags."
             },
             {
                 id: 20, type: "single", count: 1,
@@ -817,11 +843,239 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     { text: "git cherry-pick all main commits onto release", correct: false },
                     { text: "Delete release and recreate it from main", correct: false }
                 ],
-                explanation: "Rebase release onto main to get a linear history, then merge (fast-forward) into main. This is the 'rebase to sync, merge to deliver' pattern."
+                explanation: "Rebase release onto main to get a linear history, then merge (fast-forward) into main. This is the 'rebase to sync, merge to deliver' pattern — clean, linear, professional.\n\n    A → ❌ Merging main into release creates unnecessary merge commits and a tangled history graph.\n    C → ❌ Cherry-picking every main commit individually is error-prone and creates duplicate commits with different hashes.\n    D → ❌ Deleting and recreating loses all release branch work (R1, R2, R3). Destructive and unnecessary."
             }
         ];
 
-        let answers = {}, submitted = {}, score = 0;
+        // ==================== MCQ-2 QUESTIONS ====================
+        const questions2 = [
+            {
+                id: 101, type: "single", count: 1,
+                question: "What does git cherry-pick do?",
+                options: [
+                    { text: "Moves a commit from one branch to another (original is deleted)", correct: false },
+                    { text: "Copies a specific commit to the current branch with a new hash", correct: true },
+                    { text: "Merges all commits from a feature branch", correct: false },
+                    { text: "Rebases the current branch onto another branch", correct: false }
+                ],
+                explanation: "Cherry-pick COPIES a specific commit to your current branch. The original commit remains on its source branch. The new commit gets a new hash because it has a different parent.\n\n    A → ❌ Cherry-pick does NOT move or delete — it copies. The original commit stays intact on the source branch.\n    C → ❌ Merging all commits is what 'git merge' does. Cherry-pick is surgical — one (or few) specific commits only.\n    D → ❌ Rebasing replays an entire branch on a new base. Cherry-pick targets individual commits, not whole branches."
+            },
+            {
+                id: 102, type: "single", count: 1,
+                question: "After cherry-picking commit abc123 from bugfix to release, what happens to abc123 on bugfix?",
+                options: [
+                    { text: "It is deleted", correct: false },
+                    { text: "It is moved to release", correct: false },
+                    { text: "It remains unchanged on bugfix", correct: true },
+                    { text: "It is marked as 'picked'", correct: false }
+                ],
+                explanation: "Cherry-pick is a COPY operation, not a move. The original commit stays exactly where it was on the bugfix branch — same hash, same content, untouched.\n\n    A → ❌ Nothing is deleted. Cherry-pick never removes the source commit.\n    B → ❌ 'Moved' implies deletion from source — cherry-pick creates a copy with a new hash on the target.\n    D → ❌ Git has no 'picked' marker or status. There is no metadata trail linking the original to the cherry-picked copy."
+            },
+            {
+                id: 103, type: "single", count: 1,
+                question: "Why does a cherry-picked commit get a new hash?",
+                options: [
+                    { text: "Because the commit content changes", correct: false },
+                    { text: "Because Git randomly generates new hashes", correct: false },
+                    { text: "Because the parent commit is different", correct: true },
+                    { text: "Because the author changes", correct: false }
+                ],
+                explanation: "Git commit hashes are calculated from content + metadata + PARENT. Since the cherry-picked commit has a different parent on the new branch, it gets a new hash even though the diff content is identical.\n\n    A → ❌ The actual code changes (diff) are the same — it's the parent pointer that differs.\n    B → ❌ Hashes are deterministic SHA-1/SHA-256 calculations, not random.\n    D → ❌ The author and committer fields are preserved from the original commit."
+            },
+            {
+                id: 104, type: "single", count: 1,
+                question: "Which command copies commits B2, B3, and B4 to your current branch?",
+                options: [
+                    { text: "git cherry-pick B2-B4", correct: false },
+                    { text: "git cherry-pick B2..B4", correct: false },
+                    { text: "git cherry-pick B2^..B4", correct: true },
+                    { text: "git cherry-pick B2 B3 B4", correct: true }
+                ],
+                explanation: "Two valid syntaxes: 'B2^..B4' uses caret to make the range inclusive of B2, and 'B2 B3 B4' lists each commit explicitly. Both produce the same result.\n\n    A → ❌ 'B2-B4' is not valid Git syntax — Git uses '..' for ranges, not dashes.\n    B → ❌ 'B2..B4' is exclusive of B2 — it would only pick B3 and B4, missing B2."
+            },
+            {
+                id: 105, type: "single", count: 1,
+                question: "What does 'git rebase main' do when run on a feature branch?",
+                options: [
+                    { text: "Merges main into feature", correct: false },
+                    { text: "Replays feature commits on top of main's latest commit", correct: true },
+                    { text: "Deletes the feature branch", correct: false },
+                    { text: "Creates a merge commit on main", correct: false }
+                ],
+                explanation: "Rebase takes your feature commits and replays them one by one on top of main's HEAD, creating a linear history. Your feature branch moves forward to sit on top of main.\n\n    A → ❌ Merge creates a merge commit combining two histories. Rebase rewrites history to be linear — no merge commit.\n    C → ❌ Rebase does not delete anything. It replays commits and moves the branch pointer.\n    D → ❌ No merge commit is created on main. Rebase operates on the current branch (feature), not the target (main)."
+            },
+            {
+                id: 106, type: "single", count: 1,
+                question: "After rebasing, why do ALL feature branch commits have new hashes?",
+                options: [
+                    { text: "Because rebase modifies commit content", correct: false },
+                    { text: "Because each commit's parent changes during replay", correct: true },
+                    { text: "Because Git encrypts commits during rebase", correct: false },
+                    { text: "Because the author timestamp changes", correct: false }
+                ],
+                explanation: "Each replayed commit has a new parent (the previous rebased commit), which changes the hash. This cascades — the first commit gets a new parent (main's HEAD), then the second commit's parent is the new first, and so on.\n\n    A → ❌ The diff/content of each commit remains the same — only the parent pointer changes.\n    C → ❌ Git does not encrypt commits. Hashing (SHA) is for integrity, not encryption.\n    D → ❌ The author timestamp is preserved. The committer timestamp may update, but that alone doesn't explain why ALL hashes change — the parent chain does."
+            },
+            {
+                id: 107, type: "single", count: 1,
+                question: "What is a 'fast-forward' merge?",
+                options: [
+                    { text: "A merge that creates a merge commit with two parents", correct: false },
+                    { text: "A merge that simply moves the branch pointer forward (no merge commit)", correct: true },
+                    { text: "A merge that happens very quickly", correct: false },
+                    { text: "A merge that skips conflict resolution", correct: false }
+                ],
+                explanation: "Fast-forward occurs when the target branch is a direct ancestor of the source branch. Git just moves the pointer forward — no merge commit needed because history is already linear.\n\n    A → ❌ A merge commit with two parents is a 'true merge' or 'three-way merge', not a fast-forward.\n    C → ❌ 'Fast-forward' refers to the pointer movement strategy, not execution speed.\n    D → ❌ Fast-forward is only possible when there are NO divergent changes, so conflicts can't exist — it doesn't 'skip' them."
+            },
+            {
+                id: 108, type: "single", count: 1,
+                question: "When would you use 'git merge --no-ff'?",
+                options: [
+                    { text: "To speed up the merge process", correct: false },
+                    { text: "To force a merge commit even when fast-forward is possible", correct: true },
+                    { text: "To prevent conflicts", correct: false },
+                    { text: "To delete the source branch after merge", correct: false }
+                ],
+                explanation: "--no-ff forces Git to create a merge commit even when the history is linear. This preserves branch history and makes it clear that a feature was developed on a separate branch.\n\n    A → ❌ --no-ff actually adds a step (creating a merge commit) — it doesn't speed anything up.\n    C → ❌ --no-ff has no effect on conflicts. Conflicts depend on file changes, not merge strategy flags.\n    D → ❌ Branch deletion requires 'git branch -d'. --no-ff only controls whether a merge commit is created."
+            },
+            {
+                id: 109, type: "single", count: 1,
+                question: "What does 'git commit --amend' do?",
+                options: [
+                    { text: "Creates a new commit that undoes the last commit", correct: false },
+                    { text: "Rewrites the most recent commit (message and/or content)", correct: true },
+                    { text: "Amends all commits in the branch", correct: false },
+                    { text: "Merges the last two commits", correct: false }
+                ],
+                explanation: "--amend replaces the last commit with a new one. You can change the message, add forgotten files, or both. The old commit is replaced (new hash) because the content or metadata changed.\n\n    A → ❌ That describes 'git revert', which creates a new undo commit. --amend replaces in place.\n    C → ❌ --amend only affects the MOST RECENT commit. For older commits, use 'git rebase -i'.\n    D → ❌ Merging commits is 'squash' in interactive rebase. --amend modifies a single commit."
+            },
+            {
+                id: 110, type: "single", count: 1,
+                question: "To fix a commit message that is NOT the most recent, which command should you use?",
+                options: [
+                    { text: "git commit --amend", correct: false },
+                    { text: "git rebase -i HEAD~N with 'reword'", correct: true },
+                    { text: "git reset --hard", correct: false },
+                    { text: "git revert HEAD~N", correct: false }
+                ],
+                explanation: "Interactive rebase (rebase -i) lets you go back N commits and change 'pick' to 'reword' for any commit whose message you want to edit. Git will pause at that commit and let you edit the message.\n\n    A → ❌ --amend only works on the MOST RECENT commit. It cannot reach older commits.\n    C → ❌ 'git reset --hard' discards commits and changes entirely — it doesn't edit messages.\n    D → ❌ 'git revert' creates a new commit undoing changes. It doesn't fix messages — it reverses content."
+            },
+            {
+                id: 111, type: "single", count: 1,
+                question: "What is the difference between 'git reset --soft HEAD~1' and 'git reset --hard HEAD~1'?",
+                options: [
+                    { text: "--soft keeps changes staged; --hard deletes changes entirely", correct: true },
+                    { text: "--soft is faster; --hard is slower", correct: false },
+                    { text: "--soft creates a backup; --hard doesn't", correct: false },
+                    { text: "There is no difference", correct: false }
+                ],
+                explanation: "--soft undoes the commit but keeps your changes staged (ready to recommit). --hard undoes the commit AND deletes all changes from working directory and staging area — destructive and irreversible.\n\n    B → ❌ Speed is identical. The difference is what happens to your files, not performance.\n    C → ❌ Neither creates a backup. If you need recovery after --hard, you'd need 'git reflog'.\n    D → ❌ They are fundamentally different — --soft preserves work, --hard destroys it."
+            },
+            {
+                id: 112, type: "single", count: 1,
+                question: "When should you use 'git revert' instead of 'git reset'?",
+                options: [
+                    { text: "When the branch has never been pushed", correct: false },
+                    { text: "When the branch has been pushed/shared with others", correct: true },
+                    { text: "When you want to delete the commit permanently", correct: false },
+                    { text: "When you want to squash commits", correct: false }
+                ],
+                explanation: "Revert creates a NEW commit that undoes changes — safe for shared branches because it doesn't rewrite history. Reset rewrites history, which breaks others who pulled the original commits.\n\n    A → ❌ If the branch was never pushed, reset is actually fine — no one else has the history.\n    C → ❌ Revert doesn't delete anything — it adds a new commit. Reset is what removes commits from history.\n    D → ❌ Squashing commits is done with 'git rebase -i' using the 'squash' or 'fixup' action."
+            },
+            {
+                id: 113, type: "single", count: 1,
+                question: "What does 'git format-patch -1 abc123' create?",
+                options: [
+                    { text: "A new branch with commit abc123", correct: false },
+                    { text: "A .patch file containing commit abc123's changes and metadata", correct: true },
+                    { text: "A backup of the entire repository", correct: false },
+                    { text: "A compressed archive of the commit", correct: false }
+                ],
+                explanation: "format-patch exports commits as .patch files in email/mbox format containing the diff, author, date, and commit message. '-1' means export just one commit (abc123).\n\n    A → ❌ Creating branches is 'git branch' or 'git checkout -b'. format-patch produces files, not branches.\n    C → ❌ Repository backups are done with 'git clone --mirror' or 'git bundle'. format-patch exports individual commits.\n    D → ❌ It's a plain-text patch file, not a compressed archive like .tar.gz or .zip."
+            },
+            {
+                id: 114, type: "single", count: 1,
+                question: "What is the correct command to apply a format-patch file AND create a commit?",
+                options: [
+                    { text: "git apply", correct: false },
+                    { text: "git am", correct: true },
+                    { text: "git patch", correct: false },
+                    { text: "git import", correct: false }
+                ],
+                explanation: "'git am' (apply mailbox) applies format-patch output and automatically creates a commit with the original author, date, and message preserved. It's the counterpart to format-patch.\n\n    A → ❌ 'git apply' only modifies files in the working directory — it does NOT create a commit or preserve metadata.\n    C → ❌ 'git patch' is not a valid Git command.\n    D → ❌ 'git import' is not a valid Git command. You may be thinking of 'git am' or 'git apply'."
+            },
+            {
+                id: 115, type: "single", count: 1,
+                question: "In interactive rebase, what does 'squash' do?",
+                options: [
+                    { text: "Deletes the commit", correct: false },
+                    { text: "Combines the commit with the one above it, keeping both messages", correct: true },
+                    { text: "Renames the commit", correct: false },
+                    { text: "Moves the commit to a different position", correct: false }
+                ],
+                explanation: "Squash merges a commit into the previous one (the one above in the rebase todo list) and opens an editor to combine both commit messages. Great for cleaning up 'WIP' commits.\n\n    A → ❌ 'drop' deletes a commit in interactive rebase, not 'squash'.\n    C → ❌ 'reword' changes a commit message. Squash combines commits.\n    D → ❌ Reordering commits is done by changing line order in the rebase todo list, not by the squash action."
+            },
+            {
+                id: 116, type: "single", count: 1,
+                question: "What is the difference between 'squash' and 'fixup' in interactive rebase?",
+                options: [
+                    { text: "squash keeps both messages; fixup discards the fixup commit's message", correct: true },
+                    { text: "squash is faster than fixup", correct: false },
+                    { text: "fixup creates a backup; squash doesn't", correct: false },
+                    { text: "They are identical", correct: false }
+                ],
+                explanation: "Both combine commits into the previous one. 'squash' opens an editor showing both messages for you to edit. 'fixup' silently discards the fixup commit's message, keeping only the target's message.\n\n    B → ❌ Speed is the same. The only difference is message handling.\n    C → ❌ Neither creates backups. Both are history-rewriting operations.\n    D → ❌ They differ in how commit messages are handled — squash lets you edit, fixup auto-discards."
+            },
+            {
+                id: 117, type: "multi", count: 2,
+                question: "Which TWO statements about rebase are TRUE?",
+                options: [
+                    { text: "Rebase rewrites commit hashes", correct: true },
+                    { text: "Rebase should be used on shared/public branches", correct: false },
+                    { text: "Rebase creates a linear history", correct: true },
+                    { text: "Rebase preserves original commit hashes", correct: false }
+                ],
+                explanation: "Rebase replays commits with new parents → new hashes (A is true) and produces a straight-line history without merge commits (C is true).\n\n    B → ❌ The Golden Rule of Rebase: NEVER rebase shared/public branches. It rewrites history that others depend on, causing divergence and conflicts.\n    D → ❌ Directly contradicts A. Rebase always creates new hashes because parent pointers change during replay."
+            },
+            {
+                id: 118, type: "multi", count: 2,
+                question: "Which TWO are valid use cases for cherry-pick?",
+                options: [
+                    { text: "Apply a hotfix from develop to a release branch", correct: true },
+                    { text: "Merge all commits from a feature branch", correct: false },
+                    { text: "Backport a security fix to an older version branch", correct: true },
+                    { text: "Synchronize a feature branch with main", correct: false }
+                ],
+                explanation: "Cherry-pick is for selective, surgical commit transfer — perfect for hotfixes (A) and backports (C) where you need specific commits, not entire branches.\n\n    B → ❌ Merging all commits is what 'git merge' does. Cherry-picking every commit individually would be tedious and create duplicate commits.\n    D → ❌ Synchronizing a feature branch with main is what 'git rebase main' does — it replays your entire branch on top of main's latest."
+            },
+            {
+                id: 119, type: "single", count: 1,
+                question: "What happens if you run 'git cherry-pick --no-commit abc123'?",
+                options: [
+                    { text: "The cherry-pick is cancelled", correct: false },
+                    { text: "The changes are applied but NOT committed (staged only)", correct: true },
+                    { text: "The commit is moved instead of copied", correct: false },
+                    { text: "The original commit is deleted", correct: false }
+                ],
+                explanation: "--no-commit applies the cherry-picked changes to your working directory and staging area but skips the automatic commit. Useful when you want to modify the changes or combine multiple cherry-picks into one commit.\n\n    A → ❌ The changes ARE applied — the cherry-pick is not cancelled. Only the commit step is skipped.\n    C → ❌ --no-commit has nothing to do with move vs copy. Cherry-pick is always a copy.\n    D → ❌ The original commit is never deleted by cherry-pick, regardless of flags."
+            },
+            {
+                id: 120, type: "single", count: 1,
+                question: "Your release branch has diverged from main. You want release to include main's latest commits before merging. What's the recommended approach?",
+                options: [
+                    { text: "git merge main (on release branch)", correct: false },
+                    { text: "git rebase main (on release branch), then merge release into main", correct: true },
+                    { text: "git cherry-pick all main commits onto release", correct: false },
+                    { text: "Delete release and recreate it from main", correct: false }
+                ],
+                explanation: "Rebase release onto main to get a linear history, then merge (fast-forward) into main. This is the 'rebase to sync, merge to deliver' pattern — clean, linear, professional.\n\n    A → ❌ Merging main into release creates unnecessary merge commits and a tangled history graph.\n    C → ❌ Cherry-picking every main commit individually is error-prone and creates duplicate commits with different hashes.\n    D → ❌ Deleting and recreating loses all release branch work (R1, R2, R3). Destructive and unnecessary."
+            }
+        ];
+
+        // ==================== QUIZ ENGINE (supports multiple quizzes) ====================
+        const quizState = {
+            q1: { answers: {}, submitted: {}, score: 0, questions: questions1 },
+            q2: { answers: {}, submitted: {}, score: 0, questions: questions2 }
+        };
 
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -830,16 +1084,19 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
             event.target.classList.add('active');
         }
 
-        function initQuiz() {
-            const container = document.getElementById('quizContainer');
-            container.innerHTML = questions.map((q, idx) => renderQuestion(q, idx)).join('');
-            updateProgress();
+        function initQuiz(qKey) {
+            const st = quizState[qKey];
+            const suffix = qKey === 'q1' ? '1' : '2';
+            const container = document.getElementById('quizContainer' + suffix);
+            container.innerHTML = st.questions.map((q, idx) => renderQuestion(q, idx, qKey)).join('');
+            updateProgress(qKey);
         }
 
-        function renderQuestion(q, idx) {
+        function renderQuestion(q, idx, qKey) {
             const typeLabel = q.count === 1 ? 'Choose 1' : `Choose ${q.count}`;
+            const expHtml = q.explanation.replace(/\n/g, '<br>');
             return `
-                <div class="question-card" id="q${q.id}">
+                <div class="question-card" id="${qKey}_q${q.id}">
                     <div class="question-header">
                         <span class="question-number">Q${idx + 1}</span>
                         <span class="question-type">${typeLabel}</span>
@@ -847,90 +1104,100 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     <div class="question-text">${q.question}</div>
                     <div class="options-list">
                         ${q.options.map((opt, i) => `
-                            <div class="option-item" data-qid="${q.id}" data-idx="${i}" onclick="selectOption(${q.id}, ${i}, '${q.type}', ${q.count})">
+                            <div class="option-item" data-qkey="${qKey}" data-qid="${q.id}" data-idx="${i}" onclick="selectOption('${qKey}', ${q.id}, ${i}, '${q.type}', ${q.count})">
                                 <div class="option-checkbox">${String.fromCharCode(65 + i)}</div>
                                 <div class="option-text">${opt.text}</div>
                             </div>
                         `).join('')}
                     </div>
-                    <button class="submit-btn" id="sub${q.id}" onclick="submitAnswer(${q.id})" disabled>Submit Answer</button>
-                    <div class="explanation" id="exp${q.id}">
+                    <button class="submit-btn" id="${qKey}_sub${q.id}" onclick="submitAnswer('${qKey}', ${q.id})" disabled>Submit Answer</button>
+                    <div class="explanation" id="${qKey}_exp${q.id}">
                         <div class="explanation-title">📖 Explanation</div>
-                        <div class="explanation-text">${q.explanation}</div>
+                        <div class="explanation-text">${expHtml}</div>
                     </div>
                 </div>
             `;
         }
 
-        function selectOption(qid, idx, type, count) {
-            if (submitted[qid]) return;
-            if (!answers[qid]) answers[qid] = [];
-            const i = answers[qid].indexOf(idx);
-            if (type === 'single') answers[qid] = [idx];
+        function selectOption(qKey, qid, idx, type, count) {
+            const st = quizState[qKey];
+            if (st.submitted[qid]) return;
+            if (!st.answers[qid]) st.answers[qid] = [];
+            const i = st.answers[qid].indexOf(idx);
+            if (type === 'single') st.answers[qid] = [idx];
             else {
-                if (i > -1) answers[qid].splice(i, 1);
-                else if (answers[qid].length < count) answers[qid].push(idx);
-                else { answers[qid].shift(); answers[qid].push(idx); }
+                if (i > -1) st.answers[qid].splice(i, 1);
+                else if (st.answers[qid].length < count) st.answers[qid].push(idx);
+                else { st.answers[qid].shift(); st.answers[qid].push(idx); }
             }
-            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, j) => {
-                el.classList.toggle('selected', answers[qid]?.includes(j));
+            document.querySelectorAll(`.option-item[data-qkey="${qKey}"][data-qid="${qid}"]`).forEach((el, j) => {
+                el.classList.toggle('selected', st.answers[qid]?.includes(j));
             });
-            document.getElementById(`sub${qid}`).disabled = answers[qid].length !== count;
+            document.getElementById(`${qKey}_sub${qid}`).disabled = st.answers[qid].length !== count;
         }
 
-        function submitAnswer(qid) {
-            if (submitted[qid]) return;
-            submitted[qid] = true;
-            const q = questions.find(x => x.id === qid);
+        function submitAnswer(qKey, qid) {
+            const st = quizState[qKey];
+            if (st.submitted[qid]) return;
+            st.submitted[qid] = true;
+            const q = st.questions.find(x => x.id === qid);
             const correct = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1);
-            const user = answers[qid] || [];
+            const user = st.answers[qid] || [];
             const isCorrect = user.length === q.count && user.every(i => correct.includes(i)) && correct.every(i => user.includes(i));
-            if (isCorrect) score++;
-            updateScoreDisplay();
-            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, i) => {
+            if (isCorrect) st.score++;
+            updateScoreDisplay(qKey);
+            document.querySelectorAll(`.option-item[data-qkey="${qKey}"][data-qid="${qid}"]`).forEach((el, i) => {
                 el.classList.add('disabled');
                 el.classList.remove('selected');
                 if (q.options[i].correct) el.classList.add('correct');
                 else if (user.includes(i)) el.classList.add('incorrect');
             });
-            markQuestion(qid, isCorrect);
+            markQuestion(qKey, qid, isCorrect);
         }
 
-        function markQuestion(qid, isCorrect) {
-            document.getElementById(`q${qid}`).classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
-            const btn = document.getElementById(`sub${qid}`);
+        function markQuestion(qKey, qid, isCorrect) {
+            document.getElementById(`${qKey}_q${qid}`).classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            const btn = document.getElementById(`${qKey}_sub${qid}`);
             btn.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
             btn.style.background = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
             btn.disabled = true;
-            document.getElementById(`exp${qid}`).classList.add('show');
-            updateProgress();
+            document.getElementById(`${qKey}_exp${qid}`).classList.add('show');
+            updateProgress(qKey);
         }
 
-        function updateScoreDisplay() {
-            document.getElementById('correctCount').textContent = score;
-            document.getElementById('totalAnswered').textContent = Object.keys(submitted).length;
+        function updateScoreDisplay(qKey) {
+            const st = quizState[qKey];
+            const suffix = qKey === 'q1' ? '1' : '2';
+            document.getElementById('correctCount' + suffix).textContent = st.score;
+            document.getElementById('totalAnswered' + suffix).textContent = Object.keys(st.submitted).length;
         }
 
-        function updateProgress() {
-            document.getElementById('progressBar').style.width = `${(Object.keys(submitted).length / questions.length) * 100}%`;
+        function updateProgress(qKey) {
+            const st = quizState[qKey];
+            const suffix = qKey === 'q1' ? '1' : '2';
+            document.getElementById('progressBar' + suffix).style.width = `${(Object.keys(st.submitted).length / st.questions.length) * 100}%`;
         }
 
-        function resetQuiz() {
-            answers = {}; submitted = {}; score = 0;
-            document.getElementById('correctCount').textContent = '0';
-            document.getElementById('totalAnswered').textContent = '0';
-            initQuiz();
+        function resetQuiz(qKey) {
+            const st = quizState[qKey];
+            const suffix = qKey === 'q1' ? '1' : '2';
+            st.answers = {}; st.submitted = {}; st.score = 0;
+            document.getElementById('correctCount' + suffix).textContent = '0';
+            document.getElementById('totalAnswered' + suffix).textContent = '0';
+            initQuiz(qKey);
         }
 
-        function showAllAnswers() {
-            questions.forEach(q => {
-                if (submitted[q.id]) return;
-                answers[q.id] = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1).slice(0, q.count);
-                submitAnswer(q.id);
+        function showAllAnswers(qKey) {
+            const st = quizState[qKey];
+            st.questions.forEach(q => {
+                if (st.submitted[q.id]) return;
+                st.answers[q.id] = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1).slice(0, q.count);
+                submitAnswer(qKey, q.id);
             });
         }
 
-        initQuiz();
+        initQuiz('q1');
+        initQuiz('q2');
     </script>
 </body>
 </html>

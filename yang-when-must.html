@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YANG when & must Statements - DevNet Expert Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-orange: #d29922;
+            --accent-purple: #a371f7;
+            --accent-cyan: #39c5cf;
+            --accent-yellow: #f0e68c;
+            --border-color: #30363d;
+            --code-bg: #0d1117;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; }
+        .nav-container { position: fixed; top: 0; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); z-index: 1000; padding: 1rem 2rem; }
+        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-title { font-size: 1.25rem; font-weight: 700; color: var(--accent-purple); }
+        .nav-tabs { display: flex; gap: 0.5rem; align-items: center; }
+        .nav-tab { padding: 0.6rem 1.5rem; border: none; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; text-decoration: none; }
+        .nav-tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .nav-tab.active { background: var(--accent-purple); color: var(--bg-primary); }
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 6rem 2rem 3rem; }
+        .section { display: none; }
+        .section.active { display: block; }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 1.75rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--accent-blue); padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
+        h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--accent-purple); }
+        h4 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--accent-cyan); }
+        p { margin-bottom: 1rem; color: var(--text-secondary); }
+        .intro-text { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        pre { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.5; white-space: pre; }
+        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+        pre code { background: none; padding: 0; }
+        .keyword { color: var(--accent-purple); }
+        .string { color: var(--accent-green); }
+        .comment { color: var(--text-secondary); }
+        .type { color: var(--accent-cyan); }
+        .number { color: var(--accent-orange); }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border: 1px solid var(--border-color); }
+        th { background: var(--bg-tertiary); font-weight: 600; color: var(--text-primary); }
+        td { background: var(--bg-secondary); color: var(--text-secondary); }
+        tr:hover td { background: var(--bg-tertiary); }
+        .check { color: var(--accent-green); }
+        .cross { color: var(--accent-red); }
+        .tip-box { background: rgba(88, 166, 255, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .tip-box strong { color: var(--accent-blue); }
+        .warning-box { background: rgba(248, 81, 73, 0.1); border: 1px solid var(--accent-red); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .warning-box strong { color: var(--accent-red); }
+        .when-box { background: rgba(163, 113, 247, 0.1); border: 2px solid var(--accent-purple); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+        .when-box strong { color: var(--accent-purple); }
+        .must-box { background: rgba(57, 197, 207, 0.1); border: 2px solid var(--accent-cyan); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
+        .must-box strong { color: var(--accent-cyan); }
+        .result-box { background: var(--bg-tertiary); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+        .result-box ul { margin: 0.5rem 0 0 1.5rem; }
+        .graph-box { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; white-space: pre; overflow-x: auto; }
+        ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-secondary); }
+        li { margin-bottom: 0.25rem; }
+
+        /* Quiz Styles */
+        .quiz-header { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .score-display { font-size: 1.25rem; font-weight: 600; }
+        .score-correct { color: var(--accent-green); }
+        .score-total { color: var(--text-secondary); }
+        .quiz-controls { display: flex; gap: 0.75rem; }
+        .btn { padding: 0.6rem 1.25rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
+        .btn-primary { background: var(--accent-blue); color: var(--bg-primary); }
+        .btn-primary:hover { background: #79b8ff; }
+        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+        .btn-secondary:hover { background: var(--border-color); }
+        .question-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .question-card.answered-correct { border-color: var(--accent-green); }
+        .question-card.answered-incorrect { border-color: var(--accent-red); }
+        .question-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+        .question-number { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 20px; }
+        .question-type { font-size: 0.8rem; font-weight: 500; color: var(--accent-orange); }
+        .question-platform { font-size: 0.75rem; font-weight: 600; color: var(--accent-purple); background: rgba(163, 113, 247, 0.2); padding: 0.2rem 0.6rem; border-radius: 12px; }
+        .scenario-box { font-size: 0.9rem; color: var(--text-secondary); padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; margin-bottom: 1rem; line-height: 1.6; border-left: 3px solid var(--accent-purple); }
+        .yang-tree { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.75rem; margin: 0.75rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; white-space: pre; overflow-x: auto; }
+        .question-text { font-size: 1.05rem; font-weight: 500; color: var(--text-primary); margin-bottom: 1.25rem; line-height: 1.5; }
+        .options-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .option-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem; background: var(--bg-tertiary); border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        .option-item:hover:not(.disabled) { background: var(--bg-primary); border-color: var(--border-color); }
+        .option-item.selected { border-color: var(--accent-blue); background: rgba(88, 166, 255, 0.1); }
+        .option-item.correct { border-color: var(--accent-green); background: rgba(63, 185, 80, 0.1); }
+        .option-item.incorrect { border-color: var(--accent-red); background: rgba(248, 81, 73, 0.1); }
+        .option-item.disabled { cursor: default; }
+        .option-checkbox { min-width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; }
+        .option-item.selected .option-checkbox { border-color: var(--accent-blue); background: var(--accent-blue); color: var(--bg-primary); }
+        .option-item.correct .option-checkbox { border-color: var(--accent-green); background: var(--accent-green); color: var(--bg-primary); }
+        .option-item.incorrect .option-checkbox { border-color: var(--accent-red); background: var(--accent-red); color: white; }
+        .option-text { flex: 1; }
+        .option-text pre { margin: 0; font-size: 0.75rem; background: var(--bg-primary); border: 1px solid var(--border-color); }
+        .submit-btn { margin-top: 1rem; width: 100%; padding: 0.75rem; background: var(--accent-blue); color: var(--bg-primary); border: none; border-radius: 8px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .submit-btn:hover:not(:disabled) { background: #79b8ff; }
+        .submit-btn:disabled { background: var(--bg-tertiary); color: var(--text-secondary); cursor: not-allowed; }
+        .explanation { margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border-radius: 8px; border-left: 4px solid var(--accent-blue); display: none; }
+        .explanation.show { display: block; }
+        .explanation-title { font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem; }
+        .explanation-text { color: var(--text-secondary); font-size: 0.9rem; }
+        .progress-bar { width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan)); border-radius: 4px; transition: width 0.3s ease; }
+
+        @media (max-width: 768px) { 
+            .nav-content { flex-direction: column; gap: 1rem; } 
+            .main-content { padding: 8rem 1rem 2rem; } 
+            h1 { font-size: 1.75rem; } 
+            .quiz-header { flex-direction: column; text-align: center; }
+            pre { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="nav-title">📐 YANG when & must Statements - DevNet Expert</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
+                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+                <a href="docs/yang_when_must.md" class="nav-tab" target="_blank">📄 Lab Guide</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- ==================== SECTION 1: LEARN ==================== -->
+        <section id="learn" class="section active">
+            <h1>YANG "when" and "must" Statements</h1>
+            <p class="intro-text">Master conditional configuration and value validation in YANG models — critical for CCIE DevNet Expert.</p>
+
+            <!-- Quick Summary -->
+            <h2>📋 Quick Summary</h2>
+            <table>
+                <thead>
+                    <tr><th>Statement</th><th>Purpose</th><th>Effect when FALSE</th><th>Use Case</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>when</code></td>
+                        <td>Controls node <strong>existence</strong></td>
+                        <td>Node doesn't exist in data tree</td>
+                        <td>Conditional configuration options</td>
+                    </tr>
+                    <tr>
+                        <td><code>must</code></td>
+                        <td>Validates node <strong>values</strong></td>
+                        <td>Configuration rejected with error</td>
+                        <td>Business logic validation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="when-box">
+                <strong>🟣 when Statement:</strong> "Should this configuration option even appear?"<br>
+                If FALSE → Node simply doesn't exist (no error)
+            </div>
+
+            <div class="must-box">
+                <strong>🔵 must Statement:</strong> "Is this value acceptable?"<br>
+                If FALSE → Configuration REJECTED with error message
+            </div>
+
+            <!-- The "when" Statement -->
+            <h2>📐 The "when" Statement</h2>
+            
+            <h3>Purpose</h3>
+            <p>Controls whether a data node exists in the configuration tree based on a condition.</p>
+
+            <h3>Syntax</h3>
+<pre><span class="keyword">when</span> <span class="string">'xpath-expression'</span>;</pre>
+
+            <h3>Example 1: Basic Conditional Leaf</h3>
+<pre><span class="keyword">container</span> interface {
+  <span class="keyword">leaf</span> type {
+    <span class="keyword">type</span> <span class="type">enumeration</span> {
+      <span class="keyword">enum</span> ethernet;
+      <span class="keyword">enum</span> serial;
+      <span class="keyword">enum</span> loopback;
+    }
+  }
+  
+  <span class="comment">// This leaf ONLY exists when interface type is ethernet</span>
+  <span class="keyword">leaf</span> duplex {
+    <span class="keyword">when</span> <span class="string">'../type = "ethernet"'</span>;
+    <span class="keyword">type</span> <span class="type">enumeration</span> {
+      <span class="keyword">enum</span> half;
+      <span class="keyword">enum</span> full;
+      <span class="keyword">enum</span> auto;
+    }
+  }
+  
+  <span class="comment">// This leaf ONLY exists when interface type is serial</span>
+  <span class="keyword">leaf</span> clock-rate {
+    <span class="keyword">when</span> <span class="string">'../type = "serial"'</span>;
+    <span class="keyword">type</span> <span class="type">uint32</span>;
+  }
+}</pre>
+
+            <div class="result-box">
+                <strong>Result:</strong>
+                <ul>
+                    <li>Configure <code>type = "ethernet"</code> → <code>duplex</code> leaf appears, <code>clock-rate</code> doesn't exist</li>
+                    <li>Configure <code>type = "serial"</code> → <code>clock-rate</code> leaf appears, <code>duplex</code> doesn't exist</li>
+                    <li>Configure <code>type = "loopback"</code> → neither <code>duplex</code> nor <code>clock-rate</code> exist</li>
+                </ul>
+            </div>
+
+            <h3>Example 2: Protocol Enable/Disable</h3>
+<pre><span class="keyword">container</span> bgp {
+  <span class="keyword">leaf</span> enabled {
+    <span class="keyword">type</span> <span class="type">boolean</span>;
+    <span class="keyword">default</span> <span class="string">false</span>;
+  }
+  
+  <span class="comment">// BGP AS number only exists when BGP is enabled</span>
+  <span class="keyword">leaf</span> as-number {
+    <span class="keyword">when</span> <span class="string">'../enabled = "true"'</span>;
+    <span class="keyword">type</span> <span class="type">uint32</span>;
+    <span class="keyword">mandatory</span> <span class="string">true</span>;
+  }
+  
+  <span class="comment">// BGP neighbors only exist when BGP is enabled</span>
+  <span class="keyword">list</span> neighbor {
+    <span class="keyword">when</span> <span class="string">'../../enabled = "true"'</span>;
+    <span class="keyword">key</span> <span class="string">"address"</span>;
+    
+    <span class="keyword">leaf</span> address {
+      <span class="keyword">type</span> <span class="type">inet:ip-address</span>;
+    }
+    
+    <span class="keyword">leaf</span> remote-as {
+      <span class="keyword">type</span> <span class="type">uint32</span>;
+    }
+  }
+}</pre>
+
+            <div class="result-box">
+                <strong>Result:</strong>
+                <ul>
+                    <li><code>enabled = false</code> → Only the <code>enabled</code> leaf exists, no <code>as-number</code> or <code>neighbor</code> nodes</li>
+                    <li><code>enabled = true</code> → All BGP configuration nodes become available</li>
+                </ul>
+            </div>
+
+            <!-- The "must" Statement -->
+            <h2>✅ The "must" Statement</h2>
+            
+            <h3>Purpose</h3>
+            <p>Validates that data values satisfy business logic constraints.</p>
+
+            <h3>Syntax</h3>
+<pre><span class="keyword">must</span> <span class="string">'xpath-expression'</span> {
+  <span class="keyword">error-message</span> <span class="string">"Error description"</span>;
+  <span class="keyword">error-app-tag</span> <span class="string">"error-tag"</span>;
+}</pre>
+
+            <h3>Example 1: Cross-Field Validation (BGP)</h3>
+<pre><span class="keyword">container</span> bgp {
+  <span class="keyword">leaf</span> local-as {
+    <span class="keyword">type</span> <span class="type">uint32</span>;
+  }
+  
+  <span class="keyword">list</span> neighbor {
+    <span class="keyword">key</span> <span class="string">"address"</span>;
+    
+    <span class="keyword">leaf</span> address {
+      <span class="keyword">type</span> <span class="type">inet:ip-address</span>;
+    }
+    
+    <span class="keyword">leaf</span> remote-as {
+      <span class="keyword">type</span> <span class="type">uint32</span>;
+    }
+    
+    <span class="keyword">leaf</span> peer-type {
+      <span class="keyword">type</span> <span class="type">enumeration</span> {
+        <span class="keyword">enum</span> internal;
+        <span class="keyword">enum</span> external;
+      }
+    }
+    
+    <span class="comment">// IBGP neighbors must have same AS as local</span>
+    <span class="keyword">must</span> <span class="string">'peer-type != "internal" or remote-as = ../../local-as'</span> {
+      <span class="keyword">error-message</span> <span class="string">"IBGP neighbor must have same AS as local AS"</span>;
+    }
+    
+    <span class="comment">// EBGP neighbors must have different AS from local</span>
+    <span class="keyword">must</span> <span class="string">'peer-type != "external" or remote-as != ../../local-as'</span> {
+      <span class="keyword">error-message</span> <span class="string">"EBGP neighbor must have different AS from local AS"</span>;
+    }
+  }
+}</pre>
+
+            <div class="result-box">
+                <strong>Result:</strong>
+                <ul>
+                    <li><code>local-as = 65001</code>, neighbor with <code>peer-type = "internal"</code> and <code>remote-as = 65002</code> → <span class="cross"><strong>REJECTED</strong></span></li>
+                    <li><code>local-as = 65001</code>, neighbor with <code>peer-type = "internal"</code> and <code>remote-as = 65001</code> → <span class="check"><strong>ACCEPTED</strong></span></li>
+                    <li><code>local-as = 65001</code>, neighbor with <code>peer-type = "external"</code> and <code>remote-as = 65001</code> → <span class="cross"><strong>REJECTED</strong></span></li>
+                </ul>
+            </div>
+
+            <h3>Example 2: ACL Port Validation</h3>
+<pre><span class="keyword">container</span> access-list {
+  <span class="keyword">list</span> rule {
+    <span class="keyword">key</span> <span class="string">"sequence"</span>;
+    
+    <span class="keyword">leaf</span> sequence { <span class="keyword">type</span> <span class="type">uint32</span>; }
+    <span class="keyword">leaf</span> action { <span class="keyword">type</span> <span class="type">enumeration</span> { <span class="keyword">enum</span> permit; <span class="keyword">enum</span> deny; } }
+    <span class="keyword">leaf</span> protocol { <span class="keyword">type</span> <span class="type">enumeration</span> { <span class="keyword">enum</span> ip; <span class="keyword">enum</span> tcp; <span class="keyword">enum</span> udp; <span class="keyword">enum</span> icmp; } }
+    <span class="keyword">leaf</span> src-port { <span class="keyword">type</span> <span class="type">uint16</span>; }
+    <span class="keyword">leaf</span> dst-port { <span class="keyword">type</span> <span class="type">uint16</span>; }
+    
+    <span class="comment">// Ports are only valid for TCP/UDP protocols</span>
+    <span class="keyword">must</span> <span class="string">'not(src-port) or protocol = "tcp" or protocol = "udp"'</span> {
+      <span class="keyword">error-message</span> <span class="string">"Source port can only be specified for TCP or UDP"</span>;
+    }
+    
+    <span class="keyword">must</span> <span class="string">'not(dst-port) or protocol = "tcp" or protocol = "udp"'</span> {
+      <span class="keyword">error-message</span> <span class="string">"Destination port can only be specified for TCP or UDP"</span>;
+    }
+  }
+}</pre>
+
+            <div class="result-box">
+                <strong>Result:</strong>
+                <ul>
+                    <li><code>protocol = "icmp"</code> with <code>src-port = 80</code> → <span class="cross"><strong>REJECTED</strong></span> (ICMP doesn't use ports)</li>
+                    <li><code>protocol = "tcp"</code> with <code>src-port = 80</code> → <span class="check"><strong>ACCEPTED</strong></span></li>
+                    <li><code>protocol = "ip"</code> with no ports → <span class="check"><strong>ACCEPTED</strong></span></li>
+                </ul>
+            </div>
+
+            <!-- XPath Navigation -->
+            <h2>🧭 XPath Relative Path Navigation</h2>
+            
+            <h3>BGP Example Tree Structure</h3>
+            <div class="graph-box">module: bgp-example
+  +--rw routing
+     +--rw bgp
+        +--rw as-number?   uint32              ← ../../as-number from neighbor
+        +--rw neighbor* [address]              ← ../ from leaf context
+           +--rw address          inet:ip-address
+           +--rw remote-as?       uint32       ← remote-as (sibling)
+           +--rw peer-type?       enumeration
+           +--rw ebgp-multihop?   uint8</div>
+
+            <h3>XPath Navigation Summary</h3>
+            <table>
+                <thead>
+                    <tr><th>XPath Expression</th><th>Target Node</th><th>Levels Up</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>.</code></td><td>Current node (self)</td><td>0</td></tr>
+                    <tr><td><code>remote-as</code></td><td>Sibling leaf</td><td>0</td></tr>
+                    <tr><td><code>../</code></td><td>Parent node</td><td>1</td></tr>
+                    <tr><td><code>../../</code></td><td>Grandparent node</td><td>2</td></tr>
+                    <tr><td><code>../../as-number</code></td><td>Grandparent's leaf</td><td>2</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Visual Path Traversal</h3>
+            <div class="graph-box">bgp container (../../)              ← STEP 2: Second ../ brings you here
+  ├── as-number                      ← STEP 3: Access this leaf
+  └── neighbor list (../)            ← STEP 1: First ../ brings you here
+        └── neighbor entry           ← START: Context node (you are here)
+              ├── address
+              ├── remote-as
+              ├── peer-type
+              └── ebgp-multihop</div>
+
+            <!-- Practical Tips -->
+            <h2>💡 Practical Tips</h2>
+            
+            <h3>Use "when" for:</h3>
+            <ul>
+                <li>✅ Protocol-specific configuration (only show BGP config when BGP is enabled)</li>
+                <li>✅ Interface-type-specific settings (duplex only on ethernet)</li>
+                <li>✅ Feature flags (advanced options only when advanced mode enabled)</li>
+                <li>✅ Conditional augmentations (add nodes only to specific node instances)</li>
+            </ul>
+
+            <h3>Use "must" for:</h3>
+            <ul>
+                <li>✅ Value range validation (MTU must be 1500 for ethernet)</li>
+                <li>✅ Cross-field validation (IBGP peer AS must equal local AS)</li>
+                <li>✅ Business logic rules (area 0 cannot be stub)</li>
+                <li>✅ Dependency validation (ports only valid for TCP/UDP)</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>⚠️ Don't confuse them!</strong><br>
+                <code>when</code> = Controls <strong>existence</strong> (should this option appear?)<br>
+                <code>must</code> = Controls <strong>validity</strong> (is this value acceptable?)
+            </div>
+
+            <!-- Key Restrictions -->
+            <h2>🚫 Key Restrictions</h2>
+            
+            <h3>when Statement Restrictions</h3>
+<pre><span class="comment">// ❌ ILLEGAL: Cannot use "when" on list keys</span>
+<span class="keyword">list</span> interface {
+  <span class="keyword">key</span> <span class="string">"name"</span>;
+  <span class="keyword">leaf</span> name {
+    <span class="keyword">when</span> <span class="string">'some-condition'</span>;  <span class="comment">// ❌ NOT ALLOWED!</span>
+    <span class="keyword">type</span> <span class="type">string</span>;
+  }
+}</pre>
+
+            <h3>Circular Dependencies</h3>
+<pre><span class="comment">// ❌ ILLEGAL: Circular dependency</span>
+<span class="keyword">leaf</span> a {
+  <span class="keyword">when</span> <span class="string">'../b = "foo"'</span>;
+}
+
+<span class="keyword">leaf</span> b {
+  <span class="keyword">when</span> <span class="string">'../a = "bar"'</span>;  <span class="comment">// ❌ Circular dependency!</span>
+}</pre>
+
+            <!-- Exam Tips -->
+            <h2>🎯 DevNet Expert Exam Tips</h2>
+            <ol>
+                <li><strong>Remember the fundamental difference:</strong> <code>when</code> = existence control, <code>must</code> = value validation</li>
+                <li><strong>XPath navigation:</strong> <code>../</code> moves up one level, use <code>.</code> to reference current node value</li>
+                <li><strong>Error handling:</strong> <code>when = false</code> → No error, node just doesn't exist. <code>must = false</code> → RPC error with error-message</li>
+                <li><strong>Validation tools:</strong> <code>pyang</code> checks basic YANG syntax, <code>yanglint</code> validates XPath expressions</li>
+                <li><strong>Common patterns:</strong> Feature flags with when, cross-validation with must</li>
+            </ol>
+
+        </section>
+
+        <!-- ==================== SECTION 2: MCQ PRACTICE ==================== -->
+        <section id="quiz" class="section">
+            <h1>MCQ Practice — JSON/XML Payloads</h1>
+            <p class="intro-text">20 scenario-based questions with real JSON/XML payloads for NX-OS, IOS-XE, BGP, Extended ACL, and NSO Service packages.</p>
+
+            <div class="quiz-header">
+                <div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <span class="score-display">
+                        Score: <span class="score-correct" id="correctCount">0</span>
+                        <span class="score-total">/ <span id="totalAnswered">0</span> answered</span>
+                    </span>
+                </div>
+                <div class="quiz-controls">
+                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
+                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+                </div>
+            </div>
+
+            <div id="quizContainer"></div>
+        </section>
+    </main>
+
+    <script>
+        const questions = [
+            // Q1 - IOS-XE BGP when statement
+            {
+                id: 1, type: "single", count: 1, category: "IOS-XE BGP", platform: "IOS-XE",
+                scenario: `Given this YANG model with a "when" statement:
+<div class="yang-tree">container bgp {
+  leaf enabled { type boolean; default false; }
+  leaf as-number {
+    when '../enabled = "true"';
+    type uint32;
+  }
+}</div>
+Which RESTCONF JSON payload will be ACCEPTED?`,
+                question: "Select the valid payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "enabled": false,
+    "as-number": 65001
+  }
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "enabled": true,
+    "as-number": 65001
+  }
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "as-number": 65001
+  }
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "enabled": "yes",
+    "as-number": 65001
+  }
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "The 'when' statement requires enabled=true for as-number to exist. Option A fails because enabled=false means as-number doesn't exist. Option C fails because enabled defaults to false. Option D fails because 'yes' is not a valid boolean value.",
+            },
+            // Q2 - NX-OS Interface when
+            {
+                id: 2, type: "single", count: 1, category: "NX-OS Interface", platform: "NX-OS",
+                scenario: `Given this YANG model for NX-OS interfaces:
+<div class="yang-tree">list interface {
+  key "name";
+  leaf name { type string; }
+  leaf type { type enumeration { enum ethernet; enum loopback; } }
+  leaf duplex {
+    when '../type = "ethernet"';
+    type enumeration { enum half; enum full; }
+  }
+}</div>
+Which XML payload is valid for a loopback interface?`,
+                question: "Select the valid NETCONF XML payload:",
+                options: [
+                    { 
+                        text: `<pre>&lt;interface&gt;
+  &lt;name&gt;Loopback0&lt;/name&gt;
+  &lt;type&gt;loopback&lt;/type&gt;
+  &lt;duplex&gt;full&lt;/duplex&gt;
+&lt;/interface&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;interface&gt;
+  &lt;name&gt;Loopback0&lt;/name&gt;
+  &lt;type&gt;loopback&lt;/type&gt;
+&lt;/interface&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;interface&gt;
+  &lt;name&gt;Ethernet1/1&lt;/name&gt;
+  &lt;type&gt;loopback&lt;/type&gt;
+  &lt;duplex&gt;half&lt;/duplex&gt;
+&lt;/interface&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;interface&gt;
+  &lt;name&gt;Loopback0&lt;/name&gt;
+  &lt;duplex&gt;auto&lt;/duplex&gt;
+&lt;/interface&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "When type='loopback', the duplex leaf does not exist (when condition is false). Only Option B is valid because it doesn't include duplex for a loopback interface.",
+            },
+            // Q3 - BGP must statement IBGP
+            {
+                id: 3, type: "multi", count: 2, category: "BGP must validation", platform: "IOS-XE",
+                scenario: `Given this YANG model with "must" constraints:
+<div class="yang-tree">container bgp {
+  leaf local-as { type uint32; }
+  list neighbor {
+    key "address";
+    leaf address { type inet:ip-address; }
+    leaf remote-as { type uint32; }
+    leaf peer-type { type enumeration { enum internal; enum external; } }
+    
+    must 'peer-type != "internal" or remote-as = ../../local-as' {
+      error-message "IBGP neighbor must have same AS";
+    }
+  }
+}</div>
+Which TWO payloads will be ACCEPTED?`,
+                question: "Select all valid payloads:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "local-as": 65001,
+    "neighbor": [{
+      "address": "10.1.1.1",
+      "remote-as": 65001,
+      "peer-type": "internal"
+    }]
+  }
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "local-as": 65001,
+    "neighbor": [{
+      "address": "10.1.1.1",
+      "remote-as": 65002,
+      "peer-type": "internal"
+    }]
+  }
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "local-as": 65001,
+    "neighbor": [{
+      "address": "10.1.1.1",
+      "remote-as": 65002,
+      "peer-type": "external"
+    }]
+  }
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "local-as": 65001,
+    "neighbor": [{
+      "address": "10.1.1.1",
+      "remote-as": 65001,
+      "peer-type": "external"
+    }]
+  }
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "IBGP (internal) requires remote-as = local-as. EBGP (external) requires remote-as != local-as. Option A: IBGP with matching AS ✓. Option B: IBGP with different AS ✗. Option C: EBGP with different AS ✓. Option D: EBGP with same AS ✗.",
+            },
+            // Q4 - Extended ACL must statement
+            {
+                id: 4, type: "single", count: 1, category: "Extended ACL", platform: "IOS-XE",
+                scenario: `Given this YANG model for Extended ACL with "must" constraint:
+<div class="yang-tree">list rule {
+  key "sequence";
+  leaf sequence { type uint32; }
+  leaf protocol { type enumeration { enum ip; enum tcp; enum udp; enum icmp; } }
+  leaf dst-port { type uint16; }
+  
+  must 'not(dst-port) or protocol = "tcp" or protocol = "udp"' {
+    error-message "Port only valid for TCP/UDP";
+  }
+}</div>
+Which payload will be REJECTED?`,
+                question: "Select the INVALID payload:",
+                options: [
+                    { 
+                        text: `<pre>&lt;rule&gt;
+  &lt;sequence&gt;10&lt;/sequence&gt;
+  &lt;protocol&gt;tcp&lt;/protocol&gt;
+  &lt;dst-port&gt;443&lt;/dst-port&gt;
+&lt;/rule&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;rule&gt;
+  &lt;sequence&gt;20&lt;/sequence&gt;
+  &lt;protocol&gt;udp&lt;/protocol&gt;
+  &lt;dst-port&gt;53&lt;/dst-port&gt;
+&lt;/rule&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;rule&gt;
+  &lt;sequence&gt;30&lt;/sequence&gt;
+  &lt;protocol&gt;icmp&lt;/protocol&gt;
+  &lt;dst-port&gt;8&lt;/dst-port&gt;
+&lt;/rule&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;rule&gt;
+  &lt;sequence&gt;40&lt;/sequence&gt;
+  &lt;protocol&gt;ip&lt;/protocol&gt;
+&lt;/rule&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "The must constraint requires: no dst-port OR protocol is TCP/UDP. ICMP doesn't use ports, so specifying dst-port with ICMP violates the constraint. Option C is REJECTED.",
+            },
+            // Q5 - NSO Service BGP
+            {
+                id: 5, type: "single", count: 1, category: "NSO Service Package", platform: "Cisco NSO",
+                scenario: `Given this NSO service YANG model for BGP provisioning:
+<div class="yang-tree">list bgp-service {
+  key "name";
+  leaf name { type string; }
+  leaf router-id {
+    when '../as-number';
+    type inet:ipv4-address;
+  }
+  leaf as-number { type uint32; }
+}</div>
+Which JSON payload will allow router-id configuration?`,
+                question: "Select the valid payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "bgp-service": [{
+    "name": "customer-1",
+    "router-id": "1.1.1.1"
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp-service": [{
+    "name": "customer-1",
+    "as-number": 65001,
+    "router-id": "1.1.1.1"
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp-service": [{
+    "name": "customer-1",
+    "as-number": null,
+    "router-id": "1.1.1.1"
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp-service": [{
+    "name": "customer-1",
+    "router-id": "1.1.1.1",
+    "as-number": 0
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "The when '../as-number' statement means router-id only exists when as-number is present. Option B includes as-number=65001, making router-id valid. Option A lacks as-number. Option C has null. Option D has as-number=0 which may be invalid.",
+            },
+            // Q6 - NX-OS VLAN when
+            {
+                id: 6, type: "multi", count: 2, category: "NX-OS VLAN", platform: "NX-OS",
+                scenario: `Given this YANG model for NX-OS VLAN with conditional private-vlan config:
+<div class="yang-tree">list vlan {
+  key "id";
+  leaf id { type uint16 { range "1..4094"; } }
+  leaf name { type string; }
+  leaf pvlan-type {
+    type enumeration { enum primary; enum isolated; enum community; }
+  }
+  leaf pvlan-association {
+    when '../pvlan-type = "primary"';
+    type leafref { path "../../vlan/id"; }
+  }
+}</div>
+Which TWO XML payloads are valid?`,
+                question: "Select all valid payloads:",
+                options: [
+                    { 
+                        text: `<pre>&lt;vlan&gt;
+  &lt;id&gt;100&lt;/id&gt;
+  &lt;name&gt;PRIMARY&lt;/name&gt;
+  &lt;pvlan-type&gt;primary&lt;/pvlan-type&gt;
+  &lt;pvlan-association&gt;101&lt;/pvlan-association&gt;
+&lt;/vlan&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;vlan&gt;
+  &lt;id&gt;101&lt;/id&gt;
+  &lt;name&gt;ISOLATED&lt;/name&gt;
+  &lt;pvlan-type&gt;isolated&lt;/pvlan-type&gt;
+  &lt;pvlan-association&gt;100&lt;/pvlan-association&gt;
+&lt;/vlan&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;vlan&gt;
+  &lt;id&gt;102&lt;/id&gt;
+  &lt;name&gt;COMMUNITY&lt;/name&gt;
+  &lt;pvlan-type&gt;community&lt;/pvlan-type&gt;
+&lt;/vlan&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;vlan&gt;
+  &lt;id&gt;103&lt;/id&gt;
+  &lt;name&gt;REGULAR&lt;/name&gt;
+  &lt;pvlan-association&gt;100&lt;/pvlan-association&gt;
+&lt;/vlan&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "pvlan-association only exists when pvlan-type='primary'. Option A: primary type with association ✓. Option B: isolated type cannot have association ✗. Option C: community type without association ✓. Option D: no pvlan-type but has association ✗.",
+            },
+            // Q7 - IOS-XE OSPF must
+            {
+                id: 7, type: "single", count: 1, category: "IOS-XE OSPF", platform: "IOS-XE",
+                scenario: `Given this YANG model for OSPF area with "must" constraint:
+<div class="yang-tree">list area {
+  key "id";
+  leaf id { type inet:ipv4-address; }
+  leaf area-type {
+    type enumeration { enum normal; enum stub; enum nssa; }
+  }
+  
+  must 'id != "0.0.0.0" or area-type = "normal"' {
+    error-message "Area 0 cannot be stub or NSSA";
+  }
+}</div>
+Which payload will be REJECTED?`,
+                question: "Select the INVALID payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "area": [{
+    "id": "0.0.0.0",
+    "area-type": "normal"
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "area": [{
+    "id": "0.0.0.1",
+    "area-type": "stub"
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "area": [{
+    "id": "0.0.0.0",
+    "area-type": "stub"
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "area": [{
+    "id": "0.0.0.2",
+    "area-type": "nssa"
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "The must constraint enforces: if area is 0.0.0.0 (backbone), it must be 'normal'. Area 0 cannot be stub or NSSA. Option C violates this rule.",
+            },
+            // Q8 - NSO Extended ACL Service
+            {
+                id: 8, type: "multi", count: 2, category: "NSO ACL Service", platform: "Cisco NSO",
+                scenario: `Given this NSO service YANG for Extended ACL:
+<div class="yang-tree">list acl-service {
+  key "name";
+  leaf name { type string; }
+  list rule {
+    key "seq";
+    leaf seq { type uint32; }
+    leaf action { type enumeration { enum permit; enum deny; } }
+    leaf protocol { type enumeration { enum tcp; enum udp; enum icmp; } }
+    container tcp-flags {
+      when '../protocol = "tcp"';
+      leaf syn { type empty; }
+      leaf ack { type empty; }
+      leaf fin { type empty; }
+    }
+  }
+}</div>
+Which TWO payloads are valid?`,
+                question: "Select all valid payloads:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "acl-service": [{
+    "name": "WEB-ACL",
+    "rule": [{
+      "seq": 10,
+      "action": "permit",
+      "protocol": "tcp",
+      "tcp-flags": { "syn": [null] }
+    }]
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "acl-service": [{
+    "name": "DNS-ACL",
+    "rule": [{
+      "seq": 20,
+      "action": "permit",
+      "protocol": "udp",
+      "tcp-flags": { "syn": [null] }
+    }]
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "acl-service": [{
+    "name": "ICMP-ACL",
+    "rule": [{
+      "seq": 30,
+      "action": "deny",
+      "protocol": "icmp"
+    }]
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "acl-service": [{
+    "name": "PING-ACL",
+    "rule": [{
+      "seq": 40,
+      "action": "permit",
+      "protocol": "icmp",
+      "tcp-flags": { "ack": [null] }
+    }]
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "tcp-flags container only exists when protocol='tcp'. Option A: TCP with tcp-flags ✓. Option B: UDP cannot have tcp-flags ✗. Option C: ICMP without tcp-flags ✓. Option D: ICMP cannot have tcp-flags ✗.",
+            },
+            // Q9 - NX-OS BGP neighbor when
+            {
+                id: 9, type: "single", count: 1, category: "NX-OS BGP", platform: "NX-OS",
+                scenario: `Given this YANG model for NX-OS BGP with conditional neighbor config:
+<div class="yang-tree">container bgp {
+  leaf admin-state {
+    type enumeration { enum enabled; enum disabled; }
+    default "disabled";
+  }
+  leaf as-number {
+    when '../admin-state = "enabled"';
+    type uint32;
+  }
+  list neighbor {
+    when '../admin-state = "enabled"';
+    key "addr";
+    leaf addr { type inet:ip-address; }
+    leaf remote-as { type uint32; }
+  }
+}</div>
+Which XML payload is valid?`,
+                question: "Select the valid payload:",
+                options: [
+                    { 
+                        text: `<pre>&lt;bgp&gt;
+  &lt;admin-state&gt;disabled&lt;/admin-state&gt;
+  &lt;as-number&gt;65001&lt;/as-number&gt;
+&lt;/bgp&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;bgp&gt;
+  &lt;admin-state&gt;enabled&lt;/admin-state&gt;
+  &lt;as-number&gt;65001&lt;/as-number&gt;
+  &lt;neighbor&gt;
+    &lt;addr&gt;10.1.1.1&lt;/addr&gt;
+    &lt;remote-as&gt;65002&lt;/remote-as&gt;
+  &lt;/neighbor&gt;
+&lt;/bgp&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;bgp&gt;
+  &lt;neighbor&gt;
+    &lt;addr&gt;10.1.1.1&lt;/addr&gt;
+    &lt;remote-as&gt;65002&lt;/remote-as&gt;
+  &lt;/neighbor&gt;
+&lt;/bgp&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;bgp&gt;
+  &lt;admin-state&gt;disabled&lt;/admin-state&gt;
+  &lt;neighbor&gt;
+    &lt;addr&gt;10.1.1.1&lt;/addr&gt;
+    &lt;remote-as&gt;65002&lt;/remote-as&gt;
+  &lt;/neighbor&gt;
+&lt;/bgp&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "Both as-number and neighbor require admin-state='enabled'. Option A: disabled with as-number ✗. Option B: enabled with all config ✓. Option C: missing admin-state (defaults to disabled) ✗. Option D: disabled with neighbor ✗.",
+            },
+            // Q10 - IOS-XE Interface MTU must
+            {
+                id: 10, type: "single", count: 1, category: "IOS-XE Interface", platform: "IOS-XE",
+                scenario: `Given this YANG model with MTU validation:
+<div class="yang-tree">container interface {
+  leaf type {
+    type enumeration { enum ethernet; enum gigabit; enum serial; }
+  }
+  leaf mtu { type uint32; }
+  
+  must 'type != "ethernet" or (mtu >= 64 and mtu <= 1500)' {
+    error-message "Ethernet MTU must be 64-1500";
+  }
+  must 'type != "gigabit" or (mtu >= 64 and mtu <= 9216)' {
+    error-message "GigabitEthernet MTU must be 64-9216";
+  }
+}</div>
+Which payload will be REJECTED?`,
+                question: "Select the INVALID payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "interface": {
+    "type": "ethernet",
+    "mtu": 1500
+  }
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "interface": {
+    "type": "gigabit",
+    "mtu": 9000
+  }
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "interface": {
+    "type": "ethernet",
+    "mtu": 9000
+  }
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "interface": {
+    "type": "serial",
+    "mtu": 1500
+  }
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "Ethernet MTU must be 64-1500. GigabitEthernet MTU can be 64-9216. Option C tries to set ethernet MTU to 9000, which exceeds the 1500 limit for standard ethernet.",
+            },
+            // Q11 - NSO BGP VRF when
+            {
+                id: 11, type: "single", count: 1, category: "NSO BGP VRF", platform: "Cisco NSO",
+                scenario: `Given this NSO service YANG for BGP VRF:
+<div class="yang-tree">list bgp-vrf-service {
+  key "vrf-name";
+  leaf vrf-name { type string; }
+  leaf rd { type string; }
+  container address-family {
+    leaf ipv4-unicast { type boolean; default false; }
+    list ipv4-network {
+      when '../ipv4-unicast = "true"';
+      key "prefix";
+      leaf prefix { type inet:ipv4-prefix; }
+    }
+  }
+}</div>
+Which payload allows ipv4-network configuration?`,
+                question: "Select the valid payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "bgp-vrf-service": [{
+    "vrf-name": "CUSTOMER-A",
+    "rd": "65001:100",
+    "address-family": {
+      "ipv4-network": [{"prefix": "10.0.0.0/8"}]
+    }
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp-vrf-service": [{
+    "vrf-name": "CUSTOMER-A",
+    "rd": "65001:100",
+    "address-family": {
+      "ipv4-unicast": true,
+      "ipv4-network": [{"prefix": "10.0.0.0/8"}]
+    }
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp-vrf-service": [{
+    "vrf-name": "CUSTOMER-A",
+    "rd": "65001:100",
+    "address-family": {
+      "ipv4-unicast": false,
+      "ipv4-network": [{"prefix": "10.0.0.0/8"}]
+    }
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp-vrf-service": [{
+    "vrf-name": "CUSTOMER-A",
+    "address-family": {
+      "ipv4-network": [{"prefix": "10.0.0.0/8"}]
+    }
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "ipv4-network list only exists when ipv4-unicast='true'. Option B explicitly sets ipv4-unicast=true, enabling the ipv4-network configuration.",
+            },
+            // Q12 - NX-OS Port-Channel must
+            {
+                id: 12, type: "multi", count: 2, category: "NX-OS Port-Channel", platform: "NX-OS",
+                scenario: `Given this YANG model for NX-OS Port-Channel with must constraint:
+<div class="yang-tree">list port-channel {
+  key "id";
+  leaf id { type uint16 { range "1..4096"; } }
+  leaf mode {
+    type enumeration { enum active; enum passive; enum on; }
+  }
+  leaf min-links { type uint8 { range "1..16"; } }
+  leaf max-links { type uint8 { range "1..16"; } }
+  
+  must 'min-links <= max-links' {
+    error-message "min-links cannot exceed max-links";
+  }
+}</div>
+Which TWO payloads are valid?`,
+                question: "Select all valid payloads:",
+                options: [
+                    { 
+                        text: `<pre>&lt;port-channel&gt;
+  &lt;id&gt;10&lt;/id&gt;
+  &lt;mode&gt;active&lt;/mode&gt;
+  &lt;min-links&gt;2&lt;/min-links&gt;
+  &lt;max-links&gt;8&lt;/max-links&gt;
+&lt;/port-channel&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;port-channel&gt;
+  &lt;id&gt;20&lt;/id&gt;
+  &lt;mode&gt;passive&lt;/mode&gt;
+  &lt;min-links&gt;8&lt;/min-links&gt;
+  &lt;max-links&gt;4&lt;/max-links&gt;
+&lt;/port-channel&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;port-channel&gt;
+  &lt;id&gt;30&lt;/id&gt;
+  &lt;mode&gt;on&lt;/mode&gt;
+  &lt;min-links&gt;4&lt;/min-links&gt;
+  &lt;max-links&gt;4&lt;/max-links&gt;
+&lt;/port-channel&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;port-channel&gt;
+  &lt;id&gt;40&lt;/id&gt;
+  &lt;mode&gt;active&lt;/mode&gt;
+  &lt;min-links&gt;16&lt;/min-links&gt;
+  &lt;max-links&gt;8&lt;/max-links&gt;
+&lt;/port-channel&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "must constraint: min-links <= max-links. Option A: 2 <= 8 ✓. Option B: 8 > 4 ✗. Option C: 4 <= 4 ✓. Option D: 16 > 8 ✗.",
+            },
+            // Q13 - IOS-XE Static Route when
+            {
+                id: 13, type: "single", count: 1, category: "IOS-XE Static Route", platform: "IOS-XE",
+                scenario: `Given this YANG model for static routes with conditional next-hop:
+<div class="yang-tree">list static-route {
+  key "prefix";
+  leaf prefix { type inet:ipv4-prefix; }
+  leaf type {
+    type enumeration { enum next-hop; enum null0; enum interface; }
+  }
+  leaf next-hop-addr {
+    when '../type = "next-hop"';
+    type inet:ipv4-address;
+  }
+  leaf outgoing-interface {
+    when '../type = "interface"';
+    type string;
+  }
+}</div>
+Which payload is valid for a null route?`,
+                question: "Select the valid payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "static-route": [{
+    "prefix": "10.0.0.0/8",
+    "type": "null0",
+    "next-hop-addr": "0.0.0.0"
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "static-route": [{
+    "prefix": "10.0.0.0/8",
+    "type": "null0"
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "static-route": [{
+    "prefix": "10.0.0.0/8",
+    "type": "null0",
+    "outgoing-interface": "Null0"
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "static-route": [{
+    "prefix": "10.0.0.0/8",
+    "next-hop-addr": "192.168.1.1"
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "For type='null0', neither next-hop-addr nor outgoing-interface should exist. Option B correctly specifies only type='null0' without additional parameters.",
+            },
+            // Q14 - NSO L3VPN Service must
+            {
+                id: 14, type: "single", count: 1, category: "NSO L3VPN Service", platform: "Cisco NSO",
+                scenario: `Given this NSO L3VPN service YANG with must validation:
+<div class="yang-tree">list l3vpn-service {
+  key "name";
+  leaf name { type string; }
+  leaf topology {
+    type enumeration { enum hub-spoke; enum full-mesh; enum partial-mesh; }
+  }
+  list site {
+    key "site-id";
+    leaf site-id { type string; }
+    leaf role {
+      type enumeration { enum hub; enum spoke; enum any; }
+    }
+    
+    must '../../topology != "hub-spoke" or role != "any"' {
+      error-message "Hub-spoke topology requires hub or spoke role";
+    }
+  }
+}</div>
+Which payload will be REJECTED?`,
+                question: "Select the INVALID payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "l3vpn-service": [{
+    "name": "VPN-1",
+    "topology": "full-mesh",
+    "site": [{"site-id": "SITE-A", "role": "any"}]
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "l3vpn-service": [{
+    "name": "VPN-2",
+    "topology": "hub-spoke",
+    "site": [{"site-id": "SITE-A", "role": "hub"}]
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "l3vpn-service": [{
+    "name": "VPN-3",
+    "topology": "hub-spoke",
+    "site": [{"site-id": "SITE-A", "role": "any"}]
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "l3vpn-service": [{
+    "name": "VPN-4",
+    "topology": "hub-spoke",
+    "site": [{"site-id": "SITE-A", "role": "spoke"}]
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "The must constraint says: if topology is hub-spoke, role cannot be 'any'. Option C violates this by using hub-spoke topology with role='any'.",
+            },
+            // Q15 - NX-OS VXLAN when
+            {
+                id: 15, type: "multi", count: 2, category: "NX-OS VXLAN", platform: "NX-OS",
+                scenario: `Given this YANG model for NX-OS VXLAN with conditional config:
+<div class="yang-tree">container nve {
+  leaf source-interface { type string; }
+  leaf host-reachability-protocol {
+    type enumeration { enum bgp; enum static; enum flood-and-learn; }
+  }
+  container bgp-config {
+    when '../host-reachability-protocol = "bgp"';
+    leaf advertise-virtual-rmac { type boolean; }
+    leaf suppress-arp { type boolean; }
+  }
+  list static-peers {
+    when '../host-reachability-protocol = "static"';
+    key "peer-ip";
+    leaf peer-ip { type inet:ipv4-address; }
+  }
+}</div>
+Which TWO payloads are valid?`,
+                question: "Select all valid payloads:",
+                options: [
+                    { 
+                        text: `<pre>&lt;nve&gt;
+  &lt;source-interface&gt;loopback0&lt;/source-interface&gt;
+  &lt;host-reachability-protocol&gt;bgp&lt;/host-reachability-protocol&gt;
+  &lt;bgp-config&gt;
+    &lt;suppress-arp&gt;true&lt;/suppress-arp&gt;
+  &lt;/bgp-config&gt;
+&lt;/nve&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;nve&gt;
+  &lt;source-interface&gt;loopback0&lt;/source-interface&gt;
+  &lt;host-reachability-protocol&gt;static&lt;/host-reachability-protocol&gt;
+  &lt;bgp-config&gt;
+    &lt;suppress-arp&gt;true&lt;/suppress-arp&gt;
+  &lt;/bgp-config&gt;
+&lt;/nve&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;nve&gt;
+  &lt;source-interface&gt;loopback0&lt;/source-interface&gt;
+  &lt;host-reachability-protocol&gt;static&lt;/host-reachability-protocol&gt;
+  &lt;static-peers&gt;
+    &lt;peer-ip&gt;10.1.1.1&lt;/peer-ip&gt;
+  &lt;/static-peers&gt;
+&lt;/nve&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;nve&gt;
+  &lt;source-interface&gt;loopback0&lt;/source-interface&gt;
+  &lt;host-reachability-protocol&gt;flood-and-learn&lt;/host-reachability-protocol&gt;
+  &lt;static-peers&gt;
+    &lt;peer-ip&gt;10.1.1.1&lt;/peer-ip&gt;
+  &lt;/static-peers&gt;
+&lt;/nve&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "bgp-config only exists with protocol='bgp'. static-peers only exists with protocol='static'. Option A: bgp with bgp-config ✓. Option B: static with bgp-config ✗. Option C: static with static-peers ✓. Option D: flood-and-learn with static-peers ✗.",
+            },
+            // Q16 - IOS-XE QoS must
+            {
+                id: 16, type: "single", count: 1, category: "IOS-XE QoS", platform: "IOS-XE",
+                scenario: `Given this YANG model for QoS policy with must constraint:
+<div class="yang-tree">list policy-map {
+  key "name";
+  leaf name { type string; }
+  list class {
+    key "class-name";
+    leaf class-name { type string; }
+    leaf bandwidth-percent { type uint8 { range "1..100"; } }
+    leaf priority { type empty; }
+    
+    must 'not(bandwidth-percent and priority)' {
+      error-message "Cannot configure both bandwidth and priority";
+    }
+  }
+}</div>
+Which payload will be REJECTED?`,
+                question: "Select the INVALID payload:",
+                options: [
+                    { 
+                        text: `<pre>&lt;policy-map&gt;
+  &lt;name&gt;QOS-POLICY&lt;/name&gt;
+  &lt;class&gt;
+    &lt;class-name&gt;VOICE&lt;/class-name&gt;
+    &lt;priority/&gt;
+  &lt;/class&gt;
+&lt;/policy-map&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;policy-map&gt;
+  &lt;name&gt;QOS-POLICY&lt;/name&gt;
+  &lt;class&gt;
+    &lt;class-name&gt;DATA&lt;/class-name&gt;
+    &lt;bandwidth-percent&gt;30&lt;/bandwidth-percent&gt;
+  &lt;/class&gt;
+&lt;/policy-map&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;policy-map&gt;
+  &lt;name&gt;QOS-POLICY&lt;/name&gt;
+  &lt;class&gt;
+    &lt;class-name&gt;VIDEO&lt;/class-name&gt;
+    &lt;bandwidth-percent&gt;20&lt;/bandwidth-percent&gt;
+    &lt;priority/&gt;
+  &lt;/class&gt;
+&lt;/policy-map&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;policy-map&gt;
+  &lt;name&gt;QOS-POLICY&lt;/name&gt;
+  &lt;class&gt;
+    &lt;class-name&gt;DEFAULT&lt;/class-name&gt;
+  &lt;/class&gt;
+&lt;/policy-map&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "The must constraint says: cannot have both bandwidth-percent AND priority. Option C tries to configure both, which violates the constraint.",
+            },
+            // Q17 - NSO Device Template when
+            {
+                id: 17, type: "single", count: 1, category: "NSO Device Template", platform: "Cisco NSO",
+                scenario: `Given this NSO device template YANG with conditional config:
+<div class="yang-tree">list device-template {
+  key "name";
+  leaf name { type string; }
+  leaf device-type {
+    type enumeration { enum ios-xe; enum nx-os; enum ios-xr; }
+  }
+  container nx-os-specific {
+    when '../device-type = "nx-os"';
+    leaf feature-vpc { type boolean; }
+    leaf feature-fabricpath { type boolean; }
+  }
+  container ios-xe-specific {
+    when '../device-type = "ios-xe"';
+    leaf feature-sdwan { type boolean; }
+  }
+}</div>
+Which payload is valid for an IOS-XE device?`,
+                question: "Select the valid payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "device-template": [{
+    "name": "XE-TEMPLATE",
+    "device-type": "ios-xe",
+    "nx-os-specific": {
+      "feature-vpc": true
+    }
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "device-template": [{
+    "name": "XE-TEMPLATE",
+    "device-type": "ios-xe",
+    "ios-xe-specific": {
+      "feature-sdwan": true
+    }
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "device-template": [{
+    "name": "XE-TEMPLATE",
+    "device-type": "ios-xe",
+    "ios-xe-specific": {
+      "feature-sdwan": true
+    },
+    "nx-os-specific": {
+      "feature-vpc": false
+    }
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "device-template": [{
+    "name": "XE-TEMPLATE",
+    "ios-xe-specific": {
+      "feature-sdwan": true
+    }
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "For device-type='ios-xe', only ios-xe-specific container exists. nx-os-specific doesn't exist. Option B correctly configures ios-xe with its specific container only.",
+            },
+            // Q18 - NX-OS ACL with when and must
+            {
+                id: 18, type: "multi", count: 2, category: "NX-OS ACL Combined", platform: "NX-OS",
+                scenario: `Given this YANG model combining when and must:
+<div class="yang-tree">list ip-acl {
+  key "name";
+  leaf name { type string; }
+  list ace {
+    key "seq";
+    leaf seq { type uint32; }
+    leaf action { type enumeration { enum permit; enum deny; } }
+    leaf protocol { type enumeration { enum tcp; enum udp; enum ip; } }
+    
+    container tcp-options {
+      when '../protocol = "tcp"';
+      leaf established { type empty; }
+      leaf flags { type string; }
+      
+      must 'not(established and flags)' {
+        error-message "Cannot use both established and flags";
+      }
+    }
+  }
+}</div>
+Which TWO payloads are valid?`,
+                question: "Select all valid payloads:",
+                options: [
+                    { 
+                        text: `<pre>&lt;ip-acl&gt;
+  &lt;name&gt;WEB-ACL&lt;/name&gt;
+  &lt;ace&gt;
+    &lt;seq&gt;10&lt;/seq&gt;
+    &lt;action&gt;permit&lt;/action&gt;
+    &lt;protocol&gt;tcp&lt;/protocol&gt;
+    &lt;tcp-options&gt;
+      &lt;established/&gt;
+    &lt;/tcp-options&gt;
+  &lt;/ace&gt;
+&lt;/ip-acl&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;ip-acl&gt;
+  &lt;name&gt;WEB-ACL&lt;/name&gt;
+  &lt;ace&gt;
+    &lt;seq&gt;20&lt;/seq&gt;
+    &lt;action&gt;permit&lt;/action&gt;
+    &lt;protocol&gt;tcp&lt;/protocol&gt;
+    &lt;tcp-options&gt;
+      &lt;established/&gt;
+      &lt;flags&gt;syn ack&lt;/flags&gt;
+    &lt;/tcp-options&gt;
+  &lt;/ace&gt;
+&lt;/ip-acl&gt;</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>&lt;ip-acl&gt;
+  &lt;name&gt;WEB-ACL&lt;/name&gt;
+  &lt;ace&gt;
+    &lt;seq&gt;30&lt;/seq&gt;
+    &lt;action&gt;deny&lt;/action&gt;
+    &lt;protocol&gt;ip&lt;/protocol&gt;
+  &lt;/ace&gt;
+&lt;/ip-acl&gt;</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>&lt;ip-acl&gt;
+  &lt;name&gt;WEB-ACL&lt;/name&gt;
+  &lt;ace&gt;
+    &lt;seq&gt;40&lt;/seq&gt;
+    &lt;action&gt;permit&lt;/action&gt;
+    &lt;protocol&gt;udp&lt;/protocol&gt;
+    &lt;tcp-options&gt;
+      &lt;established/&gt;
+    &lt;/tcp-options&gt;
+  &lt;/ace&gt;
+&lt;/ip-acl&gt;</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "tcp-options only exists for protocol='tcp' (when). Cannot have both established AND flags (must). Option A: TCP with established only ✓. Option B: TCP with both established and flags ✗. Option C: IP without tcp-options ✓. Option D: UDP cannot have tcp-options ✗.",
+            },
+            // Q19 - IOS-XE BGP Address Family when
+            {
+                id: 19, type: "single", count: 1, category: "IOS-XE BGP AF", platform: "IOS-XE",
+                scenario: `Given this YANG model for BGP address-family:
+<div class="yang-tree">container bgp {
+  leaf as-number { type uint32; }
+  container address-family {
+    container ipv4 {
+      leaf unicast { type boolean; default false; }
+      list network {
+        when '../unicast = "true"';
+        key "prefix";
+        leaf prefix { type inet:ipv4-prefix; }
+        leaf route-map { type string; }
+      }
+    }
+    container vpnv4 {
+      leaf unicast { type boolean; default false; }
+      list vrf {
+        when '../unicast = "true"';
+        key "name";
+        leaf name { type string; }
+        leaf rd { type string; }
+      }
+    }
+  }
+}</div>
+Which payload correctly configures VPNv4 with VRF?`,
+                question: "Select the valid payload:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "as-number": 65001,
+    "address-family": {
+      "vpnv4": {
+        "vrf": [{"name": "CUST-A", "rd": "65001:100"}]
+      }
+    }
+  }
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "as-number": 65001,
+    "address-family": {
+      "vpnv4": {
+        "unicast": true,
+        "vrf": [{"name": "CUST-A", "rd": "65001:100"}]
+      }
+    }
+  }
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "as-number": 65001,
+    "address-family": {
+      "ipv4": {
+        "unicast": true
+      },
+      "vpnv4": {
+        "vrf": [{"name": "CUST-A", "rd": "65001:100"}]
+      }
+    }
+  }
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "bgp": {
+    "as-number": 65001,
+    "address-family": {
+      "vpnv4": {
+        "unicast": false,
+        "vrf": [{"name": "CUST-A", "rd": "65001:100"}]
+      }
+    }
+  }
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "VRF list under vpnv4 requires vpnv4/unicast='true'. Option B correctly sets vpnv4 unicast=true before configuring VRF. Other options either don't enable vpnv4 unicast or explicitly set it to false.",
+            },
+            // Q20 - NSO Multi-Layer Service must
+            {
+                id: 20, type: "multi", count: 2, category: "NSO Multi-Layer", platform: "Cisco NSO",
+                scenario: `Given this NSO service YANG for multi-layer connectivity:
+<div class="yang-tree">list connectivity-service {
+  key "id";
+  leaf id { type string; }
+  leaf service-type {
+    type enumeration { enum l2vpn; enum l3vpn; enum evpn; }
+  }
+  leaf encapsulation {
+    type enumeration { enum vlan; enum vxlan; enum mpls; }
+  }
+  
+  must 'service-type != "evpn" or encapsulation = "vxlan"' {
+    error-message "EVPN requires VXLAN encapsulation";
+  }
+  must 'service-type != "l2vpn" or encapsulation != "vxlan"' {
+    error-message "L2VPN cannot use VXLAN encapsulation";
+  }
+}</div>
+Which TWO payloads are valid?`,
+                question: "Select all valid payloads:",
+                options: [
+                    { 
+                        text: `<pre>{
+  "connectivity-service": [{
+    "id": "SVC-001",
+    "service-type": "evpn",
+    "encapsulation": "vxlan"
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "connectivity-service": [{
+    "id": "SVC-002",
+    "service-type": "evpn",
+    "encapsulation": "mpls"
+  }]
+}</pre>`, 
+                        correct: false 
+                    },
+                    { 
+                        text: `<pre>{
+  "connectivity-service": [{
+    "id": "SVC-003",
+    "service-type": "l2vpn",
+    "encapsulation": "vlan"
+  }]
+}</pre>`, 
+                        correct: true 
+                    },
+                    { 
+                        text: `<pre>{
+  "connectivity-service": [{
+    "id": "SVC-004",
+    "service-type": "l2vpn",
+    "encapsulation": "vxlan"
+  }]
+}</pre>`, 
+                        correct: false 
+                    }
+                ],
+                explanation: "EVPN requires VXLAN (must #1). L2VPN cannot use VXLAN (must #2). Option A: EVPN with VXLAN ✓. Option B: EVPN with MPLS ✗. Option C: L2VPN with VLAN ✓. Option D: L2VPN with VXLAN ✗.",
+            }
+        ];
+
+        let answers = {}, submitted = {}, score = 0;
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = questions.map((q, idx) => renderQuestion(q, idx)).join('');
+            updateProgress();
+        }
+
+        function renderQuestion(q, idx) {
+            const typeLabel = q.count === 1 ? 'Choose 1' : `Choose ${q.count}`;
+            return `
+                <div class="question-card" id="q${q.id}">
+                    <div class="question-header">
+                        <span class="question-number">Q${idx + 1} • ${q.category}</span>
+                        <span class="question-platform">${q.platform}</span>
+                        <span class="question-type">${typeLabel}</span>
+                    </div>
+                    <div class="scenario-box">${q.scenario}</div>
+                    <div class="question-text">${q.question}</div>
+                    <div class="options-list">
+                        ${q.options.map((opt, i) => `
+                            <div class="option-item" data-qid="${q.id}" data-idx="${i}" onclick="selectOption(${q.id}, ${i}, '${q.type}', ${q.count})">
+                                <div class="option-checkbox">${String.fromCharCode(65 + i)}</div>
+                                <div class="option-text">${opt.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-btn" id="sub${q.id}" onclick="submitAnswer(${q.id})" disabled>Submit Answer</button>
+                    <div class="explanation" id="exp${q.id}">
+                        <div class="explanation-title">📖 Explanation</div>
+                        <div class="explanation-text">${q.explanation}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectOption(qid, idx, type, count) {
+            if (submitted[qid]) return;
+            if (!answers[qid]) answers[qid] = [];
+            const i = answers[qid].indexOf(idx);
+            if (type === 'single') answers[qid] = [idx];
+            else {
+                if (i > -1) answers[qid].splice(i, 1);
+                else if (answers[qid].length < count) answers[qid].push(idx);
+                else { answers[qid].shift(); answers[qid].push(idx); }
+            }
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, j) => {
+                el.classList.toggle('selected', answers[qid]?.includes(j));
+            });
+            document.getElementById(`sub${qid}`).disabled = answers[qid].length !== count;
+        }
+
+        function submitAnswer(qid) {
+            if (submitted[qid]) return;
+            submitted[qid] = true;
+            const q = questions.find(x => x.id === qid);
+            const correct = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1);
+            const user = answers[qid] || [];
+            const isCorrect = user.length === q.count && user.every(i => correct.includes(i)) && correct.every(i => user.includes(i));
+            if (isCorrect) score++;
+            updateScoreDisplay();
+            document.querySelectorAll(`.option-item[data-qid="${qid}"]`).forEach((el, i) => {
+                el.classList.add('disabled');
+                el.classList.remove('selected');
+                if (q.options[i].correct) el.classList.add('correct');
+                else if (user.includes(i)) el.classList.add('incorrect');
+            });
+            markQuestion(qid, isCorrect);
+        }
+
+        function markQuestion(qid, isCorrect) {
+            document.getElementById(`q${qid}`).classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
+            const btn = document.getElementById(`sub${qid}`);
+            btn.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
+            btn.style.background = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
+            btn.disabled = true;
+            document.getElementById(`exp${qid}`).classList.add('show');
+            updateProgress();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('totalAnswered').textContent = Object.keys(submitted).length;
+        }
+
+        function updateProgress() {
+            document.getElementById('progressBar').style.width = `${(Object.keys(submitted).length / questions.length) * 100}%`;
+        }
+
+        function resetQuiz() {
+            answers = {}; submitted = {}; score = 0;
+            document.getElementById('correctCount').textContent = '0';
+            document.getElementById('totalAnswered').textContent = '0';
+            initQuiz();
+        }
+
+        function showAllAnswers() {
+            questions.forEach(q => {
+                if (submitted[q.id]) return;
+                answers[q.id] = q.options.map((o, i) => o.correct ? i : -1).filter(i => i > -1).slice(0, q.count);
+                submitAnswer(q.id);
+            });
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

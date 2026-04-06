@@ -296,6 +296,8 @@
     }
     
     <span class="comment">// EBGP neighbors must have different AS from local</span>
+    <span class="comment">// must 'A != X or B != Y'; read it as "If A equals X, then B must not equal Y"</span>
+    <span class="comment">// If peer-type = "external" THEN remote-as ≠ local-as</span>
     <span class="keyword">must</span> <span class="string">'peer-type != "external" or remote-as != ../../local-as'</span> {
       <span class="keyword">error-message</span> <span class="string">"EBGP neighbor must have different AS from local AS"</span>;
     }

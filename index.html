@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,8 +20,19 @@
             --border-color: #30363d;
             --sidebar-width: 280px;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
@@ -39,23 +51,29 @@
             padding: 0 1rem;
             flex-shrink: 0;
         }
+
         .top-nav-brand {
             font-weight: 600;
             color: var(--accent-blue);
             font-size: 1rem;
         }
+
         .top-nav-links {
             margin-left: 2rem;
             display: flex;
             gap: 1.5rem;
         }
+
         .top-nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.9rem;
             transition: color 0.2s;
         }
-        .top-nav-links a:hover { color: var(--text-primary); }
+
+        .top-nav-links a:hover {
+            color: var(--text-primary);
+        }
 
         /* Main Layout */
         .app-container {
@@ -73,11 +91,13 @@
             transition: width 0.3s ease, min-width 0.3s ease;
             flex-shrink: 0;
         }
+
         .sidebar.collapsed {
             width: 0;
             min-width: 0;
             overflow: hidden;
         }
+
         .sidebar-header {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
@@ -89,11 +109,13 @@
             background: var(--bg-secondary);
             z-index: 10;
         }
+
         .sidebar-title {
             font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
         }
+
         .sidebar-toggle {
             background: none;
             border: none;
@@ -106,12 +128,25 @@
             justify-content: center;
             transition: all 0.2s;
         }
-        .sidebar-toggle:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+
+        .sidebar-toggle:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
 
         /* Navigation Tree */
-        .nav-tree { padding: 0.5rem 0; }
-        .nav-chapter { border-bottom: 1px solid var(--border-color); }
-        .nav-chapter:last-child { border-bottom: none; }
+        .nav-tree {
+            padding: 0.5rem 0;
+        }
+
+        .nav-chapter {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-chapter:last-child {
+            border-bottom: none;
+        }
+
         .chapter-header {
             display: flex;
             align-items: center;
@@ -120,7 +155,11 @@
             transition: background 0.2s;
             user-select: none;
         }
-        .chapter-header:hover { background: var(--bg-tertiary); }
+
+        .chapter-header:hover {
+            background: var(--bg-tertiary);
+        }
+
         .chapter-icon {
             width: 18px;
             height: 18px;
@@ -130,14 +169,24 @@
             justify-content: center;
             transition: transform 0.2s;
         }
-        .chapter-icon svg { width: 10px; height: 10px; fill: var(--text-secondary); }
-        .nav-chapter.expanded .chapter-icon { transform: rotate(90deg); }
+
+        .chapter-icon svg {
+            width: 10px;
+            height: 10px;
+            fill: var(--text-secondary);
+        }
+
+        .nav-chapter.expanded .chapter-icon {
+            transform: rotate(90deg);
+        }
+
         .chapter-title {
             font-size: 0.85rem;
             font-weight: 500;
             color: var(--text-primary);
             flex: 1;
         }
+
         .chapter-badge {
             font-size: 0.65rem;
             padding: 0.1rem 0.35rem;
@@ -151,7 +200,11 @@
             display: none;
             padding-left: 0.75rem;
         }
-        .nav-chapter.expanded .chapter-items { display: block; }
+
+        .nav-chapter.expanded .chapter-items {
+            display: block;
+        }
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -163,19 +216,23 @@
             border-left: 2px solid transparent;
             cursor: pointer;
         }
+
         .nav-item:hover {
             background: var(--bg-tertiary);
             color: var(--text-primary);
         }
+
         .nav-item.active {
             background: rgba(88, 166, 255, 0.1);
             color: var(--accent-blue);
             border-left-color: var(--accent-blue);
         }
+
         .nav-item.disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
+
         .nav-item-icon {
             width: 16px;
             height: 16px;
@@ -185,15 +242,27 @@
             justify-content: center;
             font-size: 0.75rem;
         }
-        .nav-item-text { flex: 1; }
+
+        .nav-item-text {
+            flex: 1;
+        }
+
         .nav-item-badge {
             font-size: 0.6rem;
             padding: 0.1rem 0.3rem;
             border-radius: 6px;
             font-weight: 600;
         }
-        .badge-ready { background: var(--accent-green); color: #000; }
-        .badge-soon { background: var(--bg-tertiary); color: var(--text-secondary); }
+
+        .badge-ready {
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        .badge-soon {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
 
         /* Content Area */
         .content-wrapper {
@@ -219,8 +288,14 @@
             display: none;
             transition: all 0.2s;
         }
-        .sidebar-show-btn:hover { background: var(--bg-tertiary); }
-        .sidebar.collapsed ~ .content-wrapper .sidebar-show-btn { display: flex; }
+
+        .sidebar-show-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .sidebar.collapsed~.content-wrapper .sidebar-show-btn {
+            display: flex;
+        }
 
         /* Content Frame */
         .content-frame {
@@ -235,14 +310,21 @@
             overflow-y: auto;
             padding: 2rem;
         }
-        .welcome-content.hidden { display: none; }
 
-        .content-header { margin-bottom: 2rem; }
+        .welcome-content.hidden {
+            display: none;
+        }
+
+        .content-header {
+            margin-bottom: 2rem;
+        }
+
         .content-header h1 {
             font-size: 2rem;
             color: var(--accent-blue);
             margin-bottom: 0.5rem;
         }
+
         .content-header p {
             color: var(--text-secondary);
             font-size: 1rem;
@@ -256,6 +338,7 @@
             margin-bottom: 1.5rem;
             max-width: 900px;
         }
+
         .objective-header {
             display: flex;
             align-items: center;
@@ -264,12 +347,17 @@
             color: var(--accent-blue);
             font-weight: 600;
         }
+
         .objective-text {
             color: var(--text-secondary);
             font-size: 0.95rem;
         }
 
-        .chapter-overview { margin-top: 2rem; max-width: 1200px; }
+        .chapter-overview {
+            margin-top: 2rem;
+            max-width: 1200px;
+        }
+
         .chapter-overview h2 {
             font-size: 1.25rem;
             color: var(--text-primary);
@@ -283,6 +371,7 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.25rem;
         }
+
         .guide-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -291,21 +380,25 @@
             transition: all 0.2s;
             cursor: pointer;
         }
+
         .guide-card:hover {
             border-color: var(--accent-blue);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
+
         .guide-card.disabled {
             opacity: 0.5;
             pointer-events: none;
         }
+
         .guide-card-header {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             margin-bottom: 0.75rem;
         }
+
         .guide-card-icon {
             width: 36px;
             height: 36px;
@@ -316,21 +409,25 @@
             justify-content: center;
             font-size: 1.1rem;
         }
+
         .guide-card-title {
             font-size: 1rem;
             font-weight: 600;
             color: var(--text-primary);
         }
+
         .guide-card-desc {
             color: var(--text-secondary);
             font-size: 0.85rem;
             line-height: 1.5;
         }
+
         .guide-card-meta {
             margin-top: 0.75rem;
             display: flex;
             gap: 0.5rem;
         }
+
         .meta-tag {
             font-size: 0.7rem;
             padding: 0.15rem 0.4rem;
@@ -348,23 +445,45 @@
         }
 
         /* Scrollbar */
-        .sidebar::-webkit-scrollbar, .welcome-content::-webkit-scrollbar { width: 6px; }
-        .sidebar::-webkit-scrollbar-track, .welcome-content::-webkit-scrollbar-track { background: var(--bg-secondary); }
-        .sidebar::-webkit-scrollbar-thumb, .welcome-content::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+        .sidebar::-webkit-scrollbar,
+        .welcome-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track,
+        .welcome-content::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb,
+        .welcome-content::-webkit-scrollbar-thumb {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
 
         /* Mobile */
         @media (max-width: 768px) {
-            .sidebar { 
+            .sidebar {
                 position: absolute;
                 height: calc(100% - 50px);
                 z-index: 1000;
             }
-            .sidebar.collapsed { width: 0; }
-            .top-nav-links { display: none; }
-            .guide-grid { grid-template-columns: 1fr; }
+
+            .sidebar.collapsed {
+                width: 0;
+            }
+
+            .top-nav-links {
+                display: none;
+            }
+
+            .guide-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
     <!-- Top Navigation -->
     <nav class="top-nav">
@@ -382,9 +501,9 @@
                 <span class="sidebar-title">CCIE Automation</span>
                 <button class="sidebar-toggle" onclick="toggleSidebar()" title="Hide sidebar">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M6 2L2 8l4 6V2z"/>
-                        <path d="M10 2h1v12h-1z"/>
-                        <path d="M13 2h1v12h-1z"/>
+                        <path d="M6 2L2 8l4 6V2z" />
+                        <path d="M10 2h1v12h-1z" />
+                        <path d="M13 2h1v12h-1z" />
                     </svg>
                 </button>
             </div>
@@ -402,7 +521,9 @@
                 <div class="nav-chapter expanded">
                     <div class="chapter-header" onclick="toggleChapter(this)">
                         <span class="chapter-icon">
-                            <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                            <svg viewBox="0 0 16 16">
+                                <path d="M6 12L10 8 6 4z" />
+                            </svg>
                         </span>
                         <span class="chapter-title">CCIE Workbook</span>
                     </div>
@@ -411,7 +532,9 @@
                         <div class="nav-chapter expanded">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 1, Git</span>
                             </div>
@@ -453,7 +576,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 2, REST API</span>
                             </div>
@@ -475,7 +600,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 3, YANG</span>
                             </div>
@@ -502,7 +629,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 4, NETCONF</span>
                             </div>
@@ -519,7 +648,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 5, Cisco NSO</span>
                             </div>
@@ -536,7 +667,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 6, RESTCONF</span>
                             </div>
@@ -553,7 +686,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 7, pyATS</span>
                             </div>
@@ -580,7 +715,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 8, Ansible</span>
                             </div>
@@ -597,7 +734,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 9, Terraform</span>
                             </div>
@@ -614,7 +753,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 10, Docker</span>
                             </div>
@@ -631,7 +772,9 @@
                         <div class="nav-chapter">
                             <div class="chapter-header" onclick="toggleChapter(this)">
                                 <span class="chapter-icon">
-                                    <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
                                 </span>
                                 <span class="chapter-title">Chapter 11, Kubernetes</span>
                             </div>
@@ -650,7 +793,9 @@
                 <div class="nav-chapter">
                     <div class="chapter-header" onclick="toggleChapter(this)">
                         <span class="chapter-icon">
-                            <svg viewBox="0 0 16 16"><path d="M6 12L10 8 6 4z"/></svg>
+                            <svg viewBox="0 0 16 16">
+                                <path d="M6 12L10 8 6 4z" />
+                            </svg>
                         </span>
                         <span class="chapter-title">Quiz Bank</span>
                         <span class="chapter-badge">4</span>
@@ -690,9 +835,9 @@
             <!-- Toggle Button -->
             <button class="sidebar-show-btn" onclick="toggleSidebar()" title="Show sidebar">
                 <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M10 2l4 6-4 6V2z"/>
-                    <path d="M5 2h1v12H5z"/>
-                    <path d="M2 2h1v12H2z"/>
+                    <path d="M10 2l4 6-4 6V2z" />
+                    <path d="M5 2h1v12H5z" />
+                    <path d="M2 2h1v12H2z" />
                 </svg>
             </button>
 
@@ -708,7 +853,8 @@
                         <span>✅</span> Objective
                     </div>
                     <div class="objective-text">
-                        Master the CCIE DevNet Expert exam topics through interactive study guides, hands-on labs, and MCQ practice. Each chapter includes theory, code examples, and quiz questions.
+                        Master the CCIE DevNet Expert exam topics through interactive study guides, hands-on labs, and
+                        MCQ practice. Each chapter includes theory, code examples, and quiz questions.
                     </div>
                 </div>
 
@@ -720,7 +866,8 @@
                                 <div class="guide-card-icon">🔀</div>
                                 <div class="guide-card-title">Git Workflows</div>
                             </div>
-                            <div class="guide-card-desc">Gitflow, GitHub Flow, GitLab Flow, Trunk-Based Development, and merge strategies.</div>
+                            <div class="guide-card-desc">Gitflow, GitHub Flow, GitLab Flow, Trunk-Based Development, and
+                                merge strategies.</div>
                             <div class="guide-card-meta">
                                 <span class="meta-tag">30 MCQ</span>
                                 <span class="meta-tag">6 Workflows</span>
@@ -732,7 +879,8 @@
                                 <div class="guide-card-icon">🔧</div>
                                 <div class="guide-card-title">Git Operations</div>
                             </div>
-                            <div class="guide-card-desc">revert, reset, rebase, cherry-pick, bisect, format-patch commands.</div>
+                            <div class="guide-card-desc">revert, reset, rebase, cherry-pick, bisect, format-patch
+                                commands.</div>
                             <div class="guide-card-meta">
                                 <span class="meta-tag">20 MCQ</span>
                                 <span class="meta-tag">7 Commands</span>
@@ -744,7 +892,8 @@
                                 <div class="guide-card-icon">🍒</div>
                                 <div class="guide-card-title">Cherry-Pick & Rebase</div>
                             </div>
-                            <div class="guide-card-desc">Selective commit transfer, interactive rebase, format-patch workflows.</div>
+                            <div class="guide-card-desc">Selective commit transfer, interactive rebase, format-patch
+                                workflows.</div>
                             <div class="guide-card-meta">
                                 <span class="meta-tag">20 MCQ</span>
                                 <span class="meta-tag">Lab Included</span>
@@ -756,13 +905,14 @@
                                 <div class="guide-card-icon">🔀</div>
                                 <div class="guide-card-title">Merge Strategies</div>
                             </div>
-                            <div class="guide-card-desc">3-way merge, -s vs -X flags, ort, recursive, octopus strategies.</div>
+                            <div class="guide-card-desc">3-way merge, -s vs -X flags, ort, recursive, octopus
+                                strategies.</div>
                             <div class="guide-card-meta">
                                 <span class="meta-tag">20 MCQ</span>
                                 <span class="meta-tag">Drag & Drop</span>
                             </div>
                         </div>
-                            <div class="guide-card" onclick="loadContentFromCard('git-stash-sync-merge.html')">
+                        <div class="guide-card" onclick="loadContentFromCard('git-stash-sync-merge.html')">
                             <div class="guide-card-header">
                                 <div class="guide-card-icon">🔀</div>
                                 <div class="guide-card-title">Git Stash</div>
@@ -773,17 +923,7 @@
                                 <span class="meta-tag">Drag & Drop</span>
                             </div>
                         </div>
-                        <div class="guide-card" onclick="loadContentFromCard('yang-when-must.html')">
-                        <div class="guide-card-header">
-                            <div class="guide-card-icon">📐</div>
-                            <div class="guide-card-title">YANG when & must</div>
-                        </div>
-                        <div class="guide-card-desc">Conditional config with when, value validation with must, XPath navigation, JSON/XML payloads.</div>
-                        <div class="guide-card-meta">
-                            <span class="meta-tag">20 MCQ</span>
-                            <span class="meta-tag">JSON/XML Payloads</span>
-                        </div>
-                    </div>
+
                     </div>
                 </div>
 
@@ -795,7 +935,8 @@
                                 <div class="guide-card-icon">🧪</div>
                                 <div class="guide-card-title">pyATS & Genie</div>
                             </div>
-                            <div class="guide-card-desc">Network testing, testbed configuration, job files, and parsing.</div>
+                            <div class="guide-card-desc">Network testing, testbed configuration, job files, and parsing.
+                            </div>
                             <div class="guide-card-meta">
                                 <span class="meta-tag">Coming Soon</span>
                             </div>
@@ -811,13 +952,26 @@
                                 <span class="meta-tag">Coming Soon</span>
                             </div>
                         </div>
+                        <div class="guide-card" onclick="loadContentFromCard('yang-when-must.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">📐</div>
+                                <div class="guide-card-title">YANG when & must</div>
+                            </div>
+                            <div class="guide-card-desc">Conditional config with when, value validation with must, XPath
+                                navigation, JSON/XML payloads.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">20 MCQ</span>
+                                <span class="meta-tag">JSON/XML Payloads</span>
+                            </div>
+                        </div>
 
                         <div class="guide-card disabled">
                             <div class="guide-card-header">
                                 <div class="guide-card-icon">⚙️</div>
                                 <div class="guide-card-title">Ansible</div>
                             </div>
-                            <div class="guide-card-desc">Playbooks, roles, network modules, and automation patterns.</div>
+                            <div class="guide-card-desc">Playbooks, roles, network modules, and automation patterns.
+                            </div>
                             <div class="guide-card-meta">
                                 <span class="meta-tag">Coming Soon</span>
                             </div>
@@ -826,7 +980,8 @@
                 </div>
 
                 <footer>
-                    <p>📚 Navigate using the sidebar to explore chapters. Each guide includes theory and MCQ practice.</p>
+                    <p>📚 Navigate using the sidebar to explore chapters. Each guide includes theory and MCQ practice.
+                    </p>
                 </footer>
             </div>
 
@@ -874,7 +1029,7 @@
                     }
                 }
             });
-            
+
             loadContent(url, null);
         }
 
@@ -889,4 +1044,5 @@
         }
     </script>
 </body>
+
 </html>

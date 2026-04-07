@@ -675,10 +675,10 @@
                                 <span class="chapter-title">Chapter 6, RESTCONF</span>
                             </div>
                             <div class="chapter-items">
-                                <div class="nav-item disabled">
+                                <div class="nav-item" onclick="loadContent('restconf-operation.html', this)">
                                     <span class="nav-item-icon">📄</span>
                                     <span class="nav-item-text">RESTCONF Operations</span>
-                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                    <span class="nav-item-badge badge-soon">Ready</span>
                                 </div>
                             </div>
                         </div>
@@ -799,7 +799,8 @@
                             </svg>
                         </span>
                         <span class="chapter-title">Quiz Bank</span>
-                        <span class="chapter-badge">7</span> <!-- Need to update after adding every MCQ -->
+                        <span class="chapter-badge" style="background: #f85149; color: #fff;">8</span>
+                        <!-- Need to update after adding every MCQ -->
                     </div>
                     <div class="chapter-items">
                         <div class="nav-item" onclick="loadContent('git-workflows.html', this)">
@@ -829,6 +830,10 @@
                         <div class="nav-item" onclick="loadContent('netconf-operation.html', this)">
                             <span class="nav-item-icon">💬</span>
                             <span class="nav-item-text">NETCONF Operations (17 MCQ)</span>
+                        </div>
+                        <div class="nav-item" onclick="loadContent('restconf-operation.html', this)">
+                            <span class="nav-item-icon">💬</span>
+                            <span class="nav-item-text">RESTCONF Operations (26 MCQ)</span>
                         </div>
                     </div>
                 </div>
@@ -928,6 +933,18 @@
                                 <span class="meta-tag">Drag & Drop</span>
                             </div>
                         </div>
+                        <div class="guide-card" onclick="loadContentFromCard('restconf-operation.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🌐</div>
+                                <div class="guide-card-title">RESTCONF Operations</div>
+                            </div>
+                            <div class="guide-card-desc">RESTCONF CRUD (GET, POST, PUT, PATCH, DELETE), URI
+                                construction, payload structure, RFC 8040 rules.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">26 MCQ</span>
+                                <span class="meta-tag">Drag & Drop</span>
+                            </div>
+                        </div>
 
                     </div>
                 </div>
@@ -952,7 +969,8 @@
                                 <div class="guide-card-icon">📋</div>
                                 <div class="guide-card-title">NETCONF Operations</div>
                             </div>
-                            <div class="guide-card-desc">NETCONF edit-config operations (create, merge, replace, delete), YANG-to-XML mapping, Jinja2 ACL templates.</div>
+                            <div class="guide-card-desc">NETCONF edit-config operations (create, merge, replace,
+                                delete), YANG-to-XML mapping, Jinja2 ACL templates.</div>
                             <div class="guide-card-meta">
                                 <span class="meta-tag">17 MCQ</span>
                                 <span class="meta-tag">XML Payloads</span>

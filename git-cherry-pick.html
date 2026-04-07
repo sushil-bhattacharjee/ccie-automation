@@ -113,6 +113,8 @@
         .progress-bar { width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-orange), var(--accent-red)); border-radius: 4px; transition: width 0.3s ease; }
 
+
+        /* Fill-type questions */
         .fill-template { font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; color: var(--text-primary); }
         .fill-blank { display: inline-block; min-width: 80px; border-bottom: 2px solid var(--accent-blue); color: var(--accent-blue); font-weight: 600; padding: 0 4px; min-height: 1.4em; }
         .fill-blank.correct-answer { border-color: var(--accent-green); color: var(--accent-green); }
@@ -123,15 +125,18 @@
         .pool-word.selected { border-color: var(--accent-blue); background: rgba(88,166,255,0.15); }
         .pool-word.disabled { cursor: default; opacity: 0.6; }
 
-        .order-list { display: flex; flex-direction: column; gap: 0.5rem; }
-        .order-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 1rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 0.9rem; }
-        .order-item.correct-pos { border-color: var(--accent-green); background: rgba(63,185,80,0.1); }
-        .order-item.wrong-pos { border-color: var(--accent-red); background: rgba(248,81,73,0.1); }
+        /* Order (drag-and-drop) */
+        .order-list { display: flex; flex-direction: column; gap: 0.5rem; min-height: 50px; }
+        .order-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 0.9rem; cursor: grab; user-select: none; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+        .order-item:active { cursor: grabbing; }
+        .order-item.dragging { opacity: 0.4; transform: scale(0.97); }
+        .order-item.drag-over { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(88,166,255,0.3); }
+        .order-item.correct-pos { border-color: var(--accent-green); background: rgba(63,185,80,0.1); cursor: default; }
+        .order-item.wrong-pos { border-color: var(--accent-red); background: rgba(248,81,73,0.1); cursor: default; }
         .order-num { min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border-radius: 4px; font-size: 0.75rem; font-weight: 600; color: var(--accent-cyan); flex-shrink: 0; }
-        .order-arrows { display: flex; flex-direction: column; gap: 2px; margin-left: auto; flex-shrink: 0; }
-        .order-arrows button { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); width: 24px; height: 18px; cursor: pointer; border-radius: 3px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; }
-        .order-arrows button:hover { background: var(--accent-blue); color: var(--bg-primary); }
+        .order-grip { color: var(--text-secondary); font-size: 1rem; flex-shrink: 0; cursor: grab; letter-spacing: 2px; }
 
+        /* Match pairs */
         .match-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .match-col-title { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 0.5rem; text-transform: uppercase; }
         .match-item { padding: 0.6rem 1rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.5rem; transition: all 0.2s; }
@@ -143,34 +148,25 @@
         .match-item.disabled { cursor: default; }
         .match-pair-label { font-size: 0.7rem; color: var(--accent-purple); font-weight: 600; float: right; }
 
-
-        .fill-template { font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; color: var(--text-primary); }
-        .fill-blank { display: inline-block; min-width: 80px; border-bottom: 2px solid var(--accent-blue); color: var(--accent-blue); font-weight: 600; padding: 0 4px; min-height: 1.4em; }
-        .fill-blank.correct-answer { border-color: var(--accent-green); color: var(--accent-green); }
-        .fill-blank.wrong-answer { border-color: var(--accent-red); color: var(--accent-red); }
-        .pool-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-        .pool-word { padding: 0.4rem 1rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 6px; cursor: pointer; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; transition: all 0.2s; }
-        .pool-word:hover:not(.disabled) { border-color: var(--accent-blue); }
-        .pool-word.selected { border-color: var(--accent-blue); background: rgba(88,166,255,0.15); }
-        .pool-word.disabled { cursor: default; opacity: 0.6; }
-        .order-list { display: flex; flex-direction: column; gap: 0.5rem; }
-        .order-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 1rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 0.9rem; }
-        .order-item.correct-pos { border-color: var(--accent-green); background: rgba(63,185,80,0.1); }
-        .order-item.wrong-pos { border-color: var(--accent-red); background: rgba(248,81,73,0.1); }
-        .order-num { min-width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border-radius: 4px; font-size: 0.75rem; font-weight: 600; color: var(--accent-cyan); flex-shrink: 0; }
-        .order-arrows { display: flex; flex-direction: column; gap: 2px; margin-left: auto; flex-shrink: 0; }
-        .order-arrows button { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-secondary); width: 24px; height: 18px; cursor: pointer; border-radius: 3px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; }
-        .order-arrows button:hover { background: var(--accent-blue); color: var(--bg-primary); }
-        .match-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .match-col-title { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); margin-bottom: 0.5rem; text-transform: uppercase; }
-        .match-item { padding: 0.6rem 1rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 8px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.5rem; transition: all 0.2s; }
-        .match-item:hover:not(.disabled):not(.matched) { border-color: var(--accent-blue); }
-        .match-item.active { border-color: var(--accent-orange); background: rgba(210,153,34,0.15); }
-        .match-item.matched { border-color: var(--accent-purple); background: rgba(163,113,247,0.1); cursor: default; }
-        .match-item.correct-match { border-color: var(--accent-green); background: rgba(63,185,80,0.1); }
-        .match-item.wrong-match { border-color: var(--accent-red); background: rgba(248,81,73,0.1); }
-        .match-item.disabled { cursor: default; }
-        .match-pair-label { font-size: 0.7rem; color: var(--accent-purple); font-weight: 600; float: right; }
+        /* Block-fill questions */
+        .block-container { display: flex; flex-direction: column; gap: 1.5rem; }
+        .block-section { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 1.25rem; }
+        .block-title { font-size: 0.85rem; font-weight: 600; color: var(--accent-orange); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .block-slots { display: flex; flex-direction: column; gap: 0.4rem; min-height: 40px; }
+        .block-slot { min-height: 38px; border: 2px dashed var(--border-color); border-radius: 6px; display: flex; align-items: center; padding: 0.4rem 0.75rem; font-size: 0.88rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s; }
+        .block-slot.drag-over { border-color: var(--accent-blue); background: rgba(88,166,255,0.05); }
+        .block-slot.filled { border-style: solid; border-color: var(--accent-purple); background: rgba(163,113,247,0.1); color: var(--text-primary); cursor: pointer; }
+        .block-slot.filled:hover { border-color: var(--accent-red); }
+        .block-slot.correct-slot { border-color: var(--accent-green); background: rgba(63,185,80,0.1); border-style: solid; }
+        .block-slot.wrong-slot { border-color: var(--accent-red); background: rgba(248,81,73,0.1); border-style: solid; }
+        .block-slot .slot-remove { margin-left: auto; color: var(--accent-red); font-size: 0.75rem; opacity: 0; transition: opacity 0.15s; }
+        .block-slot.filled:hover .slot-remove { opacity: 1; }
+        .cmd-pool { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; margin-top: 0.5rem; }
+        .cmd-pool-title { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); width: 100%; margin-bottom: 0.25rem; }
+        .cmd-chip { padding: 0.4rem 0.9rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 6px; cursor: grab; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; user-select: none; transition: all 0.2s; white-space: nowrap; }
+        .cmd-chip:hover:not(.used) { border-color: var(--accent-blue); background: rgba(88,166,255,0.1); }
+        .cmd-chip.dragging { opacity: 0.4; }
+        .cmd-chip.used { opacity: 0.3; cursor: default; border-style: dashed; }
 
         @media (max-width: 768px) { 
             .nav-content { flex-direction: column; gap: 1rem; } 
@@ -653,7 +649,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
         <!-- ==================== SECTION 3: MCQ-2 PRACTICE ==================== -->
         <section id="quiz2" class="section">
             <h1>MCQ-2 Practice — Cherry-Pick, Rebase & Merge</h1>
-            <p class="intro-text">10 mixed-format questions: multi-select, fill-in-the-blank, ordering, and matching.</p>
+            <p class="intro-text">15 mixed-format questions: multi-select, fill-in-the-blank, drag-to-reorder, matching, and block-fill command challenges.</p>
             <div class="quiz-header">
                 <div>
                     <div class="progress-bar"><div class="progress-fill" id="progressBar2" style="width: 0%"></div></div>
@@ -696,126 +692,180 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
             { id: 201, type: "multi", count: 2, question: "Scenario: You are on 'release' branch and need ONLY the SNMP fix (B2) from 'bugfix'. Which TWO commands correctly achieve this?", options: [{ text: "git cherry-pick ba64768", correct: true },{ text: "git merge bugfix", correct: false },{ text: "git cherry-pick B1^..B3", correct: false },{ text: "git format-patch -1 ba64768 && git am *.patch", correct: true },{ text: "git rebase bugfix", correct: false },{ text: "git checkout bugfix && git merge release", correct: false }], explanation: "Goal = copy ONLY B2 (not full branch). Cherry-pick and format-patch+am both achieve selective single-commit transfer.\n\n    A → ✅ Cherry-pick copies the single commit ba64768 (B2) to current branch.\n    B → ❌ Merge brings ALL commits (B1, B2, B3) — not selective.\n    C → ❌ B1^..B3 copies the entire range B1→B3 — not selective.\n    D → ✅ format-patch exports B2 as a .patch file, git am applies it and commits — offline cherry-pick.\n    E → ❌ Rebase replays entire bugfix branch history — not selective.\n    F → ❌ Wrong direction entirely — merges release INTO bugfix, not B2 onto release." },
             { id: 202, type: "multi", count: 2, question: "After running 'git rebase main' on release, which TWO are TRUE?", options: [{ text: "Commit hashes will change", correct: true },{ text: "Original commits are deleted permanently", correct: false },{ text: "Commits are replayed on top of main", correct: true },{ text: "Merge commit is created", correct: false },{ text: "Branch history becomes non-linear", correct: false },{ text: "Rebase modifies shared branch safely", correct: false }], explanation: "Rebase replays release commits on top of main's HEAD, producing new hashes due to changed parent pointers.\n\n    A → ✅ New parent for each replayed commit → new SHA hash.\n    B → ❌ Old commits still exist in reflog for ~90 days — not permanently deleted.\n    C → ✅ Core mechanism of rebase: take commits and replay them on the new base.\n    D → ❌ Rebase produces LINEAR history — no merge commit. That's what 'git merge' does.\n    E → ❌ Opposite — rebase makes history linear by eliminating branch divergence.\n    F → ❌ Rebase on shared branches is DANGEROUS — it rewrites history others depend on." },
             { id: 203, type: "match", question: "Match each Git command to its purpose:", left: ["git cherry-pick", "git rebase", "git merge", "git stash"], right: ["Copy specific commit", "Replay commits on new base", "Combine branch history", "Temporarily save changes"], explanation: "Each command has a distinct purpose in the Git workflow:\n\n    git cherry-pick → Copy specific commit: Surgical, single-commit transfer between branches.\n    git rebase → Replay commits on new base: Moves your branch to sit on top of another branch's latest.\n    git merge → Combine branch history: Integrates all commits from one branch into another.\n    git stash → Temporarily save changes: Parks uncommitted work so you can switch branches cleanly." },
-            { id: 204, type: "order", question: "Arrange the correct workflow: Feature → interrupt → hotfix → resume → deliver", steps: ["git checkout -b feature-api","Edit files","git stash push -u -m 'WIP'","git checkout main","Fix bug && git commit","git checkout feature-api","git stash pop","git add . && git commit","git rebase main","git checkout main && git merge feature-api"], explanation: "The complete interrupt-and-resume workflow:\n\n    1. Create feature branch → 2. Start working → 3. Stash WIP (interrupted!) → 4. Switch to main → 5. Hotfix → 6. Return to feature → 7. Restore stash → 8. Commit feature work → 9. Rebase to sync with main (gets hotfix) → 10. Merge to deliver." },
+            { id: 204, type: "order", question: "Scenario: You're a network automation developer building an API module on a feature branch. Mid-coding, your lead pings you — there's a critical SNMP polling bug on main that's breaking production monitoring. You need to stash your unfinished work, switch to main, fix the bug, then return to your feature branch and deliver it cleanly.\n\nArrange the Git commands in the correct order:", steps: ["git checkout -b feature-api","Edit files (start coding API module)","git stash push -u -m 'WIP: API module'","git checkout main","Fix SNMP bug && git commit -m 'hotfix: SNMP polling'","git checkout feature-api","git stash pop","git add . && git commit -m 'feat: API module complete'","git rebase main","git checkout main && git merge feature-api"], explanation: "The interrupt-and-resume workflow for a real developer:\n\n    1. git checkout -b feature-api → Create feature branch from main to isolate your API work.\n    2. Edit files → You start writing code for the API module.\n    3. git stash push -u -m 'WIP: API module' → Emergency interrupt! Stash uncommitted work (-u includes new untracked files).\n    4. git checkout main → Switch to main where the production bug lives.\n    5. Fix SNMP bug && git commit → Apply the hotfix directly on main.\n    6. git checkout feature-api → Return to your feature branch.\n    7. git stash pop → Restore your stashed WIP code back to working directory.\n    8. git add . && git commit → Finish and commit your API module work.\n    9. git rebase main → Sync feature with main to pick up the hotfix, creating linear history.\n    10. git checkout main && git merge feature-api → Deliver: fast-forward merge since rebased." },
             { id: 205, type: "fill", question: "Complete the command: Apply a patch file and create a commit automatically", template: "git ____ 0001-fix.patch", pool: ["apply", "am", "commit", "patch"], answer: "am", explanation: "'git am' (apply mailbox) applies format-patch output and auto-creates a commit preserving author, date, and message.\n\n    apply → ❌ 'git apply' only modifies files — does NOT create a commit. You'd still need git add + git commit.\n    commit → ❌ 'git commit' creates commits from staged changes, it doesn't read .patch files.\n    patch → ❌ 'git patch' is not a valid Git command." },
             { id: 206, type: "multi", count: 2, question: "Which TWO statements about git stash are correct?", options: [{ text: "git stash pop removes stash after applying", correct: true },{ text: "git stash apply removes stash", correct: false },{ text: "git stash push -u includes untracked files", correct: true },{ text: "git stash works only after commit", correct: false },{ text: "git stash deletes changes permanently", correct: false },{ text: "git stash replaces commit", correct: false }], explanation: "Stash is a temporary storage stack for uncommitted changes.\n\n    A → ✅ 'pop' = apply + drop. It restores changes AND removes the stash entry.\n    B → ❌ 'apply' restores changes but KEEPS the stash entry — you can apply it again later.\n    C → ✅ '-u' (--include-untracked) stashes both tracked modifications AND untracked files.\n    D → ❌ Stash is specifically for UNCOMMITTED work — it wouldn't make sense after committing.\n    E → ❌ Stash is temporary storage, not deletion. Changes are recoverable via 'stash list'.\n    F → ❌ Stash is orthogonal to commit — it saves work temporarily, commits save work permanently." },
             { id: 207, type: "multi", count: 2, question: "Which TWO are safe practices for shared branches?", options: [{ text: "Use git revert", correct: true },{ text: "Avoid rebase on shared branch", correct: true },{ text: "Always force push", correct: false },{ text: "Use git reset --hard", correct: false },{ text: "Delete history freely", correct: false },{ text: "Rewrite commits on main", correct: false }], explanation: "Shared branches = don't rewrite history. Additive changes only.\n\n    A → ✅ Revert creates a NEW undo commit — history stays intact, safe for everyone.\n    B → ✅ Rebase rewrites history — anyone who pulled the old commits will have conflicts.\n    C → ❌ Force push overwrites remote history — breaks all collaborators' local copies.\n    D → ❌ reset --hard on a shared branch + force push = destroyed history for everyone.\n    E → ❌ Deleting history on shared branches breaks every collaborator's local repo.\n    F → ❌ Rewriting commits on main is the cardinal sin of Git collaboration." },
             { id: 208, type: "fill", question: "Complete the command: Continue cherry-pick after resolving conflicts", template: "git cherry-pick ____", pool: ["--abort", "--continue", "--skip", "--merge"], answer: "--continue", explanation: "After resolving conflicts and staging the fixes (git add), '--continue' resumes the cherry-pick operation.\n\n    --abort → ❌ Cancels the entire cherry-pick and returns to the state before it started.\n    --skip → ❌ Skips the current conflicting commit entirely — doesn't apply its changes at all.\n    --merge → ❌ Not a valid cherry-pick flag. Merge strategies are specified differently." },
             { id: 209, type: "multi", count: 2, question: "Which TWO commands rewrite commit history?", options: [{ text: "git rebase", correct: true },{ text: "git commit --amend", correct: true },{ text: "git merge", correct: false },{ text: "git revert", correct: false },{ text: "git pull", correct: false },{ text: "git clone", correct: false }], explanation: "History rewriting = existing commits get new hashes or are removed from the branch.\n\n    A → ✅ Rebase replays commits with new parents → new hashes. Old history is replaced.\n    B → ✅ --amend replaces the last commit with a new one — old commit hash disappears from branch.\n    C → ❌ Merge ADDS a new merge commit — it never modifies existing commits.\n    D → ❌ Revert ADDS a new undo commit — original commit stays in history untouched.\n    E → ❌ Pull is fetch + merge — it adds commits, doesn't rewrite them.\n    F → ❌ Clone copies a repo — it doesn't modify any history." },
-            { id: 210, type: "order", question: "Arrange the release lifecycle: Cherry-pick → rebase → merge", steps: ["git checkout release","git cherry-pick ba64768","git rebase main","git checkout main","git merge release"], explanation: "The release lifecycle pattern:\n\n    1. Switch to release branch → 2. Cherry-pick the critical fix (B2) → 3. Rebase onto main to sync (get M2) → 4. Switch to main → 5. Merge release into main (fast-forward since rebased).\n\n    This is the 'cherry-pick to select, rebase to sync, merge to deliver' pattern." }
+            { id: 210, type: "order", question: "Scenario: Your team's release branch (release) has the version bump (R1–R3) and a cherry-picked SNMP fix. Now you need to sync release with main (which has a new BGP feature M2), then deliver release into main for final deployment.\n\nArrange the Git commands in the correct order:", steps: ["git checkout release","git cherry-pick ba64768","git rebase main","git checkout main","git merge release"], explanation: "The release lifecycle — cherry-pick to select, rebase to sync, merge to deliver:\n\n    1. git checkout release → Switch to the release branch where R1–R3 live.\n    2. git cherry-pick ba64768 → Surgically copy the critical SNMP fix (B2) from bugfix. Only B2, not B1 or B3.\n    3. git rebase main → Replay all release commits (R1, R2, R3, B2') on top of main's latest (M2). All hashes change. History becomes linear.\n    4. git checkout main → Switch to main to prepare for the final merge.\n    5. git merge release → Fast-forward merge because release is already linear on top of main. Main now has M1→M2→R1'→R2'→R3'→B2''." },
+
+            /* ===================== NEW: Block-fill questions Q11-Q15 ===================== */
+            {
+                id: 211, type: "blocks",
+                question: "Scenario: You're a network engineer. Your team has app.py on main (M1). A colleague created a bugfix branch with 3 commits: B1 (auth fix), B2 (SNMP v2→v3 upgrade), B3 (OSPF validation). The release branch (created from main) has R1–R3. Production monitoring is broken — you need ONLY the SNMP fix (B2, hash ba64768) on the release branch. The auth and OSPF fixes are not ready.\n\nDrag the correct commands into each block:",
+                blocks: [
+                    { title: "Block 1 — Switch to target branch", slots: 1, answer: ["git checkout release"] },
+                    { title: "Block 2 — Cherry-pick the specific fix", slots: 1, answer: ["git cherry-pick ba64768"] }
+                ],
+                pool: ["git checkout release", "git cherry-pick ba64768", "git merge bugfix", "git checkout bugfix", "git rebase bugfix", "git cherry-pick B1^..B3", "git checkout main"],
+                explanation: "Block 1: git checkout release\n→ You must be ON the target branch before cherry-picking. Cherry-pick applies commits to the CURRENT branch.\n\nBlock 2: git cherry-pick ba64768\n→ Copies ONLY commit B2 (the SNMP fix) to release. Creates a new commit with a new hash but identical changes.\n\nWhy NOT the others:\n    git merge bugfix → ❌ Brings ALL 3 commits (B1+B2+B3). We only want B2.\n    git checkout bugfix → ❌ Wrong direction — we need to be on release, not bugfix.\n    git rebase bugfix → ❌ Replays entire bugfix history onto release — not selective.\n    git cherry-pick B1^..B3 → ❌ Range picks B1, B2, AND B3 — not selective.\n    git checkout main → ❌ Wrong target branch — the fix goes to release, not main."
+            },
+            {
+                id: 212, type: "blocks",
+                question: "Scenario: After cherry-picking B2 onto release, your release branch has commits M1→R1→R2→R3→B2'. Meanwhile, main has progressed to M2 (BGP feature). Before delivering release to main, you need release to include M2 so the final merge is a clean fast-forward.\n\nDrag the correct commands into each block:",
+                blocks: [
+                    { title: "Block 1 — Ensure you're on release", slots: 1, answer: ["git checkout release"] },
+                    { title: "Block 2 — Sync release with main", slots: 1, answer: ["git rebase main"] },
+                    { title: "Block 3 — Deliver release into main", slots: 2, answer: ["git checkout main", "git merge release"] }
+                ],
+                pool: ["git checkout release", "git rebase main", "git checkout main", "git merge release", "git merge main", "git rebase release", "git push --force", "git cherry-pick main"],
+                explanation: "Block 1: git checkout release\n→ Must be on release to rebase it. Rebase operates on the CURRENT branch.\n\nBlock 2: git rebase main\n→ Replays R1, R2, R3, B2' on top of main's latest commit (M2). All commits get new hashes. History becomes: M1→M2→R1'→R2'→R3'→B2''.\n\nBlock 3: git checkout main → git merge release\n→ Switch to main, then merge. Since release is linear on top of main (thanks to rebase), this is a fast-forward — no merge commit needed.\n\nWhy NOT the others:\n    git merge main → ❌ Merging main INTO release creates a merge commit and tangled history. Rebase is the clean approach.\n    git rebase release → ❌ Wrong direction — this would rebase main onto release, not the other way.\n    git push --force → ❌ Dangerous and unnecessary for this local workflow. Force push is for rewriting remote history.\n    git cherry-pick main → ❌ Invalid syntax — cherry-pick takes commit hashes, not branch names for bulk transfer."
+            },
+            {
+                id: 213, type: "blocks",
+                question: "Scenario: You committed R2 (the logging function) on the release branch but accidentally used the wrong commit message: 'R3: Call release logging in main' instead of 'R2: Add release logging function'. This was your LAST commit (HEAD). The branch has NOT been pushed yet.\n\nDrag the correct commands into each block:",
+                blocks: [
+                    { title: "Block 1 — Fix the commit message", slots: 1, answer: ["git commit --amend -m 'R2: Add release logging function'"] }
+                ],
+                pool: ["git commit --amend -m 'R2: Add release logging function'", "git revert HEAD", "git reset --hard HEAD~1", "git rebase -i HEAD~1", "git push --force"],
+                explanation: "Block 1: git commit --amend -m 'R2: Add release logging function'\n→ --amend rewrites the MOST RECENT commit's message (and/or content). Since this is the last commit and unpushed, amend is the simplest fix. The old commit is replaced with a new one (new hash).\n\nWhy NOT the others:\n    git revert HEAD → ❌ Creates a NEW commit that undoes R2's changes entirely. We don't want to undo the code — just fix the message.\n    git reset --hard HEAD~1 → ❌ Destroys the commit AND all changes. We'd lose the logging function code. Catastrophically wrong.\n    git rebase -i HEAD~1 → ❌ Works (with 'reword') but is overkill for the most recent commit. --amend is simpler and more direct.\n    git push --force → ❌ The branch hasn't been pushed yet, so force push is irrelevant. And it doesn't fix messages."
+            },
+            {
+                id: 214, type: "blocks",
+                question: "Scenario: Your colleague on a different machine (no shared repo access) made a critical SNMP fix on their bugfix branch — commit ba64768. They need to send you just that one commit so you can apply it to your release branch. You'll use Git's email-based patch workflow.\n\nDrag the correct commands into each block:",
+                blocks: [
+                    { title: "Block 1 — Colleague exports the commit (on their machine)", slots: 2, answer: ["git checkout bugfix", "git format-patch -1 ba64768"] },
+                    { title: "Block 2 — You apply the patch (on your machine)", slots: 2, answer: ["git checkout release", "git am 0001-B2-Fix-SNMP*.patch"] }
+                ],
+                pool: ["git checkout bugfix", "git format-patch -1 ba64768", "git checkout release", "git am 0001-B2-Fix-SNMP*.patch", "git apply 0001-B2-Fix-SNMP*.patch", "git cherry-pick ba64768", "git merge bugfix", "git diff > fix.patch"],
+                explanation: "Block 1: git checkout bugfix → git format-patch -1 ba64768\n→ Colleague switches to bugfix branch, then exports commit ba64768 as a .patch file. '-1' means export exactly one commit. The file contains the diff + author + date + message in email/mbox format.\n\nBlock 2: git checkout release → git am 0001-B2-Fix-SNMP*.patch\n→ You switch to release branch, then apply the patch with 'git am' (apply mailbox). git am reads the patch file and auto-creates a commit preserving the original author, date, and message.\n\nWhy NOT the others:\n    git apply 0001-B2-Fix-SNMP*.patch → ❌ 'apply' only modifies files — does NOT create a commit. You'd still need git add + git commit, and you'd lose the original author/date metadata.\n    git cherry-pick ba64768 → ❌ Cherry-pick requires the commit to exist in YOUR local repo. Cross-machine = no shared history = cherry-pick won't work.\n    git merge bugfix → ❌ The bugfix branch doesn't exist on your machine. Also, merge brings ALL commits, not just one.\n    git diff > fix.patch → ❌ 'git diff' creates a raw diff without commit metadata. format-patch is the correct tool for transferable commits."
+            },
+            {
+                id: 215, type: "blocks",
+                question: "Scenario: You made 3 WIP commits on your feature branch that you want to clean up before merging to main. The commits are: 'WIP: started auth', 'WIP: more auth work', 'feat: complete auth module'. You want to combine all three into a single clean commit with the message 'feat: complete auth module'. The branch has NOT been pushed.\n\nDrag the correct commands into each block:",
+                blocks: [
+                    { title: "Block 1 — Start interactive rebase covering 3 commits", slots: 1, answer: ["git rebase -i HEAD~3"] },
+                    { title: "Block 2 — In the editor, mark commits 2 and 3 for squashing (keep commit 1 as 'pick')", slots: 1, answer: ["Change 'pick' to 'fixup' for commits 2 and 3"] },
+                    { title: "Block 3 — Reword the remaining commit", slots: 1, answer: ["git commit --amend -m 'feat: complete auth module'"] }
+                ],
+                pool: ["git rebase -i HEAD~3", "Change 'pick' to 'fixup' for commits 2 and 3", "git commit --amend -m 'feat: complete auth module'", "git reset --hard HEAD~3", "git merge --squash feature", "Change 'pick' to 'reword' for all 3", "git revert HEAD~3..HEAD", "git stash"],
+                explanation: "Block 1: git rebase -i HEAD~3\n→ Opens interactive rebase for the last 3 commits. You'll see all three listed with 'pick' in front of each.\n\nBlock 2: Change 'pick' to 'fixup' for commits 2 and 3\n→ 'fixup' combines each commit into the one above it and DISCARDS the fixup commit's message. After saving, Git squashes all 3 into one commit with commit 1's message. Using 'fixup' instead of 'squash' avoids the message editor for commits 2 and 3.\n\nBlock 3: git commit --amend -m 'feat: complete auth module'\n→ The squashed commit still has commit 1's message ('WIP: started auth'). --amend rewrites it to the clean final message.\n\nWhy NOT the others:\n    git reset --hard HEAD~3 → ❌ Destroys all 3 commits AND their changes. You'd lose all your auth module code.\n    git merge --squash feature → ❌ This is used from another branch (like main) to squash-merge a feature. You're already on the feature branch.\n    Change 'pick' to 'reword' for all 3 → ❌ 'reword' only changes messages — it doesn't combine commits. You'd still have 3 separate commits.\n    git revert HEAD~3..HEAD → ❌ Creates new undo commits — the opposite of what you want. You want fewer commits, not more.\n    git stash → ❌ Stash is for uncommitted work. These are already committed. Completely irrelevant."
+            }
         ];
 
+        // ==================== QUIZ ENGINE ====================
         const quizState = {
-            q1: { answers: {}, submitted: {}, score: 0, questions: questions1, matchState: {}, orderState: {}, fillState: {} },
-            q2: { answers: {}, submitted: {}, score: 0, questions: questions2, matchState: {}, orderState: {}, fillState: {} }
+            q1: { answers: {}, submitted: {}, score: 0, questions: questions1, matchState: {}, orderState: {}, fillState: {}, blockState: {} },
+            q2: { answers: {}, submitted: {}, score: 0, questions: questions2, matchState: {}, orderState: {}, fillState: {}, blockState: {} }
         };
 
         function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+            document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
             document.getElementById(id).classList.add('active');
             event.target.classList.add('active');
         }
 
+        function shuffle(arr) { var a = arr.slice(); for (var i = a.length-1; i > 0; i--) { var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
         function initQuiz(qKey) {
-            const st = quizState[qKey];
-            st.matchState = {}; st.orderState = {}; st.fillState = {};
-            const suffix = qKey === 'q1' ? '1' : '2';
-            const container = document.getElementById('quizContainer' + suffix);
-            container.innerHTML = st.questions.map((q, idx) => renderQuestion(q, idx, qKey)).join('');
-            st.questions.forEach(q => {
+            var st = quizState[qKey];
+            st.matchState = {}; st.orderState = {}; st.fillState = {}; st.blockState = {};
+            var suffix = qKey === 'q1' ? '1' : '2';
+            var container = document.getElementById('quizContainer' + suffix);
+            container.innerHTML = st.questions.map(function(q, idx){ return renderQuestion(q, idx, qKey); }).join('');
+            st.questions.forEach(function(q){
                 if (q.type === 'order') {
-                    const shuffled = [...q.steps];
-                    for (let i = shuffled.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; }
-                    st.orderState[q.id] = shuffled;
+                    st.orderState[q.id] = shuffle(q.steps);
                     rerenderOrder(qKey, q.id);
+                }
+                if (q.type === 'match') {
+                    var indices = q.right.map(function(_,i){ return i; });
+                    st.matchState[q.id] = { activeLeft: null, pairs: {}, shuffledRight: shuffle(indices) };
+                    rerenderMatch(qKey, q.id);
+                }
+                if (q.type === 'blocks') {
+                    st.blockState[q.id] = { slots: {}, usedPool: [] };
+                    q.blocks.forEach(function(b, bi) {
+                        st.blockState[q.id].slots[bi] = new Array(b.slots).fill(null);
+                    });
                 }
             });
             updateProgress(qKey);
         }
 
         function renderQuestion(q, idx, qKey) {
-            const expHtml = q.explanation.replace(/\n/g, '<br>');
+            var expHtml = q.explanation.replace(/\n/g, '<br>');
             if (q.type === 'single' || q.type === 'multi') {
-                const typeLabel = q.count === 1 ? 'Choose 1' : 'Choose ' + q.count;
-                return '<div class="question-card" id="' + qKey + '_q' + q.id + '">' +
-                    '<div class="question-header"><span class="question-number">Q' + (idx+1) + '</span><span class="question-type">' + typeLabel + '</span></div>' +
-                    '<div class="question-text">' + q.question + '</div>' +
-                    '<div class="options-list">' + q.options.map((opt, i) =>
-                        '<div class="option-item" data-qkey="' + qKey + '" data-qid="' + q.id + '" data-idx="' + i + '" onclick="selectOption(\'' + qKey + '\',' + q.id + ',' + i + ',\'' + q.type + '\',' + q.count + ')">' +
-                        '<div class="option-checkbox">' + String.fromCharCode(65+i) + '</div><div class="option-text">' + opt.text + '</div></div>'
-                    ).join('') + '</div>' +
-                    '<button class="submit-btn" id="' + qKey + '_sub' + q.id + '" onclick="submitAnswer(\'' + qKey + '\',' + q.id + ')" disabled>Submit Answer</button>' +
-                    '<div class="explanation" id="' + qKey + '_exp' + q.id + '"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">' + expHtml + '</div></div></div>';
+                var typeLabel = q.count === 1 ? 'Choose 1' : 'Choose ' + q.count;
+                return '<div class="question-card" id="'+qKey+'_q'+q.id+'">' +
+                    '<div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">'+typeLabel+'</span></div>' +
+                    '<div class="question-text">'+q.question+'</div><div class="options-list">' +
+                    q.options.map(function(opt,i){
+                        return '<div class="option-item" data-qkey="'+qKey+'" data-qid="'+q.id+'" data-idx="'+i+'" onclick="selectOption(\''+qKey+'\','+q.id+','+i+',\''+q.type+'\','+q.count+')"><div class="option-checkbox">'+String.fromCharCode(65+i)+'</div><div class="option-text">'+opt.text+'</div></div>';
+                    }).join('') + '</div>' +
+                    '<button class="submit-btn" id="'+qKey+'_sub'+q.id+'" onclick="submitAnswer(\''+qKey+'\','+q.id+')" disabled>Submit Answer</button>' +
+                    '<div class="explanation" id="'+qKey+'_exp'+q.id+'"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">'+expHtml+'</div></div></div>';
             }
             if (q.type === 'fill') {
-                var tmpl = q.template.replace('____', '<span class="fill-blank" id="' + qKey + '_blank' + q.id + '">&nbsp;&nbsp;&nbsp;&nbsp;</span>');
-                return '<div class="question-card" id="' + qKey + '_q' + q.id + '">' +
-                    '<div class="question-header"><span class="question-number">Q' + (idx+1) + '</span><span class="question-type">Fill the Blank</span></div>' +
-                    '<div class="question-text">' + q.question + '</div>' +
-                    '<div class="fill-template">' + tmpl + '</div>' +
-                    '<div class="pool-options">' + q.pool.map(w =>
-                        '<div class="pool-word" data-qkey="' + qKey + '" data-qid="' + q.id + '" data-word="' + w + '" onclick="selectFill(\'' + qKey + '\',' + q.id + ',\'' + w + '\')">' + w + '</div>'
-                    ).join('') + '</div>' +
-                    '<button class="submit-btn" id="' + qKey + '_sub' + q.id + '" onclick="submitFill(\'' + qKey + '\',' + q.id + ')" disabled>Submit Answer</button>' +
-                    '<div class="explanation" id="' + qKey + '_exp' + q.id + '"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">' + expHtml + '</div></div></div>';
+                var tmpl = q.template.replace('____', '<span class="fill-blank" id="'+qKey+'_blank'+q.id+'">&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+                return '<div class="question-card" id="'+qKey+'_q'+q.id+'">' +
+                    '<div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Fill the Blank</span></div>' +
+                    '<div class="question-text">'+q.question+'</div><div class="fill-template">'+tmpl+'</div>' +
+                    '<div class="pool-options">' + q.pool.map(function(w){ return '<div class="pool-word" data-qkey="'+qKey+'" data-qid="'+q.id+'" data-word="'+w+'" onclick="selectFill(\''+qKey+'\','+q.id+',\''+w+'\')">'+w+'</div>'; }).join('') + '</div>' +
+                    '<button class="submit-btn" id="'+qKey+'_sub'+q.id+'" onclick="submitFill(\''+qKey+'\','+q.id+')" disabled>Submit Answer</button>' +
+                    '<div class="explanation" id="'+qKey+'_exp'+q.id+'"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">'+expHtml+'</div></div></div>';
             }
             if (q.type === 'match') {
-                return '<div class="question-card" id="' + qKey + '_q' + q.id + '">' +
-                    '<div class="question-header"><span class="question-number">Q' + (idx+1) + '</span><span class="question-type">Match Pairs</span></div>' +
-                    '<div class="question-text">' + q.question + '</div>' +
+                return '<div class="question-card" id="'+qKey+'_q'+q.id+'">' +
+                    '<div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Match Pairs</span></div>' +
+                    '<div class="question-text">'+q.question+'</div>' +
                     '<p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">Click a command on the left, then click its matching purpose on the right.</p>' +
-                    '<div class="match-container" id="' + qKey + '_match' + q.id + '"><div><div class="match-col-title">Command</div>' +
-                    q.left.map((l,i) => '<div class="match-item" data-qkey="' + qKey + '" data-qid="' + q.id + '" data-side="left" data-idx="' + i + '" onclick="selectMatch(\'' + qKey + '\',' + q.id + ',\'left\',' + i + ')">' + l + '</div>').join('') +
-                    '</div><div><div class="match-col-title">Purpose</div>' +
-                    q.right.map((r,i) => '<div class="match-item" data-qkey="' + qKey + '" data-qid="' + q.id + '" data-side="right" data-idx="' + i + '" onclick="selectMatch(\'' + qKey + '\',' + q.id + ',\'right\',' + i + ')">' + r + '</div>').join('') +
-                    '</div></div><div id="' + qKey + '_matchInfo' + q.id + '" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-secondary);"></div>' +
-                    '<button class="submit-btn" id="' + qKey + '_sub' + q.id + '" onclick="submitMatch(\'' + qKey + '\',' + q.id + ')" disabled>Submit Answer</button>' +
-                    '<div class="explanation" id="' + qKey + '_exp' + q.id + '"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">' + expHtml + '</div></div></div>';
+                    '<div class="match-container" id="'+qKey+'_match'+q.id+'"></div>' +
+                    '<div id="'+qKey+'_matchInfo'+q.id+'" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-secondary);"></div>' +
+                    '<button class="submit-btn" id="'+qKey+'_sub'+q.id+'" onclick="submitMatch(\''+qKey+'\','+q.id+')" disabled>Submit Answer</button>' +
+                    '<div class="explanation" id="'+qKey+'_exp'+q.id+'"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">'+expHtml+'</div></div></div>';
             }
             if (q.type === 'order') {
-                return '<div class="question-card" id="' + qKey + '_q' + q.id + '">' +
-                    '<div class="question-header"><span class="question-number">Q' + (idx+1) + '</span><span class="question-type">Arrange in Order</span></div>' +
-                    '<div class="question-text">' + q.question + '</div>' +
-                    '<div class="order-list" id="' + qKey + '_order' + q.id + '"></div>' +
-                    '<button class="submit-btn" id="' + qKey + '_sub' + q.id + '" onclick="submitOrder(\'' + qKey + '\',' + q.id + ')">Submit Answer</button>' +
-                    '<div class="explanation" id="' + qKey + '_exp' + q.id + '"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">' + expHtml + '</div></div></div>';
+                return '<div class="question-card" id="'+qKey+'_q'+q.id+'">' +
+                    '<div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Drag to Reorder</span></div>' +
+                    '<div class="question-text">'+q.question+'</div>' +
+                    '<div class="order-list" id="'+qKey+'_order'+q.id+'"></div>' +
+                    '<button class="submit-btn" id="'+qKey+'_sub'+q.id+'" onclick="submitOrder(\''+qKey+'\','+q.id+')">Submit Answer</button>' +
+                    '<div class="explanation" id="'+qKey+'_exp'+q.id+'"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">'+expHtml+'</div></div></div>';
+            }
+            if (q.type === 'blocks') {
+                return '<div class="question-card" id="'+qKey+'_q'+q.id+'">' +
+                    '<div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Drag Commands to Blocks</span></div>' +
+                    '<div class="question-text">'+q.question+'</div>' +
+                    '<div class="block-container" id="'+qKey+'_blocks'+q.id+'">' +
+                    q.blocks.map(function(b, bi){
+                        var slotsHtml = '';
+                        for (var s = 0; s < b.slots; s++) { slotsHtml += '<div class="block-slot" data-qkey="'+qKey+'" data-qid="'+q.id+'" data-block="'+bi+'" data-slot="'+s+'" ondrop="dropBlock(event,\''+qKey+'\','+q.id+','+bi+','+s+')" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" onclick="removeFromSlot(\''+qKey+'\','+q.id+','+bi+','+s+')"><span class="slot-text" style="opacity:0.4">Drop command here</span><span class="slot-remove">✕</span></div>'; }
+                        return '<div class="block-section"><div class="block-title">'+b.title+'</div><div class="block-slots">'+slotsHtml+'</div></div>';
+                    }).join('') + '</div>' +
+                    '<div class="cmd-pool" id="'+qKey+'_pool'+q.id+'"><div class="cmd-pool-title">📦 Command Pool — drag commands into the blocks above</div>' +
+                    q.pool.map(function(cmd, ci){ return '<div class="cmd-chip" draggable="true" data-qkey="'+qKey+'" data-qid="'+q.id+'" data-cmd="'+cmd+'" ondragstart="dragChip(event,\''+cmd+'\')" id="'+qKey+'_chip'+q.id+'_'+ci+'">'+cmd+'</div>'; }).join('') + '</div>' +
+                    '<button class="submit-btn" id="'+qKey+'_sub'+q.id+'" onclick="submitBlocks(\''+qKey+'\','+q.id+')" disabled>Submit Answer</button>' +
+                    '<div class="explanation" id="'+qKey+'_exp'+q.id+'"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">'+expHtml+'</div></div></div>';
             }
             return '';
         }
 
-        function selectOption(qKey, qid, idx, type, count) {
-            var st = quizState[qKey];
-            if (st.submitted[qid]) return;
-            if (!st.answers[qid]) st.answers[qid] = [];
-            if (type === 'single') st.answers[qid] = [idx];
-            else { var i = st.answers[qid].indexOf(idx); if (i > -1) st.answers[qid].splice(i,1); else if (st.answers[qid].length < count) st.answers[qid].push(idx); else { st.answers[qid].shift(); st.answers[qid].push(idx); } }
-            document.querySelectorAll('.option-item[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el,j){ el.classList.toggle('selected', st.answers[qid] && st.answers[qid].includes(j)); });
-            document.getElementById(qKey+'_sub'+qid).disabled = st.answers[qid].length !== count;
-        }
-
-        function selectFill(qKey, qid, word) {
-            var st = quizState[qKey]; if (st.submitted[qid]) return;
-            st.fillState[qid] = word;
-            document.getElementById(qKey+'_blank'+qid).textContent = word;
-            document.querySelectorAll('.pool-word[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el){ el.classList.toggle('selected', el.dataset.word === word); });
-            document.getElementById(qKey+'_sub'+qid).disabled = false;
-        }
-        function submitFill(qKey, qid) {
-            var st = quizState[qKey]; if (st.submitted[qid]) return; st.submitted[qid] = true;
-            var q = st.questions.find(function(x){ return x.id === qid; });
-            var isCorrect = st.fillState[qid] === q.answer;
-            if (isCorrect) st.score++;
-            var blank = document.getElementById(qKey+'_blank'+qid);
-            blank.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
-            if (!isCorrect) blank.textContent = st.fillState[qid] + ' ✗ → ' + q.answer;
-            document.querySelectorAll('.pool-word[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el){ el.classList.add('disabled'); });
-            markQuestion(qKey, qid, isCorrect);
+        // ---- MATCH (with shuffled right column) ----
+        function rerenderMatch(qKey, qid) {
+            var st = quizState[qKey]; var q = st.questions.find(function(x){ return x.id === qid; });
+            var ms = st.matchState[qid]; var container = document.getElementById(qKey+'_match'+qid);
+            if (!container) return;
+            container.innerHTML = '<div><div class="match-col-title">Command</div>' +
+                q.left.map(function(l,i){ return '<div class="match-item" data-qkey="'+qKey+'" data-qid="'+qid+'" data-side="left" data-idx="'+i+'" onclick="selectMatch(\''+qKey+'\','+qid+',\'left\','+i+')">'+l+'</div>'; }).join('') +
+                '</div><div><div class="match-col-title">Purpose</div>' +
+                ms.shuffledRight.map(function(origIdx){ return '<div class="match-item" data-qkey="'+qKey+'" data-qid="'+qid+'" data-side="right" data-idx="'+origIdx+'" onclick="selectMatch(\''+qKey+'\','+qid+',\'right\','+origIdx+')">'+q.right[origIdx]+'</div>'; }).join('') + '</div>';
         }
 
         function selectMatch(qKey, qid, side, idx) {
             var st = quizState[qKey]; if (st.submitted[qid]) return;
-            if (!st.matchState[qid]) st.matchState[qid] = { activeLeft: null, pairs: {} };
             var ms = st.matchState[qid];
             var el = document.querySelector('.match-item[data-qkey="'+qKey+'"][data-qid="'+qid+'"][data-side="'+side+'"][data-idx="'+idx+'"]');
             if (el.classList.contains('matched')) return;
@@ -851,27 +901,54 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
             markQuestion(qKey, qid, allCorrect);
         }
 
+        // ---- ORDER (drag-and-drop) ----
+        var dragSrcIdx = null;
         function rerenderOrder(qKey, qid) {
             var st = quizState[qKey]; var items = st.orderState[qid];
             var container = document.getElementById(qKey+'_order'+qid); if (!container) return;
             container.innerHTML = items.map(function(step,i){
-                return '<div class="order-item" data-idx="'+i+'"><span class="order-num">'+(i+1)+'</span><span>'+step+'</span>' +
-                    '<div class="order-arrows"><button onclick="moveOrder(\''+qKey+'\','+qid+','+i+',-1)">▲</button><button onclick="moveOrder(\''+qKey+'\','+qid+','+i+',1)">▼</button></div></div>';
+                return '<div class="order-item" draggable="true" data-idx="'+i+'" data-qkey="'+qKey+'" data-qid="'+qid+'">' +
+                    '<span class="order-grip">⠿</span><span class="order-num">'+(i+1)+'</span><span>'+step+'</span></div>';
             }).join('');
-        }
-        function moveOrder(qKey, qid, idx, dir) {
-            var st = quizState[qKey]; if (st.submitted[qid]) return;
-            var items = st.orderState[qid]; var newIdx = idx + dir;
-            if (newIdx < 0 || newIdx >= items.length) return;
-            var tmp = items[idx]; items[idx] = items[newIdx]; items[newIdx] = tmp;
-            rerenderOrder(qKey, qid);
+            container.querySelectorAll('.order-item').forEach(function(el){
+                el.addEventListener('dragstart', function(e){ dragSrcIdx = parseInt(el.dataset.idx); el.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+                el.addEventListener('dragend', function(){ el.classList.remove('dragging'); });
+                el.addEventListener('dragover', function(e){ e.preventDefault(); el.classList.add('drag-over'); });
+                el.addEventListener('dragleave', function(){ el.classList.remove('drag-over'); });
+                el.addEventListener('drop', function(e){
+                    e.preventDefault(); el.classList.remove('drag-over');
+                    var targetIdx = parseInt(el.dataset.idx);
+                    if (dragSrcIdx !== null && dragSrcIdx !== targetIdx) {
+                        var arr = st.orderState[qid]; var tmp = arr[dragSrcIdx]; arr.splice(dragSrcIdx, 1); arr.splice(targetIdx, 0, tmp);
+                        rerenderOrder(qKey, qid);
+                    }
+                    dragSrcIdx = null;
+                });
+                // Touch support
+                var touchStartY = 0, touchIdx = null;
+                el.addEventListener('touchstart', function(e){ touchStartY = e.touches[0].clientY; touchIdx = parseInt(el.dataset.idx); el.classList.add('dragging'); }, {passive: true});
+                el.addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive: false});
+                el.addEventListener('touchend', function(e){
+                    el.classList.remove('dragging');
+                    var endY = e.changedTouches[0].clientY;
+                    var diff = endY - touchStartY;
+                    var arr = st.orderState[qid];
+                    var moveDir = diff > 30 ? 1 : (diff < -30 ? -1 : 0);
+                    if (moveDir !== 0 && touchIdx !== null) {
+                        var newIdx = touchIdx + moveDir;
+                        if (newIdx >= 0 && newIdx < arr.length) { var tmp = arr[touchIdx]; arr[touchIdx] = arr[newIdx]; arr[newIdx] = tmp; rerenderOrder(qKey, qid); }
+                    }
+                    touchIdx = null;
+                });
+            });
         }
         function submitOrder(qKey, qid) {
             var st = quizState[qKey]; if (st.submitted[qid]) return; st.submitted[qid] = true;
             var q = st.questions.find(function(x){ return x.id === qid; }); var items = st.orderState[qid]; var allCorrect = true;
             var container = document.getElementById(qKey+'_order'+qid);
             container.querySelectorAll('.order-item').forEach(function(el,i){
-                el.querySelector('.order-arrows').style.display = 'none';
+                el.removeAttribute('draggable'); el.style.cursor = 'default';
+                var grip = el.querySelector('.order-grip'); if (grip) grip.style.display = 'none';
                 var isCorrect = items[i] === q.steps[i]; if (!isCorrect) allCorrect = false;
                 el.classList.add(isCorrect ? 'correct-pos' : 'wrong-pos');
             });
@@ -879,6 +956,107 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
             markQuestion(qKey, qid, allCorrect);
         }
 
+        // ---- FILL ----
+        function selectFill(qKey, qid, word) {
+            var st = quizState[qKey]; if (st.submitted[qid]) return;
+            st.fillState[qid] = word;
+            document.getElementById(qKey+'_blank'+qid).textContent = word;
+            document.querySelectorAll('.pool-word[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el){ el.classList.toggle('selected', el.dataset.word === word); });
+            document.getElementById(qKey+'_sub'+qid).disabled = false;
+        }
+        function submitFill(qKey, qid) {
+            var st = quizState[qKey]; if (st.submitted[qid]) return; st.submitted[qid] = true;
+            var q = st.questions.find(function(x){ return x.id === qid; });
+            var isCorrect = st.fillState[qid] === q.answer;
+            if (isCorrect) st.score++;
+            var blank = document.getElementById(qKey+'_blank'+qid);
+            blank.classList.add(isCorrect ? 'correct-answer' : 'wrong-answer');
+            if (!isCorrect) blank.textContent = st.fillState[qid] + ' ✗ → ' + q.answer;
+            document.querySelectorAll('.pool-word[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el){ el.classList.add('disabled'); });
+            markQuestion(qKey, qid, isCorrect);
+        }
+
+        // ---- BLOCKS (drag from pool to slots) ----
+        function dragChip(e, cmd) { e.dataTransfer.setData('text/plain', cmd); e.target.classList.add('dragging'); setTimeout(function(){ e.target.classList.remove('dragging'); }, 0); }
+        function dropBlock(e, qKey, qid, blockIdx, slotIdx) {
+            e.preventDefault(); e.target.classList.remove('drag-over');
+            var st = quizState[qKey]; if (st.submitted[qid]) return;
+            var cmd = e.dataTransfer.getData('text/plain');
+            if (!cmd) return;
+            // Remove from previous slot if already placed
+            var bs = st.blockState[qid];
+            Object.keys(bs.slots).forEach(function(bi){ bs.slots[bi].forEach(function(v,si){ if (v === cmd) bs.slots[bi][si] = null; }); });
+            bs.slots[blockIdx][slotIdx] = cmd;
+            // Update used pool
+            var allUsed = [];
+            Object.keys(bs.slots).forEach(function(bi){ bs.slots[bi].forEach(function(v){ if (v) allUsed.push(v); }); });
+            bs.usedPool = allUsed;
+            rerenderBlockSlots(qKey, qid);
+            updateBlockChips(qKey, qid);
+            checkBlocksComplete(qKey, qid);
+        }
+        function removeFromSlot(qKey, qid, blockIdx, slotIdx) {
+            var st = quizState[qKey]; if (st.submitted[qid]) return;
+            var bs = st.blockState[qid];
+            if (!bs.slots[blockIdx][slotIdx]) return;
+            bs.slots[blockIdx][slotIdx] = null;
+            var allUsed = [];
+            Object.keys(bs.slots).forEach(function(bi){ bs.slots[bi].forEach(function(v){ if (v) allUsed.push(v); }); });
+            bs.usedPool = allUsed;
+            rerenderBlockSlots(qKey, qid);
+            updateBlockChips(qKey, qid);
+            document.getElementById(qKey+'_sub'+qid).disabled = true;
+        }
+        function rerenderBlockSlots(qKey, qid) {
+            var st = quizState[qKey]; var bs = st.blockState[qid];
+            Object.keys(bs.slots).forEach(function(bi){
+                bs.slots[bi].forEach(function(v, si){
+                    var slotEl = document.querySelector('.block-slot[data-qkey="'+qKey+'"][data-qid="'+qid+'"][data-block="'+bi+'"][data-slot="'+si+'"]');
+                    if (v) { slotEl.classList.add('filled'); slotEl.querySelector('.slot-text').textContent = v; slotEl.querySelector('.slot-text').style.opacity = '1'; }
+                    else { slotEl.classList.remove('filled'); slotEl.querySelector('.slot-text').textContent = 'Drop command here'; slotEl.querySelector('.slot-text').style.opacity = '0.4'; }
+                });
+            });
+        }
+        function updateBlockChips(qKey, qid) {
+            var st = quizState[qKey]; var bs = st.blockState[qid];
+            document.querySelectorAll('.cmd-chip[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el){
+                el.classList.toggle('used', bs.usedPool.includes(el.dataset.cmd));
+            });
+        }
+        function checkBlocksComplete(qKey, qid) {
+            var st = quizState[qKey]; var q = st.questions.find(function(x){ return x.id === qid; }); var bs = st.blockState[qid];
+            var allFilled = true;
+            q.blocks.forEach(function(b, bi){ bs.slots[bi].forEach(function(v){ if (!v) allFilled = false; }); });
+            document.getElementById(qKey+'_sub'+qid).disabled = !allFilled;
+        }
+        function submitBlocks(qKey, qid) {
+            var st = quizState[qKey]; if (st.submitted[qid]) return; st.submitted[qid] = true;
+            var q = st.questions.find(function(x){ return x.id === qid; }); var bs = st.blockState[qid]; var allCorrect = true;
+            q.blocks.forEach(function(b, bi){
+                bs.slots[bi].forEach(function(v, si){
+                    var slotEl = document.querySelector('.block-slot[data-qkey="'+qKey+'"][data-qid="'+qid+'"][data-block="'+bi+'"][data-slot="'+si+'"]');
+                    var isCorrect = v === b.answer[si];
+                    if (!isCorrect) allCorrect = false;
+                    slotEl.classList.remove('filled');
+                    slotEl.classList.add(isCorrect ? 'correct-slot' : 'wrong-slot');
+                    slotEl.querySelector('.slot-remove').style.display = 'none';
+                    slotEl.onclick = null;
+                });
+            });
+            document.querySelectorAll('.cmd-chip[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el){ el.removeAttribute('draggable'); el.classList.add('used'); el.style.cursor = 'default'; });
+            if (allCorrect) st.score++;
+            markQuestion(qKey, qid, allCorrect);
+        }
+
+        // ---- SINGLE/MULTI ----
+        function selectOption(qKey, qid, idx, type, count) {
+            var st = quizState[qKey]; if (st.submitted[qid]) return;
+            if (!st.answers[qid]) st.answers[qid] = [];
+            if (type === 'single') st.answers[qid] = [idx];
+            else { var i = st.answers[qid].indexOf(idx); if (i > -1) st.answers[qid].splice(i,1); else if (st.answers[qid].length < count) st.answers[qid].push(idx); else { st.answers[qid].shift(); st.answers[qid].push(idx); } }
+            document.querySelectorAll('.option-item[data-qkey="'+qKey+'"][data-qid="'+qid+'"]').forEach(function(el,j){ el.classList.toggle('selected', st.answers[qid] && st.answers[qid].includes(j)); });
+            document.getElementById(qKey+'_sub'+qid).disabled = st.answers[qid].length !== count;
+        }
         function submitAnswer(qKey, qid) {
             var st = quizState[qKey]; if (st.submitted[qid]) return; st.submitted[qid] = true;
             var q = st.questions.find(function(x){ return x.id === qid; });
@@ -894,6 +1072,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
             markQuestion(qKey, qid, isCorrect);
         }
 
+        // ---- COMMON ----
         function markQuestion(qKey, qid, isCorrect) {
             document.getElementById(qKey+'_q'+qid).classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
             var btn = document.getElementById(qKey+'_sub'+qid);
@@ -903,7 +1082,6 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
             document.getElementById(qKey+'_exp'+qid).classList.add('show');
             updateScoreDisplay(qKey); updateProgress(qKey);
         }
-
         function updateScoreDisplay(qKey) {
             var st = quizState[qKey]; var suffix = qKey === 'q1' ? '1' : '2';
             document.getElementById('correctCount'+suffix).textContent = st.score;
@@ -915,7 +1093,7 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
         }
         function resetQuiz(qKey) {
             var st = quizState[qKey]; var suffix = qKey === 'q1' ? '1' : '2';
-            st.answers = {}; st.submitted = {}; st.score = 0; st.matchState = {}; st.orderState = {}; st.fillState = {};
+            st.answers = {}; st.submitted = {}; st.score = 0; st.matchState = {}; st.orderState = {}; st.fillState = {}; st.blockState = {};
             document.getElementById('correctCount'+suffix).textContent = '0';
             document.getElementById('totalAnswered'+suffix).textContent = '0';
             initQuiz(qKey);
@@ -932,13 +1110,18 @@ git format-patch -3 ba64768    # Export 3 commits ending at ba64768</pre>
                     document.getElementById(qKey+'_blank'+q.id).textContent = q.answer;
                     submitFill(qKey, q.id);
                 } else if (q.type === 'match') {
-                    if (!st.matchState[q.id]) st.matchState[q.id] = { activeLeft: null, pairs: {} };
+                    if (!st.matchState[q.id]) st.matchState[q.id] = { activeLeft: null, pairs: {}, shuffledRight: [] };
                     for (var i = 0; i < q.left.length; i++) st.matchState[q.id].pairs[i] = i;
                     submitMatch(qKey, q.id);
                 } else if (q.type === 'order') {
                     st.orderState[q.id] = q.steps.slice();
                     rerenderOrder(qKey, q.id);
                     submitOrder(qKey, q.id);
+                } else if (q.type === 'blocks') {
+                    if (!st.blockState[q.id]) { st.blockState[q.id] = { slots: {}, usedPool: [] }; q.blocks.forEach(function(b,bi){ st.blockState[q.id].slots[bi] = new Array(b.slots).fill(null); }); }
+                    q.blocks.forEach(function(b, bi){ b.answer.forEach(function(a, si){ st.blockState[q.id].slots[bi][si] = a; }); });
+                    rerenderBlockSlots(qKey, q.id);
+                    submitBlocks(qKey, q.id);
                 }
             });
         }

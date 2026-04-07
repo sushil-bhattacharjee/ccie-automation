@@ -637,7 +637,7 @@
                                 <span class="chapter-title">Chapter 4, NETCONF</span>
                             </div>
                             <div class="chapter-items">
-                                <div class="nav-item disabled">
+                                <div class="nav-item" onclick="loadContent('netconf-operation.html', this)">
                                     <span class="nav-item-icon">📄</span>
                                     <span class="nav-item-text">NETCONF Operations</span>
                                     <span class="nav-item-badge badge-soon">Soon</span>
@@ -826,6 +826,10 @@
                             <span class="nav-item-icon">💬</span>
                             <span class="nav-item-text">YANG when/must (20 MCQ)</span>
                         </div>
+                        <div class="nav-item" onclick="loadContent('netconf-operation.html', this)">
+                            <span class="nav-item-icon">💬</span>
+                            <span class="nav-item-text">NETCONF Operations (17 MCQ)</span>
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -943,14 +947,15 @@
                             </div>
                         </div>
 
-                        <div class="guide-card disabled">
+                        <div class="guide-card" onclick="loadContentFromCard('netconf-operation.html')">
                             <div class="guide-card-header">
                                 <div class="guide-card-icon">📋</div>
-                                <div class="guide-card-title">YANG & NETCONF</div>
+                                <div class="guide-card-title">NETCONF Operations</div>
                             </div>
-                            <div class="guide-card-desc">YANG models, must/when statements, NETCONF operations.</div>
+                            <div class="guide-card-desc">NETCONF edit-config operations (create, merge, replace, delete), YANG-to-XML mapping, Jinja2 ACL templates.</div>
                             <div class="guide-card-meta">
-                                <span class="meta-tag">Coming Soon</span>
+                                <span class="meta-tag">17 MCQ</span>
+                                <span class="meta-tag">XML Payloads</span>
                             </div>
                         </div>
                         <div class="guide-card" onclick="loadContentFromCard('yang-when-must.html')">

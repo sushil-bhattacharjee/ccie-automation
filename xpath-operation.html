@@ -1,0 +1,2388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XPath Filtering Challenge - DevNet Expert Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-tertiary:#21262d;--text-primary:#e6edf3;--text-secondary:#8b949e;--accent-blue:#58a6ff;--accent-green:#3fb950;--accent-red:#f85149;--accent-orange:#d29922;--accent-purple:#a371f7;--accent-cyan:#39c5cf;--border-color:#30363d;--code-bg:#0d1117}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7}
+        .nav-container{position:fixed;top:0;left:0;right:0;background:var(--bg-secondary);border-bottom:1px solid var(--border-color);z-index:1000;padding:1rem 2rem}
+        .nav-content{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}.nav-title{font-size:1.2rem;font-weight:700;color:var(--accent-purple)}
+        .nav-tabs{display:flex;gap:0.5rem}.nav-tab{padding:0.6rem 1.5rem;border:none;background:transparent;color:var(--text-secondary);font-family:inherit;font-size:0.95rem;font-weight:500;cursor:pointer;border-radius:8px;transition:all 0.2s;text-decoration:none}
+        .nav-tab:hover{background:var(--bg-tertiary);color:var(--text-primary)}.nav-tab.active{background:var(--accent-purple);color:var(--bg-primary)}
+        .main-content{max-width:1200px;margin:0 auto;padding:6rem 2rem 3rem}.section{display:none}.section.active{display:block}
+        h1{font-size:2.5rem;font-weight:700;margin-bottom:1rem}h2{font-size:1.75rem;font-weight:600;margin:2.5rem 0 1rem;color:var(--accent-blue);padding-bottom:0.5rem;border-bottom:2px solid var(--border-color)}
+        h3{font-size:1.25rem;font-weight:600;margin:1.5rem 0 0.75rem;color:var(--accent-purple)}h4{font-size:1.1rem;font-weight:600;margin:1rem 0 0.5rem;color:var(--accent-cyan)}
+        p{margin-bottom:1rem;color:var(--text-secondary)}.intro-text{font-size:1.1rem;color:var(--text-secondary);margin-bottom:2rem}
+        pre{background:var(--code-bg);border:1px solid var(--border-color);border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin:1rem 0;font-family:'JetBrains Mono',monospace;font-size:0.73rem;line-height:1.5;white-space:pre}
+        code{font-family:'JetBrains Mono',monospace;background:var(--bg-tertiary);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85em}pre code{background:none;padding:0}
+        table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.85rem}th,td{padding:0.6rem 0.8rem;text-align:left;border:1px solid var(--border-color)}
+        th{background:var(--bg-tertiary);font-weight:600;color:var(--text-primary)}td{background:var(--bg-secondary);color:var(--text-secondary)}
+        .tip-box{background:rgba(88,166,255,0.1);border:1px solid var(--accent-blue);border-radius:8px;padding:1rem;margin:1rem 0}.tip-box strong{color:var(--accent-blue)}
+        .warning-box{background:rgba(248,81,73,0.1);border:1px solid var(--accent-red);border-radius:8px;padding:1rem;margin:1rem 0}.warning-box strong{color:var(--accent-red)}
+        .golden-box{background:rgba(210,153,34,0.15);border:2px solid var(--accent-orange);border-radius:8px;padding:1.25rem;margin:1.5rem 0}.golden-box strong{color:var(--accent-orange)}
+        .step-header{background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border:1px solid var(--border-color);border-radius:8px;padding:1rem 1.25rem;margin:2rem 0 1rem}
+        .step-header h3{margin:0;color:var(--accent-orange)}ul,ol{margin:0.5rem 0 1rem 1.5rem;color:var(--text-secondary)}li{margin-bottom:0.25rem}
+        .check{color:var(--accent-green)}.cross{color:var(--accent-red)}.comment{color:#3fb950;font-style:italic}
+        details{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;margin:1rem 0;padding:0.75rem 1rem}
+        summary{cursor:pointer;color:var(--accent-blue);font-weight:600;font-size:1rem;padding:0.5rem 0}summary:hover{color:var(--accent-cyan)}
+        hr{border:none;border-top:1px solid var(--border-color);margin:2rem 0}
+        .quiz-header{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+        .score-display{font-size:1.25rem;font-weight:600}.score-correct{color:var(--accent-green)}.score-total{color:var(--text-secondary)}
+        .quiz-controls{display:flex;gap:0.75rem}.btn{padding:0.6rem 1.25rem;border:none;border-radius:8px;font-family:inherit;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s}
+        .btn-primary{background:var(--accent-blue);color:var(--bg-primary)}.btn-primary:hover{background:#79b8ff}.btn-secondary{background:var(--bg-tertiary);color:var(--text-primary)}.btn-secondary:hover{background:var(--border-color)}
+        .question-card{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+        .question-card.answered-correct{border-color:var(--accent-green)}.question-card.answered-incorrect{border-color:var(--accent-red)}
+        .question-header{display:flex;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem}
+        .question-number{font-size:0.8rem;font-weight:600;color:var(--accent-cyan);background:var(--bg-tertiary);padding:0.25rem 0.75rem;border-radius:20px}
+        .question-type{font-size:0.8rem;font-weight:500;color:var(--accent-orange)}.question-text{font-size:0.95rem;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;line-height:1.5}
+        .question-text pre{font-size:0.68rem;margin:0.75rem 0}.options-list{display:flex;flex-direction:column;gap:0.75rem}
+        .option-item{display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem 1rem;background:var(--bg-tertiary);border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all 0.2s}
+        .option-item:hover:not(.disabled){background:var(--bg-primary);border-color:var(--border-color)}.option-item.selected{border-color:var(--accent-blue);background:rgba(88,166,255,0.1)}
+        .option-item.correct{border-color:var(--accent-green);background:rgba(63,185,80,0.1)}.option-item.incorrect{border-color:var(--accent-red);background:rgba(248,81,73,0.1)}
+        .option-item.disabled{cursor:default}.option-checkbox{min-width:24px;height:24px;border:2px solid var(--border-color);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.75rem;font-weight:600}
+        .option-item.selected .option-checkbox{border-color:var(--accent-blue);background:var(--accent-blue);color:var(--bg-primary)}
+        .option-item.correct .option-checkbox{border-color:var(--accent-green);background:var(--accent-green);color:var(--bg-primary)}
+        .option-item.incorrect .option-checkbox{border-color:var(--accent-red);background:var(--accent-red);color:white}
+        .option-text{flex:1;color:var(--text-primary);font-size:0.85rem}.option-text pre{font-size:0.65rem;margin:0.4rem 0 0;background:var(--bg-primary);padding:0.5rem;border-radius:6px}
+        .submit-btn{margin-top:1rem;width:100%;padding:0.75rem;background:var(--accent-blue);color:var(--bg-primary);border:none;border-radius:8px;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer}
+        .submit-btn:hover:not(:disabled){background:#79b8ff}.submit-btn:disabled{background:var(--bg-tertiary);color:var(--text-secondary);cursor:not-allowed}
+        .explanation{margin-top:1rem;padding:1rem;background:var(--bg-primary);border-radius:8px;border-left:4px solid var(--accent-blue);display:none}
+        .explanation.show{display:block}.explanation-title{font-weight:600;color:var(--accent-blue);margin-bottom:0.5rem}
+        .explanation-text{color:var(--text-secondary);font-size:0.83rem;white-space:pre-wrap}
+        .progress-bar{width:100%;height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden;margin-bottom:1rem}
+        .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-purple),var(--accent-blue));border-radius:4px;transition:width 0.3s ease}
+        /* Block-fill styles */
+        .block-container{display:flex;flex-direction:column;gap:1rem}
+        .block-section{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:10px;padding:1rem 1.25rem}
+        .block-title{font-size:0.85rem;font-weight:600;color:var(--accent-orange);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.5px}
+        .block-slots{display:flex;flex-wrap:wrap;gap:0.4rem;min-height:40px}
+        .block-slot{min-height:38px;border:2px dashed var(--border-color);border-radius:6px;display:flex;align-items:center;padding:0.4rem 0.75rem;font-size:0.75rem;color:var(--text-secondary);font-family:'JetBrains Mono',monospace;transition:border-color 0.2s;min-width:60px}
+        .block-slot.drag-over{border-color:var(--accent-blue);background:rgba(88,166,255,0.05)}
+        .block-slot.filled{border-style:solid;border-color:var(--accent-purple);background:rgba(163,113,247,0.1);color:var(--text-primary);cursor:pointer}
+        .block-slot.filled:hover{border-color:var(--accent-red)}
+        .block-slot.correct-slot{border-color:var(--accent-green);background:rgba(63,185,80,0.1);border-style:solid}
+        .block-slot.wrong-slot{border-color:var(--accent-red);background:rgba(248,81,73,0.1);border-style:solid}
+        .block-slot .slot-remove{margin-left:auto;color:var(--accent-red);font-size:0.75rem;opacity:0;transition:opacity 0.15s}
+        .block-slot.filled:hover .slot-remove{opacity:1}
+        .cmd-pool{display:flex;flex-wrap:wrap;gap:0.5rem;padding:1rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:10px;margin-top:0.5rem}
+        .cmd-pool-title{font-size:0.8rem;font-weight:600;color:var(--accent-cyan);width:100%;margin-bottom:0.25rem}
+        .cmd-chip{padding:0.4rem 0.9rem;background:var(--bg-tertiary);border:2px solid var(--border-color);border-radius:6px;cursor:grab;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:0.7rem;user-select:none;transition:all 0.2s;white-space:nowrap}
+        .cmd-chip:hover:not(.used){border-color:var(--accent-blue);background:rgba(88,166,255,0.1)}
+        .cmd-chip.dragging{opacity:0.4}
+        .cmd-chip.used{opacity:0.3;cursor:default;border-style:dashed}
+
+        @media(max-width:768px){.nav-content{flex-direction:column;gap:1rem}.main-content{padding:8rem 1rem 2rem}h1{font-size:1.75rem}.quiz-header{flex-direction:column;text-align:center}pre{font-size:0.58rem}}
+    </style>
+</head>
+<body>
+    <nav class="nav-container"><div class="nav-content">
+        <div class="nav-title">🔍 XPath Filtering Challenge - DevNet Expert</div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
+            <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+        </div>
+    </div></nav>
+    <main class="main-content">
+        <section id="learn" class="section active">
+<h1>CCIE Automation — XPath Filtering Challenge</h1>
+
+<strong>Device:</strong> cat8Kv71 (IOS-XE)  
+<strong>Models:</strong> Cisco-IOS-XE-ospf-oper, Cisco-IOS-XE-bgp-oper, Cisco-IOS-XE-interfaces-oper, Cisco-IOS-XE-bgp (native)
+
+<hr>
+
+<h2>TODO Task List</h2>
+
+<div class="step-header"><h3>TODO-1: OSPF — Single Neighbor State</h3></div>
+<p>Query the OSPF neighbor state for address <code>10.0.12.21</code>. Use YANG Suite to explore the correct model path.</p>
+
+<strong>Expected output:</strong>
+<p>``<code></p>
+<p>OSPF Neighbor[10.0.12.21] State: ospf-nbr-full</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-2: OSPF — Multiple Neighbors (OR logic)</h3></div>
+<p>Query OSPF neighbor state for BOTH </code>10.0.12.21<code> AND </code>10.0.13.31<code>.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>Neighbor: 10.0.13.31 — State: ospf-nbr-full</p>
+<p>Neighbor: 10.0.12.21 — State: ospf-nbr-full</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-3: BGP — Neighbor Description (single AS + prefix filter)</h3></div>
+<p>Find BGP neighbor description where connection state is established, remote AS = 65002, and received current-prefixes < 15.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>NBR Description (received <15 prefixes): cat8Kv72</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-4: BGP — Multiple AS with OR logic + prefix filter</h3></div>
+<p>Find BGP neighbors where connection state is established, remote AS = 65002 OR 65003, and received current-prefixes < 15. Print neighbor-id, description, and current-prefixes.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 1</p>
+<p>NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-5: BGP — Subtree Filter (YANG Suite equivalent)</h3></div>
+<p>Same goal as TODO-4, but using subtree filtering. Handle OR and numeric conditions locally with Python. Watch out: subtree can't exclude neighbors where </code><connection><code> is missing entirely.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 1</p>
+<p>NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-6: BGP Config — Find update-source Loopback</h3></div>
+<p>Find the Loopback interface used as update-source for BGP neighbor </code>10.44.10.2<code>. Think about which ncclient method to use.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>Update-source interface: Loopback404</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-7: Interfaces — Find interface names that received or sent packets</h3></div>
+<p>Find interface names where admin-status is up, oper-status is up, and received or sent IPv4 packets (count > 0). Return only the names.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>Interface (in/out-pkts > 0): GigabitEthernet1</p>
+<p>Interface (in/out-pkts > 0): GigabitEthernet2</p>
+<p>Interface (in/out-pkts > 0): GigabitEthernet2.10</p>
+<p>Interface (in/out-pkts > 0): GigabitEthernet2.101</p>
+<p>Interface (in/out-pkts > 0): GigabitEthernet3.10</p>
+<p>Interface (in/out-pkts > 0): GigabitEthernet3.103</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-8: Interfaces — Find interfaces with packet counts</h3></div>
+<p>Same filter as TODO-7, but return the full interface block. Extract and print name, in-pkts, and out-pkts for each matching interface.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>Interface GigabitEthernet1 in-pkts=817876 | out-pkts=507740</p>
+<p>Interface GigabitEthernet2 in-pkts=57612 | out-pkts=55551</p>
+<p>Interface GigabitEthernet2.10 in-pkts=0 | out-pkts=69988</p>
+<p>Interface GigabitEthernet2.101 in-pkts=0 | out-pkts=44586</p>
+<p>Interface GigabitEthernet3.10 in-pkts=69988 | out-pkts=70008</p>
+<p>Interface GigabitEthernet3.103 in-pkts=65414 | out-pkts=65463</p>
+</code>`<code>
+
+<div class="step-header"><h3>TODO-9: Interfaces — OpenConfig: GigabitEthernet + oper UP + bytes</h3></div>
+<p>Find interfaces using the <strong>OpenConfig</strong> model where name starts with "Gigabit", oper-status is UP, and in-octets > 0. Extract and print name, in-octets, and out-octets. Note: OpenConfig uses different status values and counter paths than Cisco Native.</p>
+
+<strong>Expected output:</strong>
+</code>`<code>
+<p>Interface GigabitEthernet1 in-octets=225567196 | out-octets=113379189</p>
+<p>Interface GigabitEthernet2 in-octets=8555294 | out-octets=20844181</p>
+<p>Interface GigabitEthernet3 in-octets=16007844 | out-octets=15779864</p>
+</code>``
+
+<hr>
+
+            <h2>🐍 Initial Code — exam_xpath.py</h2>
+            <details>
+                <summary>📄 Click to expand initial code (with #TODO placeholders)</summary>
+<pre>&quot;&quot;&quot;
+CCIE Automation — XPath Filtering Challenge
+============================================
+Device: cat8Kv71 (IOS-XE)
+Models: Cisco-IOS-XE-ospf-oper, Cisco-IOS-XE-bgp-oper, Cisco-IOS-XE-interfaces-oper, Cisco-IOS-XE-bgp (native)
+
+Key Concepts:
+- NETCONF XPath: runs on device, no namespace prefix needed
+- lxml XPath: runs locally in Python, requires namespace prefixes (e.g., ospf:state)
+- get() = operational data | get_config() = configuration data
+- in-pkts/out-pkts = IPv4 packets only | in-octets/out-octets = all traffic (incl L2)
+- Subtree filtering: clean response, but no OR / numeric comparison support
+- XPath filtering: supports OR, AND, numeric comparisons, but returns full node
+&quot;&quot;&quot;
+
+from ncclient import manager
+from lxml.etree import fromstring, tostring
+import hvac
+import os
+
+# ============================================================================
+# DEVICE CONNECTION (via HashiCorp Vault)
+# ============================================================================
+hostname = &quot;cat8Kv71&quot;
+client = hvac.Client(
+    url=os.getenv(&#x27;VAULT_ADDR&#x27;, &#x27;&#x27;),
+    token=os.environ[&#x27;VAULT_TOKEN&#x27;]
+)
+print(f&quot;Client IS Authenticated: {client.is_authenticated()}&quot;)
+read_response = client.secrets.kv.v2.read_secret_version(path=hostname)
+device_info = read_response[&#x27;data&#x27;][&#x27;data&#x27;]
+
+session = manager.connect(
+    host=device_info[&#x27;host&#x27;],
+    username=device_info[&#x27;username&#x27;],
+    password=device_info[&#x27;password&#x27;],
+    hostkey_verify=False
+)
+
+
+# ============================================================================
+# TODO-1: OSPF — Single Neighbor State
+# ============================================================================
+# Query the OSPF neighbor state for address 10.0.12.21
+# Use YANG Suite to explore the correct model path
+# Note: nbr-id uses decimal format (10.0.0.72 = 167772232)
+#
+# Expected output:
+#   OSPF Neighbor[10.0.12.21] State: ospf-nbr-full
+
+# TODO-1a: Build the NETCONF XPath filter
+xpath_filter_ospf = &#x27;#TODO&#x27;
+
+# TODO-1b: Send the query
+response = #TODO
+xml_response = fromstring(response.data_xml.encode())
+print(&quot;\n--- TODO-1: OSPF Single Neighbor State ---&quot;)
+print(tostring(xml_response, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-1c: Build namespace dict from the response
+ns_ospf = {
+    &quot;ospf&quot;: &quot;#TODO&quot;
+}
+
+# TODO-1d: Build lxml XPath to extract the state value
+xpath_extract = &quot;#TODO&quot;
+
+data = xml_response.xpath(xpath_extract, namespaces=ns_ospf)
+for desc in data:
+    print(f&quot;OSPF Neighbor[10.0.12.21] State: {desc.text}&quot;)
+
+
+# ============================================================================
+# TODO-2: OSPF — Multiple Neighbors (OR logic)
+# ============================================================================
+# Query OSPF neighbor state for BOTH 10.0.12.21 AND 10.0.13.31
+#
+# Expected output:
+#   Neighbor: 10.0.13.31 — State: ospf-nbr-full
+#   Neighbor: 10.0.12.21 — State: ospf-nbr-full
+
+# TODO-2a: Build XPath filter for two neighbors
+xpath_filter_ospf_multi = &#x27;#TODO&#x27;
+
+# TODO-2b: Send the query
+response = #TODO
+xml_response = #TODO
+print(&quot;\n--- TODO-2: OSPF Multiple Neighbors ---&quot;)
+print(tostring(xml_response, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-2c: Build namespace and lxml XPath to extract neighbor details
+ns_ospf = {
+    &quot;ospf&quot;: &quot;#TODO&quot;
+}
+xpath_extract = &quot;#TODO&quot;
+
+neighbors = xml_response.xpath(xpath_extract, namespaces=ns_ospf)
+for nbr in neighbors:
+    address = nbr.find(&quot;ospf:address&quot;, ns_ospf).text
+    state = nbr.find(&quot;ospf:state&quot;, ns_ospf).text
+    print(f&quot;Neighbor: {address} — State: {state}&quot;)
+
+
+# ============================================================================
+# TODO-3: BGP — Neighbor Description (single AS + prefix filter)
+# ============================================================================
+# Find BGP neighbor description where:
+#   - connection state is established
+#   - remote AS = 65002
+#   - received current-prefixes &lt; 15
+#
+# Expected output:
+#   NBR Description (received &lt;15 prefixes): cat8Kv72
+
+# TODO-3a: Build XPath filter
+xpath_filter_bgp = &#x27;#TODO&#x27;
+
+# TODO-3b: Send the query
+rsp = #TODO
+xml_rsp = fromstring(rsp.data_xml.encode())
+print(&quot;\n--- TODO-3: BGP Single AS + Prefix Filter ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-3c: Build namespace and extract description
+ns_bgp = {
+    &quot;bgp&quot;: &quot;#TODO&quot;
+}
+xpath_extract = &quot;#TODO&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_bgp)
+for entry in data:
+    print(f&quot;NBR Description (received &lt;15 prefixes): {entry.text}&quot;)
+
+
+# ============================================================================
+# TODO-4: BGP — Multiple AS with OR logic + prefix filter
+# ============================================================================
+# Find BGP neighbors where:
+#   - connection state is established
+#   - remote AS = 65002 OR 65003
+#   - received current-prefixes &lt; 15
+# Print: neighbor-id, description, current-prefixes
+#
+# Expected output:
+#   NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 1
+#   NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12
+
+# TODO-4a: Build XPath filter
+xpath_filter_bgp_multi = &#x27;#TODO&#x27;
+
+# TODO-4b: Send the query
+rsp = #TODO
+xml_rsp = #TODO
+print(&quot;\n--- TODO-4: BGP Multiple AS + Prefix Filter ---&quot;)
+
+# TODO-4c: Build namespace and extract fields
+ns_bgp = {
+    &quot;bgp&quot;: &quot;#TODO&quot;
+}
+xpath_extract = &quot;#TODO&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_bgp)
+for entry in data:
+    nbr_id = entry.find(&quot;bgp:neighbor-id&quot;, ns_bgp).text
+    nbr_desc = entry.find(&quot;bgp:description&quot;, ns_bgp).text
+    cur_pfx = entry.find(&quot;bgp:prefix-activity/bgp:received/bgp:current-prefixes&quot;, ns_bgp).text
+    print(f&quot;NBR-{nbr_id} | Description: {nbr_desc} | Received Prefixes: {cur_pfx}&quot;)
+
+
+# ============================================================================
+# TODO-5: BGP — Subtree Filter (YANG Suite equivalent)
+# ============================================================================
+# Same goal as TODO-4, but using subtree filtering
+# Handle OR and numeric conditions locally with Python
+# Watch out: subtree can&#x27;t exclude neighbors where &lt;connection&gt; is missing
+#
+# Expected output:
+#   NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 1
+#   NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12
+
+# TODO-5a: Build subtree filter XML
+subtree_filter = &quot;&quot;&quot;
+#TODO
+&quot;&quot;&quot;
+
+# TODO-5b: Send the query
+rsp = #TODO
+xml_rsp = #TODO
+print(&quot;\n--- TODO-5: BGP Subtree Filter ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-5c: Local filtering — check AS, prefixes, and state
+ns_bgp = #TODO
+
+for entry in xml_rsp.xpath(&quot;#TODO&quot;, namespaces=ns_bgp):
+    # TODO: skip neighbors where connection/state is missing or not established
+    # TODO: check remote AS and prefix count locally
+    nbr_id = entry.find(&quot;bgp:neighbor-id&quot;, ns_bgp).text
+    nbr_desc = entry.find(&quot;bgp:description&quot;, ns_bgp).text
+    cur_pfx = entry.find(&quot;bgp:prefix-activity/bgp:received/bgp:current-prefixes&quot;, ns_bgp).text
+    print(f&quot;NBR-{nbr_id} | Description: {nbr_desc} | Received Prefixes: {cur_pfx}&quot;)
+
+
+# ============================================================================
+# TODO-6: BGP Config — Find update-source Loopback
+# ============================================================================
+# Find the Loopback interface used as update-source for BGP neighbor 10.44.10.2
+# This is CONFIGURATION data — which method should you use?
+#
+# Expected output:
+#   Update-source interface: Loopback404
+
+# TODO-6a: Build XPath filter
+xpath_bgp_lb = &#x27;#TODO&#x27;
+
+# TODO-6b: Send the query
+rsp = #TODO
+xml_rsp = #TODO
+print(&quot;\n--- TODO-6: BGP Update-Source Loopback ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-6c: Build namespace and extract Loopback number
+ns_native_bgp = {
+    &quot;bgp&quot;: &quot;#TODO&quot;
+}
+xpath_extract = &quot;#TODO&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_native_bgp)
+for entry in data:
+    print(f&quot;Update-source interface: Loopback{entry.text}&quot;)
+
+
+# ============================================================================
+# TODO-7: Interfaces — Find interface names with packets
+# ============================================================================
+# Find interface names where:
+#   - admin-status is up
+#   - oper-status is up
+#   - received or sent IPv4 packets (count &gt; 0)
+# Return only the names (append /name to filter)
+#
+# Expected output:
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet1
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet2
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet2.10
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet2.101
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet3.10
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet3.103
+
+# TODO-7a: Build XPath filter
+xpath_filter_intf = (
+    &#x27;#TODO&#x27;
+    &#x27;#TODO&#x27;
+    &#x27;#TODO&#x27;
+    &#x27;#TODO&#x27;
+)
+
+# TODO-7b: Send the query
+reply = #TODO
+xml_rsp = #TODO
+print(&quot;\n--- TODO-7: Interfaces with Packets ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-7c: Build namespace and extract interface names
+ns_intf = #TODO
+xpath_extract = #TODO
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_intf)
+for entry in data:
+    print(f&quot;Interface (in/out-pkts &gt; 0): {entry.text}&quot;)
+
+
+# ============================================================================
+# TODO-8: Interfaces — Find interfaces with packet counts
+# ============================================================================
+# Same filter as TODO-7 but WITHOUT /name — get the full interface block
+# Extract and print: name, in-pkts, out-pkts
+#
+# Expected output:
+#   Interface GigabitEthernet1 in-pkts=817876 | out-pkts=507740
+#   Interface GigabitEthernet2 in-pkts=57612 | out-pkts=55551
+#   Interface GigabitEthernet2.10 in-pkts=0 | out-pkts=69988
+#   Interface GigabitEthernet2.101 in-pkts=0 | out-pkts=44586
+#   Interface GigabitEthernet3.10 in-pkts=69988 | out-pkts=70008
+#   Interface GigabitEthernet3.103 in-pkts=65414 | out-pkts=65463
+
+# TODO-8a: Build XPath filter (no /name at end)
+xpath_filter_intf = (
+    &#x27;#TODO&#x27;
+    &#x27;#TODO&#x27;
+    &#x27;#TODO&#x27;
+)
+
+# TODO-8b: Send the query
+reply = #TODO
+xml_rsp = #TODO
+print(&quot;\n--- TODO-8: Interfaces with Packets ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-8c: Build namespace and extract name, in-pkts, out-pkts
+ns_intf = #TODO
+xpath_extract = #TODO
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_intf)
+for entry in data:
+    intf_name = #TODO
+    in_pkt = #TODO
+    out_pkt = #TODO
+    print(f&quot;Interface {intf_name} in-pkts={in_pkt} | out-pkts={out_pkt}&quot;)
+
+# ============================================================================
+# TODO-9: Interfaces — OpenConfig: GigabitEthernet + oper UP + bytes
+# ============================================================================
+# Find interfaces where:
+#   - name starts with &quot;Gigabit&quot;
+#   - oper-status = UP
+#   - retrieve byte counters &gt;0 bytes (in-octets / out-octets)
+#
+# Key concept:
+#   OpenConfig model: openconfig-interfaces (NOT Cisco-IOS-XE-interfaces-oper)
+#   OpenConfig uses: oper-status=&quot;UP&quot; (not &quot;if-oper-state-ready&quot;)
+#   OpenConfig bytes: state/counters/in-octets and out-octets
+#   starts-with(): starts-with(name,&#x27;Gi&#x27;) is an XPath 1.0 function — works in NETCONF XPath filters
+#   contains(): contains(name,&#x27;Ethernet&#x27;)String contains value
+#
+# Expected output:
+#   Interface GigabitEthernet1 in-octets=225567196 | out-octets=113379189
+#   Interface GigabitEthernet2 in-octets=8555294 | out-octets=20844181
+#   Interface GigabitEthernet3 in-octets=16007844 | out-octets=15779864
+#   ...
+
+# TODO-9a: Build XPath filter — OpenConfig interfaces, name starts with Gigabit, oper UP
+xpath_filter_oc_intf = (
+    #TODO-9a
+)
+
+# TODO-9b: Send the query
+reply = #TODO
+xml_rsp = #TODO
+print(&quot;\n--- TODO-9: OpenConfig Interfaces — Gigabit + UP + Bytes ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-9c: Build namespace and extract interface name, in-octets, out-octets
+# Note: XPath filter targets /state/counters, but device returns full interface
+#       blocks (XPath returns the matched node&#x27;s parent context)
+#       So we still need to iterate over interface elements
+ns_oc = #TODO
+xpath_extract = #TODO
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_oc)
+for entry in data:
+    intf_name = #TODO
+    in_octets = #TODO
+    out_octets = #TODO
+    print(f&quot;Interface {intf_name} in-octets={in_octets} | out-octets={out_octets}&quot;)
+
+# ============================================================================
+# Close session
+# ============================================================================
+session.close_session()
+print(&quot;\nSession closed.&quot;)
+</pre>
+            </details>
+
+            <h2>✅ Solution — Last Resort Only</h2>
+            <details>
+                <summary>⚠️ Click to reveal complete solution</summary>
+<pre>&quot;&quot;&quot;
+CCIE Automation — XPath Filtering Challenge
+============================================
+Device: cat8Kv71 (IOS-XE)
+Models: Cisco-IOS-XE-ospf-oper, Cisco-IOS-XE-bgp-oper, Cisco-IOS-XE-interfaces-oper, Cisco-IOS-XE-bgp (native)
+
+Key Concepts:
+- NETCONF XPath: runs on device, no namespace prefix needed
+- lxml XPath: runs locally in Python, requires namespace prefixes (e.g., ospf:state)
+- get() = operational data | get_config() = configuration data
+- in-pkts/out-pkts = IPv4 packets only | in-octets/out-octets = all traffic (incl L2)
+- Subtree filtering: clean response, but no OR / numeric comparison support
+- XPath filtering: supports OR, AND, numeric comparisons, but returns full node
+&quot;&quot;&quot;
+
+from ncclient import manager
+from lxml.etree import fromstring, tostring
+import hvac
+import os
+
+# ============================================================================
+# DEVICE CONNECTION (via HashiCorp Vault)
+# ============================================================================
+hostname = &quot;cat8Kv71&quot;
+client = hvac.Client(
+    url=os.getenv(&#x27;VAULT_ADDR&#x27;, &#x27;&#x27;),
+    token=os.environ[&#x27;VAULT_TOKEN&#x27;]
+)
+print(f&quot;Client IS Authenticated: {client.is_authenticated()}&quot;)
+read_response = client.secrets.kv.v2.read_secret_version(path=hostname)
+device_info = read_response[&#x27;data&#x27;][&#x27;data&#x27;]
+
+session = manager.connect(
+    host=device_info[&#x27;host&#x27;],
+    username=device_info[&#x27;username&#x27;],
+    password=device_info[&#x27;password&#x27;],
+    hostkey_verify=False
+)
+
+
+# ============================================================================
+# TODO-1: OSPF — Single Neighbor State
+# ============================================================================
+# Query the OSPF neighbor state for address 10.0.12.21
+# Note: nbr-id uses decimal format (10.0.0.72 = 167772232)
+#
+# Expected output:
+#   OSPF Neighbor[10.0.12.21] State: ospf-nbr-full
+
+# TODO-1a: Build the NETCONF XPath filter to get the state for neighbor 10.0.12.21
+xpath_filter_ospf = &#x27;/ospf-oper-data/ospf-state/ospf-instance/ospf-area/ospf-interface/ospf-neighbor[address=&quot;10.0.12.21&quot;]/state&#x27;
+
+# TODO-1b: Send the query
+response = session.get(filter=(&quot;xpath&quot;, xpath_filter_ospf))
+xml_response = fromstring(response.data_xml.encode())
+print(&quot;\n--- TODO-1: OSPF Single Neighbor State ---&quot;)
+print(tostring(xml_response, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-1c: Build namespace dict from the response
+ns_ospf = {
+    &quot;ospf&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper&quot;
+}
+
+# TODO-1d: Build lxml XPath to extract the state value
+xpath_extract = &quot;//ospf:state&quot;
+
+data = xml_response.xpath(xpath_extract, namespaces=ns_ospf)
+for desc in data:
+    print(f&quot;OSPF Neighbor[10.0.12.21] State: {desc.text}&quot;)
+
+
+# ============================================================================
+# TODO-2: OSPF — Multiple Neighbors (OR logic)
+# ============================================================================
+# Query OSPF neighbor state for BOTH 10.0.12.21 AND 10.0.13.31
+# Hint: use &quot;or&quot; inside the predicate
+#
+# Expected output:
+#   Neighbor: 10.0.13.31 — State: ospf-nbr-full
+#   Neighbor: 10.0.12.21 — State: ospf-nbr-full
+
+# TODO-2a: Build XPath filter with OR for two neighbors
+xpath_filter_ospf_multi = &#x27;/ospf-oper-data/ospf-state/ospf-instance/ospf-area/ospf-interface/ospf-neighbor[address=&quot;10.0.12.21&quot; or address=&quot;10.0.13.31&quot;]&#x27;
+
+# TODO-2b: Send the query
+response = session.get(filter=(&#x27;xpath&#x27;, xpath_filter_ospf_multi))
+xml_response = fromstring(response.data_xml.encode())
+print(&quot;\n--- TODO-2: OSPF Multiple Neighbors ---&quot;)
+print(tostring(xml_response, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-2c: Build namespace and lxml XPath to extract neighbor details
+ns_ospf = {
+    &quot;ospf&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper&quot;
+}
+xpath_extract = &quot;//ospf:ospf-neighbor&quot;
+
+neighbors = xml_response.xpath(xpath_extract, namespaces=ns_ospf)
+for nbr in neighbors:
+    address = nbr.find(&quot;ospf:address&quot;, ns_ospf).text
+    state = nbr.find(&quot;ospf:state&quot;, ns_ospf).text
+    print(f&quot;Neighbor: {address} — State: {state}&quot;)
+
+
+# ============================================================================
+# TODO-3: BGP — Neighbor Description (single AS + prefix filter)
+# ============================================================================
+# Find BGP neighbor description where:
+#   - connection/state = established
+#   - remote AS = 65002
+#   - received current-prefixes &lt; 15
+#
+# Expected output:
+#   NBR Description (received &lt;15 prefixes): cat8Kv72
+
+# TODO-3a: Build XPath filter for single AS with prefix comparison
+xpath_filter_bgp = &#x27;/bgp-state-data/neighbors/neighbor[as=&quot;65002&quot; and connection/state=&quot;established&quot; and prefix-activity/received/current-prefixes&lt;15]/description&#x27;
+
+# TODO-3b: Send the query
+rsp = session.get(filter=(&#x27;xpath&#x27;, xpath_filter_bgp))
+xml_rsp = fromstring(rsp.data_xml.encode())
+print(&quot;\n--- TODO-3: BGP Single AS + Prefix Filter ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-3c: Build namespace and extract description
+ns_bgp = {
+    &quot;bgp&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp-oper&quot;
+}
+xpath_extract = &quot;//bgp:description&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_bgp)
+for entry in data:
+    print(f&quot;NBR Description (received &lt;15 prefixes): {entry.text}&quot;)
+
+
+# ============================================================================
+# TODO-4: BGP — Multiple AS with OR logic + prefix filter
+# ============================================================================
+# Find BGP neighbors where:
+#   - connection/state = established
+#   - remote AS = 65002 OR 65003
+#   - received current-prefixes &lt; 15
+# Print: neighbor-id, description, current-prefixes
+#
+# Expected output:
+#   NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 1
+#   NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12
+
+# TODO-4a: Build XPath filter with OR for two AS numbers
+xpath_filter_bgp_multi = &#x27;/bgp-state-data/neighbors/neighbor[(as=&quot;65002&quot; or as=&quot;65003&quot;) and connection/state=&quot;established&quot; and prefix-activity/received/current-prefixes&lt;15]&#x27;
+
+# TODO-4b: Send the query (returns full neighbor blocks)
+rsp = session.get(filter=(&#x27;xpath&#x27;, xpath_filter_bgp_multi))
+xml_rsp = fromstring(rsp.data_xml.encode())
+print(&quot;\n--- TODO-4: BGP Multiple AS + Prefix Filter ---&quot;)
+
+# TODO-4c: Build namespace and extract neighbor-id, description, current-prefixes
+ns_bgp = {
+    &quot;bgp&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp-oper&quot;
+}
+xpath_extract = &quot;//bgp:neighbor&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_bgp)
+for entry in data:
+    nbr_id = entry.find(&quot;bgp:neighbor-id&quot;, ns_bgp).text
+    nbr_desc = entry.find(&quot;bgp:description&quot;, ns_bgp).text
+    cur_pfx = entry.find(&quot;bgp:prefix-activity/bgp:received/bgp:current-prefixes&quot;, ns_bgp).text
+    print(f&quot;NBR-{nbr_id} | Description: {nbr_desc} | Received Prefixes: {cur_pfx}&quot;)
+
+
+# ============================================================================
+# TODO-5: BGP — Subtree Filter (YANG Suite equivalent)
+# ============================================================================
+# Same goal as TODO-4, but using subtree filtering
+# Subtree can filter on state=established, but can&#x27;t do OR or &lt;15
+# Handle those conditions locally with Python
+#
+# Key difference vs XPath:
+#   - Subtree: clean response (only selected leaves), no OR / numeric logic
+#   - XPath: full node response, but supports OR / AND / numeric comparisons
+#   - Subtree can&#x27;t exclude neighbors where &lt;connection&gt; is missing entirely
+#
+# Expected output:
+#   NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 1
+#   NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12
+
+# TODO-5a: Build subtree filter XML
+subtree_filter = &quot;&quot;&quot;
+&lt;bgp-state-data xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp-oper&quot;&gt;
+        &lt;neighbors&gt;
+            &lt;neighbor&gt;
+                &lt;neighbor-id/&gt;
+                &lt;description/&gt;
+                &lt;connection&gt;
+                    &lt;state&gt;established&lt;/state&gt;
+                &lt;/connection&gt;
+                &lt;prefix-activity&gt;
+                    &lt;received&gt;
+                        &lt;current-prefixes/&gt;
+                    &lt;/received&gt;
+                &lt;/prefix-activity&gt;
+                &lt;as/&gt;
+            &lt;/neighbor&gt;
+        &lt;/neighbors&gt;
+&lt;/bgp-state-data&gt;
+&quot;&quot;&quot;
+
+# TODO-5b: Send the query
+rsp = session.get(filter=(&#x27;subtree&#x27;, subtree_filter))
+xml_rsp = fromstring(rsp.data_xml.encode())
+print(&quot;\n--- TODO-5: BGP Subtree Filter ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-5c: Local filtering — check AS in (65002,65003), prefixes&lt;15, state=established
+ns_bgp = {&quot;bgp&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp-oper&quot;}
+
+for entry in xml_rsp.xpath(&quot;//bgp:neighbor&quot;, namespaces=ns_bgp):
+    state_elem = entry.find(&quot;bgp:connection/bgp:state&quot;, ns_bgp)
+    if state_elem is None or state_elem.text != &quot;established&quot;:
+        continue
+    remote_as = entry.find(&quot;bgp:as&quot;, ns_bgp).text
+    cur_pfx = int(entry.find(&quot;bgp:prefix-activity/bgp:received/bgp:current-prefixes&quot;, ns_bgp).text)
+    if remote_as in (&quot;65002&quot;, &quot;65003&quot;) and cur_pfx &lt; 15:
+        nbr_id = entry.find(&quot;bgp:neighbor-id&quot;, ns_bgp).text
+        nbr_desc = entry.find(&quot;bgp:description&quot;, ns_bgp).text
+        print(f&quot;NBR-{nbr_id} | Description: {nbr_desc} | Received Prefixes: {cur_pfx}&quot;)
+
+
+# ============================================================================
+# TODO-6: BGP Config — Find update-source Loopback
+# ============================================================================
+# Find the Loopback interface used as update-source for BGP neighbor 10.44.10.2
+# This is CONFIGURATION data — use get_config(), not get()
+# YANG model: Cisco-IOS-XE-bgp (under native)
+#
+# Expected output:
+#   Update-source interface: Loopback404
+
+# TODO-6a: Build XPath filter for BGP config (native model)
+xpath_bgp_lb = &#x27;//bgp/neighbor[id=&quot;10.44.10.2&quot;]/update-source/interface/Loopback&#x27;
+
+# TODO-6b: Send config query
+rsp = session.get(filter=(&#x27;xpath&#x27;, xpath_bgp_lb))
+xml_rsp = fromstring(rsp.data_xml.encode())
+print(&quot;\n--- TODO-6: BGP Update-Source Loopback ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-6c: Build namespace (Cisco-IOS-XE-bgp, not bgp-oper) and extract Loopback number
+ns_native_bgp = {
+    &quot;bgp&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp&quot;
+}
+xpath_extract = &quot;//bgp:Loopback&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_native_bgp)
+for entry in data:
+    print(f&quot;Update-source interface: Loopback{entry.text}&quot;)
+
+
+# ============================================================================
+# TODO-7: Interfaces — Find interfaces that received or sent packets
+# ============================================================================
+# Find interface names where:
+#   - admin-status = if-state-up
+#   - oper-status = if-oper-state-ready
+#   - v4-protocol-stats/in-pkts &gt; 0 OR v4-protocol-stats/out-pkts &gt; 0
+#
+# Key concept:
+#   &quot;packets&quot; → use in-pkts/out-pkts (IPv4 only)
+#   &quot;any traffic&quot; → use in-octets/out-octets (includes L2: CDP, LLDP, STP)
+#   in-pkts &gt; 0 guarantees in-octets &gt; 0, but NOT vice versa
+#
+# Expected output:
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet1
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet2
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet2.10
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet2.101
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet3.10
+#   Interface (in/out-pkts &gt; 0): GigabitEthernet3.103
+
+# TODO-7a: Build XPath filter with OR for in-pkts/out-pkts
+xpath_filter_intf = (
+    &#x27;/interfaces/interface[admin-status=&quot;if-state-up&quot; and oper-status=&quot;if-oper-state-ready&quot;&#x27;
+    &#x27; and (v4-protocol-stats/in-pkts&gt;0 or v4-protocol-stats/out-pkts&gt;0)]&#x27;
+    &#x27;/name&#x27;
+)
+
+# TODO-7b: Send the query
+reply = session.get(filter=(&#x27;xpath&#x27;, xpath_filter_intf))
+xml_rsp = fromstring(reply.data_xml.encode())
+print(&quot;\n--- TODO-7: Interfaces with Packets ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-7c: Build namespace and extract interface names
+ns_intf = {&quot;interfaces&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper&quot;}
+xpath_extract = &quot;//interfaces:name&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_intf)
+for entry in data:
+    print(f&quot;\nPRINTING THE INTERFACE NAME(in/out-pkts&gt;0): {entry.text}\n&quot;)
+
+# ============================================================================
+# TODO-8: Interfaces — Find interfaces that received or sent packets
+# ============================================================================
+# Find interface names where:
+#   - admin-status = if-state-up
+#   - oper-status = if-oper-state-ready
+#   - v4-protocol-stats/in-pkts &gt; 0 OR v4-protocol-stats/out-pkts &gt; 0
+#
+# Key concept:
+#   &quot;packets&quot; → use in-pkts/out-pkts (IPv4 only)
+#   &quot;any traffic&quot; → use in-octets/out-octets (includes L2: CDP, LLDP, STP)
+#   in-pkts &gt; 0 guarantees in-octets &gt; 0, but NOT vice versa
+#
+# Expected output:
+#   Interface GigabitEthernet1 in-pkts=813037 | out-pkts=505305
+#   Interface GigabitEthernet2 in-pkts=57472 | out-pkts=55420
+#   Interface GigabitEthernet2.10 in-pkts=0 | out-pkts=69846
+#   Interface GigabitEthernet2.101 in-pkts=0 | out-pkts=44490
+#   Interface GigabitEthernet3.10 in-pkts=69846 | out-pkts=69866
+#   Interface GigabitEthernet3.103 in-pkts=65280 | out-pkts=65329
+
+# TODO-8a: Build XPath filter with OR for in-pkts/out-pkts
+xpath_filter_intf = (
+    &#x27;/interfaces/interface[admin-status=&quot;if-state-up&quot; and oper-status=&quot;if-oper-state-ready&quot;&#x27;
+    &#x27; and (v4-protocol-stats/in-pkts&gt;0 or v4-protocol-stats/out-pkts&gt;0)]&#x27;
+)
+
+# TODO-8b: Send the query
+reply = session.get(filter=(&#x27;xpath&#x27;, xpath_filter_intf))
+xml_rsp = fromstring(reply.data_xml.encode())
+print(&quot;\n--- TODO-8: Interfaces with Packets ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-8c: Build namespace and extract interface names
+ns_intf = {&quot;interfaces&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper&quot;}
+xpath_extract = &quot;//interfaces:interface&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_intf)
+for entry in data:
+    intf_name=entry.find(&quot;interfaces:name&quot;, ns_intf).text
+    in_pkt=entry.find(&quot;interfaces:v4-protocol-stats/interfaces:in-pkts&quot;, ns_intf).text
+    out_pkt=entry.find(&quot;interfaces:v4-protocol-stats/interfaces:out-pkts&quot;, ns_intf).text
+    print(f&quot;Interface {intf_name} in-pkts={in_pkt} | out-pkts={out_pkt}&quot;)
+
+# ============================================================================
+# TODO-9: Interfaces — OpenConfig: GigabitEthernet + oper UP + bytes
+# ============================================================================
+# Find interfaces where:
+#   - name starts with &quot;Gigabit&quot;
+#   - oper-status = UP
+#   - retrieve byte counters &gt;0 bytes (in-octets / out-octets)
+#
+# Key concept:
+#   OpenConfig model: openconfig-interfaces (NOT Cisco-IOS-XE-interfaces-oper)
+#   OpenConfig uses: oper-status=&quot;UP&quot; (not &quot;if-oper-state-ready&quot;)
+#   OpenConfig bytes: state/counters/in-octets and out-octets
+#   starts-with(): starts-with(name,&#x27;Gi&#x27;) is an XPath 1.0 function — works in NETCONF XPath filters
+#   contains(): contains(name,&#x27;Ethernet&#x27;)String contains value
+#
+# Expected output:
+#   Interface GigabitEthernet1 in-octets=225567196 | out-octets=113379189
+#   Interface GigabitEthernet2 in-octets=8555294 | out-octets=20844181
+#   Interface GigabitEthernet3 in-octets=16007844 | out-octets=15779864
+#   ...
+
+# TODO-9a: Build XPath filter — OpenConfig interfaces, name starts with Gigabit, oper UP
+xpath_filter_oc_intf = (
+    &#x27;/interfaces/interface[starts-with(name,&quot;Gigabit&quot;)][state/oper-status=&quot;UP&quot;]&#x27;
+    &#x27;/state/counters[in-octets &gt; 0]&#x27;
+)
+
+# TODO-9b: Send the query
+reply = session.get(filter=(&#x27;xpath&#x27;, xpath_filter_oc_intf))
+xml_rsp = fromstring(reply.data_xml.encode())
+print(&quot;\n--- TODO-9: OpenConfig Interfaces — Gigabit + UP + Bytes ---&quot;)
+print(tostring(xml_rsp, pretty_print=True, encoding=&#x27;unicode&#x27;))
+
+# TODO-9c: Build namespace and extract interface name, in-octets, out-octets
+# Note: XPath filter targets /state/counters, but device returns full interface
+#       blocks (XPath returns the matched node&#x27;s parent context)
+#       So we still need to iterate over interface elements
+ns_oc = {&quot;oc-if&quot;: &quot;http://openconfig.net/yang/interfaces&quot;}
+xpath_extract = &quot;//oc-if:interface&quot;
+
+data = xml_rsp.xpath(xpath_extract, namespaces=ns_oc)
+for entry in data:
+    intf_name = entry.find(&quot;oc-if:name&quot;, ns_oc).text
+    in_octets = entry.find(&quot;oc-if:state/oc-if:counters/oc-if:in-octets&quot;, ns_oc).text
+    out_octets = entry.find(&quot;oc-if:state/oc-if:counters/oc-if:out-octets&quot;, ns_oc).text
+    print(f&quot;Interface {intf_name} in-octets={in_octets} | out-octets={out_octets}&quot;)
+
+# # ============================================================================
+# # Close session
+# # ============================================================================
+session.close_session()
+print(&quot;\nSession closed.&quot;)
+</pre>
+            </details>
+
+            <h2>🧪 Actual Test Results</h2>
+            <details>
+                <summary>⚠️ Click to reveal full test output from cat8Kv71</summary>
+<pre>```
+Client IS Authenticated: True
+/home/sushil/DevnetExpert/mock3/e2-xpath/p1_xpath.py:30: DeprecationWarning: The raise_on_deleted_version parameter will change its default value to False in hvac v3.0.0. The current default of True will presere previous behavior. To use the old behavior with no warning, explicitly set this value to True. See https://github.com/hvac/hvac/pull/907
+  read_response = client.secrets.kv.v2.read_secret_version(path=hostname)
+
+--- TODO-1: OSPF Single Neighbor State ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;ospf-oper-data xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper&quot;&gt;
+    &lt;ospf-state&gt;
+      &lt;ospf-instance&gt;
+        &lt;af&gt;address-family-ipv4&lt;/af&gt;
+        &lt;router-id&gt;167772231&lt;/router-id&gt;
+        &lt;ospf-area&gt;
+          &lt;area-id&gt;0&lt;/area-id&gt;
+          &lt;ospf-interface&gt;
+            &lt;name&gt;GigabitEthernet3.103&lt;/name&gt;
+            &lt;ospf-neighbor&gt;
+              &lt;neighbor-id&gt;10.0.0.72&lt;/neighbor-id&gt;
+              &lt;state&gt;ospf-nbr-full&lt;/state&gt;
+            &lt;/ospf-neighbor&gt;
+          &lt;/ospf-interface&gt;
+        &lt;/ospf-area&gt;
+      &lt;/ospf-instance&gt;
+    &lt;/ospf-state&gt;
+  &lt;/ospf-oper-data&gt;
+&lt;/data&gt;
+
+OSPF Neighbor[10.0.12.21] State: ospf-nbr-full
+
+--- TODO-2: OSPF Multiple Neighbors ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;ospf-oper-data xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper&quot;&gt;
+    &lt;ospf-state&gt;
+      &lt;ospf-instance&gt;
+        &lt;af&gt;address-family-ipv4&lt;/af&gt;
+        &lt;router-id&gt;167772231&lt;/router-id&gt;
+        &lt;ospf-area&gt;
+          &lt;area-id&gt;0&lt;/area-id&gt;
+          &lt;ospf-interface&gt;
+            &lt;name&gt;GigabitEthernet2&lt;/name&gt;
+            &lt;ospf-neighbor&gt;
+              &lt;neighbor-id&gt;10.0.0.73&lt;/neighbor-id&gt;
+              &lt;address&gt;10.0.13.31&lt;/address&gt;
+              &lt;dr&gt;0.0.0.0&lt;/dr&gt;
+              &lt;bdr&gt;0.0.0.0&lt;/bdr&gt;
+              &lt;state&gt;ospf-nbr-full&lt;/state&gt;
+              &lt;stats&gt;
+                &lt;nbr-event-count&gt;6&lt;/nbr-event-count&gt;
+                &lt;nbr-retrans-qlen&gt;0&lt;/nbr-retrans-qlen&gt;
+              &lt;/stats&gt;
+            &lt;/ospf-neighbor&gt;
+          &lt;/ospf-interface&gt;
+          &lt;ospf-interface&gt;
+            &lt;name&gt;GigabitEthernet3.103&lt;/name&gt;
+            &lt;ospf-neighbor&gt;
+              &lt;neighbor-id&gt;10.0.0.72&lt;/neighbor-id&gt;
+              &lt;address&gt;10.0.12.21&lt;/address&gt;
+              &lt;dr&gt;10.0.12.21&lt;/dr&gt;
+              &lt;bdr&gt;10.0.12.12&lt;/bdr&gt;
+              &lt;state&gt;ospf-nbr-full&lt;/state&gt;
+              &lt;stats&gt;
+                &lt;nbr-event-count&gt;8&lt;/nbr-event-count&gt;
+                &lt;nbr-retrans-qlen&gt;0&lt;/nbr-retrans-qlen&gt;
+              &lt;/stats&gt;
+            &lt;/ospf-neighbor&gt;
+          &lt;/ospf-interface&gt;
+        &lt;/ospf-area&gt;
+      &lt;/ospf-instance&gt;
+    &lt;/ospf-state&gt;
+  &lt;/ospf-oper-data&gt;
+&lt;/data&gt;
+
+Neighbor: 10.0.13.31 — State: ospf-nbr-full
+Neighbor: 10.0.12.21 — State: ospf-nbr-full
+
+--- TODO-3: BGP Single AS + Prefix Filter ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;bgp-state-data xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp-oper&quot;&gt;
+    &lt;neighbors&gt;
+      &lt;neighbor&gt;
+        &lt;afi-safi&gt;ipv4-unicast&lt;/afi-safi&gt;
+        &lt;vrf-name&gt;default&lt;/vrf-name&gt;
+        &lt;neighbor-id&gt;10.44.10.2&lt;/neighbor-id&gt;
+        &lt;description&gt;cat8Kv72&lt;/description&gt;
+      &lt;/neighbor&gt;
+    &lt;/neighbors&gt;
+  &lt;/bgp-state-data&gt;
+&lt;/data&gt;
+
+NBR Description (received &lt;15 prefixes): cat8Kv72
+
+--- TODO-4: BGP Multiple AS + Prefix Filter ---
+NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 9
+NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12
+
+--- TODO-5: BGP Subtree Filter ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;bgp-state-data xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp-oper&quot;&gt;
+    &lt;neighbors&gt;
+      &lt;neighbor&gt;
+        &lt;neighbor-id&gt;10.0.13.31&lt;/neighbor-id&gt;
+        &lt;description&gt;nx9K73&lt;/description&gt;
+        &lt;connection&gt;
+          &lt;state&gt;established&lt;/state&gt;
+          &lt;mode&gt;mode-active&lt;/mode&gt;
+          &lt;total-established&gt;1&lt;/total-established&gt;
+          &lt;total-dropped&gt;0&lt;/total-dropped&gt;
+          &lt;last-reset&gt;never&lt;/last-reset&gt;
+          &lt;reset-reason/&gt;
+        &lt;/connection&gt;
+        &lt;prefix-activity&gt;
+          &lt;received&gt;
+            &lt;current-prefixes&gt;9&lt;/current-prefixes&gt;
+          &lt;/received&gt;
+        &lt;/prefix-activity&gt;
+        &lt;as&gt;65003&lt;/as&gt;
+      &lt;/neighbor&gt;
+      &lt;neighbor&gt;
+        &lt;neighbor-id&gt;10.44.10.2&lt;/neighbor-id&gt;
+        &lt;description&gt;cat8Kv72&lt;/description&gt;
+        &lt;connection&gt;
+          &lt;state&gt;established&lt;/state&gt;
+          &lt;mode&gt;mode-active&lt;/mode&gt;
+          &lt;total-established&gt;8&lt;/total-established&gt;
+          &lt;total-dropped&gt;7&lt;/total-dropped&gt;
+          &lt;last-reset&gt;00:31:38&lt;/last-reset&gt;
+          &lt;reset-reason&gt;BGP Notification received&lt;/reset-reason&gt;
+        &lt;/connection&gt;
+        &lt;prefix-activity&gt;
+          &lt;received&gt;
+            &lt;current-prefixes&gt;12&lt;/current-prefixes&gt;
+          &lt;/received&gt;
+        &lt;/prefix-activity&gt;
+        &lt;as&gt;65002&lt;/as&gt;
+      &lt;/neighbor&gt;
+      &lt;neighbor&gt;
+        &lt;neighbor-id&gt;192.168.1.2&lt;/neighbor-id&gt;
+        &lt;description&gt;cat8Kv72_thru_nx9K73&lt;/description&gt;
+        &lt;prefix-activity&gt;
+          &lt;received&gt;
+            &lt;current-prefixes&gt;0&lt;/current-prefixes&gt;
+          &lt;/received&gt;
+        &lt;/prefix-activity&gt;
+        &lt;as&gt;65002&lt;/as&gt;
+      &lt;/neighbor&gt;
+    &lt;/neighbors&gt;
+  &lt;/bgp-state-data&gt;
+&lt;/data&gt;
+
+NBR-10.0.13.31 | Description: nx9K73 | Received Prefixes: 9
+NBR-10.44.10.2 | Description: cat8Kv72 | Received Prefixes: 12
+
+--- TODO-6: BGP Update-Source Loopback ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;native xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-native&quot;&gt;
+    &lt;router&gt;
+      &lt;bgp xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-bgp&quot;&gt;
+        &lt;id&gt;65001&lt;/id&gt;
+        &lt;neighbor&gt;
+          &lt;id&gt;10.44.10.2&lt;/id&gt;
+          &lt;update-source&gt;
+            &lt;interface&gt;
+              &lt;Loopback&gt;404&lt;/Loopback&gt;
+            &lt;/interface&gt;
+          &lt;/update-source&gt;
+        &lt;/neighbor&gt;
+      &lt;/bgp&gt;
+    &lt;/router&gt;
+  &lt;/native&gt;
+&lt;/data&gt;
+
+Update-source interface: Loopback404
+
+--- TODO-7: Interfaces with Packets ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;interfaces xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper&quot;&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet1&lt;/name&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet2&lt;/name&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet2.10&lt;/name&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet2.101&lt;/name&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet3.10&lt;/name&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet3.103&lt;/name&gt;
+    &lt;/interface&gt;
+  &lt;/interfaces&gt;
+&lt;/data&gt;
+
+
+PRINTING THE INTERFACE NAME(in/out-pkts&gt;0): GigabitEthernet1
+
+
+PRINTING THE INTERFACE NAME(in/out-pkts&gt;0): GigabitEthernet2
+
+
+PRINTING THE INTERFACE NAME(in/out-pkts&gt;0): GigabitEthernet2.10
+
+
+PRINTING THE INTERFACE NAME(in/out-pkts&gt;0): GigabitEthernet2.101
+
+
+PRINTING THE INTERFACE NAME(in/out-pkts&gt;0): GigabitEthernet3.10
+
+
+PRINTING THE INTERFACE NAME(in/out-pkts&gt;0): GigabitEthernet3.103
+
+
+--- TODO-8: Interfaces with Packets ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;interfaces xmlns=&quot;http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper&quot;&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet1&lt;/name&gt;
+      &lt;interface-type&gt;iana-iftype-ethernet-csmacd&lt;/interface-type&gt;
+      &lt;admin-status&gt;if-state-up&lt;/admin-status&gt;
+      &lt;oper-status&gt;if-oper-state-ready&lt;/oper-status&gt;
+      &lt;last-change&gt;2026-04-01T13:42:20.007+00:00&lt;/last-change&gt;
+      &lt;if-index&gt;1&lt;/if-index&gt;
+      &lt;phys-address&gt;52:54:00:81:f3:b1&lt;/phys-address&gt;
+      &lt;speed&gt;1000000000&lt;/speed&gt;
+      &lt;statistics&gt;
+        &lt;discontinuity-time&gt;2026-04-01T13:41:14+00:00&lt;/discontinuity-time&gt;
+        &lt;in-octets&gt;225567196&lt;/in-octets&gt;
+        &lt;in-unicast-pkts&gt;1633611&lt;/in-unicast-pkts&gt;
+        &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+        &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+        &lt;in-discards&gt;0&lt;/in-discards&gt;
+        &lt;in-errors&gt;0&lt;/in-errors&gt;
+        &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+        &lt;out-octets&gt;113379189&lt;/out-octets&gt;
+        &lt;out-unicast-pkts&gt;802482&lt;/out-unicast-pkts&gt;
+        &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+        &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+        &lt;out-discards&gt;0&lt;/out-discards&gt;
+        &lt;out-errors&gt;0&lt;/out-errors&gt;
+        &lt;rx-pps&gt;3&lt;/rx-pps&gt;
+        &lt;rx-kbps&gt;1&lt;/rx-kbps&gt;
+        &lt;tx-pps&gt;1&lt;/tx-pps&gt;
+        &lt;tx-kbps&gt;1&lt;/tx-kbps&gt;
+        &lt;num-flaps&gt;0&lt;/num-flaps&gt;
+        &lt;in-crc-errors&gt;0&lt;/in-crc-errors&gt;
+        &lt;in-discards-64&gt;0&lt;/in-discards-64&gt;
+        &lt;in-errors-64&gt;0&lt;/in-errors-64&gt;
+        &lt;in-unknown-protos-64&gt;0&lt;/in-unknown-protos-64&gt;
+        &lt;out-octets-64&gt;113379189&lt;/out-octets-64&gt;
+      &lt;/statistics&gt;
+      &lt;vrf/&gt;
+      &lt;ipv4&gt;192.168.89.71&lt;/ipv4&gt;
+      &lt;ipv4-subnet-mask&gt;255.255.255.0&lt;/ipv4-subnet-mask&gt;
+      &lt;description/&gt;
+      &lt;mtu&gt;1500&lt;/mtu&gt;
+      &lt;input-security-acl/&gt;
+      &lt;output-security-acl/&gt;
+      &lt;v4-protocol-stats&gt;
+        &lt;in-pkts&gt;1418683&lt;/in-pkts&gt;
+        &lt;in-octets&gt;160437988&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;787163&lt;/out-pkts&gt;
+        &lt;out-octets&gt;112461143&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;787163&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v4-protocol-stats&gt;
+      &lt;v6-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;0&lt;/out-pkts&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;0&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v6-protocol-stats&gt;
+      &lt;bia-address&gt;52:54:00:81:f3:b1&lt;/bia-address&gt;
+      &lt;ipv4-tcp-adjust-mss&gt;0&lt;/ipv4-tcp-adjust-mss&gt;
+      &lt;ipv6-tcp-adjust-mss&gt;0&lt;/ipv6-tcp-adjust-mss&gt;
+      &lt;intf-ext-state-support/&gt;
+      &lt;intf-ext-state&gt;
+        &lt;error-type&gt;port-error-none&lt;/error-type&gt;
+        &lt;port-error-reason&gt;port-err-none&lt;/port-error-reason&gt;
+        &lt;auto-mdix-enabled&gt;false&lt;/auto-mdix-enabled&gt;
+        &lt;mdix-oper-status-enabled&gt;false&lt;/mdix-oper-status-enabled&gt;
+        &lt;fec-enabled&gt;false&lt;/fec-enabled&gt;
+        &lt;mgig-downshift-enabled&gt;false&lt;/mgig-downshift-enabled&gt;
+      &lt;/intf-ext-state&gt;
+      &lt;storm-control&gt;
+        &lt;broadcast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/broadcast&gt;
+        &lt;multicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/multicast&gt;
+        &lt;unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unicast&gt;
+        &lt;unknown-unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unknown-unicast&gt;
+      &lt;/storm-control&gt;
+      &lt;auto-upstream-bandwidth&gt;0&lt;/auto-upstream-bandwidth&gt;
+      &lt;auto-downstream-bandwidth&gt;0&lt;/auto-downstream-bandwidth&gt;
+      &lt;ether-state&gt;
+        &lt;negotiated-duplex-mode&gt;full-duplex&lt;/negotiated-duplex-mode&gt;
+        &lt;negotiated-port-speed&gt;speed-1gb&lt;/negotiated-port-speed&gt;
+        &lt;auto-negotiate&gt;true&lt;/auto-negotiate&gt;
+        &lt;enable-flow-control&gt;false&lt;/enable-flow-control&gt;
+        &lt;media-type&gt;ether-media-type-virtual&lt;/media-type&gt;
+      &lt;/ether-state&gt;
+      &lt;ether-stats&gt;
+        &lt;in-mac-control-frames&gt;0&lt;/in-mac-control-frames&gt;
+        &lt;in-mac-pause-frames&gt;0&lt;/in-mac-pause-frames&gt;
+        &lt;in-oversize-frames&gt;0&lt;/in-oversize-frames&gt;
+        &lt;in-jabber-frames&gt;0&lt;/in-jabber-frames&gt;
+        &lt;in-fragment-frames&gt;0&lt;/in-fragment-frames&gt;
+        &lt;in-8021q-frames&gt;0&lt;/in-8021q-frames&gt;
+        &lt;out-mac-control-frames&gt;0&lt;/out-mac-control-frames&gt;
+        &lt;out-mac-pause-frames&gt;0&lt;/out-mac-pause-frames&gt;
+        &lt;out-8021q-frames&gt;0&lt;/out-8021q-frames&gt;
+      &lt;/ether-stats&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet2&lt;/name&gt;
+      &lt;interface-type&gt;iana-iftype-ethernet-csmacd&lt;/interface-type&gt;
+      &lt;admin-status&gt;if-state-up&lt;/admin-status&gt;
+      &lt;oper-status&gt;if-oper-state-ready&lt;/oper-status&gt;
+      &lt;last-change&gt;2026-04-05T09:24:21.585+00:00&lt;/last-change&gt;
+      &lt;if-index&gt;2&lt;/if-index&gt;
+      &lt;phys-address&gt;52:54:00:1e:ba:5d&lt;/phys-address&gt;
+      &lt;speed&gt;1000000000&lt;/speed&gt;
+      &lt;statistics&gt;
+        &lt;discontinuity-time&gt;2026-04-01T13:41:14+00:00&lt;/discontinuity-time&gt;
+        &lt;in-octets&gt;8555294&lt;/in-octets&gt;
+        &lt;in-unicast-pkts&gt;88020&lt;/in-unicast-pkts&gt;
+        &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+        &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+        &lt;in-discards&gt;0&lt;/in-discards&gt;
+        &lt;in-errors&gt;0&lt;/in-errors&gt;
+        &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+        &lt;out-octets&gt;20844181&lt;/out-octets&gt;
+        &lt;out-unicast-pkts&gt;217970&lt;/out-unicast-pkts&gt;
+        &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+        &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+        &lt;out-discards&gt;0&lt;/out-discards&gt;
+        &lt;out-errors&gt;0&lt;/out-errors&gt;
+        &lt;rx-pps&gt;0&lt;/rx-pps&gt;
+        &lt;rx-kbps&gt;0&lt;/rx-kbps&gt;
+        &lt;tx-pps&gt;0&lt;/tx-pps&gt;
+        &lt;tx-kbps&gt;0&lt;/tx-kbps&gt;
+        &lt;num-flaps&gt;0&lt;/num-flaps&gt;
+        &lt;in-crc-errors&gt;0&lt;/in-crc-errors&gt;
+        &lt;in-discards-64&gt;0&lt;/in-discards-64&gt;
+        &lt;in-errors-64&gt;0&lt;/in-errors-64&gt;
+        &lt;in-unknown-protos-64&gt;0&lt;/in-unknown-protos-64&gt;
+        &lt;out-octets-64&gt;20844181&lt;/out-octets-64&gt;
+      &lt;/statistics&gt;
+      &lt;vrf/&gt;
+      &lt;ipv4&gt;10.0.13.13&lt;/ipv4&gt;
+      &lt;ipv4-subnet-mask&gt;255.255.255.0&lt;/ipv4-subnet-mask&gt;
+      &lt;description/&gt;
+      &lt;mtu&gt;1500&lt;/mtu&gt;
+      &lt;input-security-acl/&gt;
+      &lt;output-security-acl/&gt;
+      &lt;v4-protocol-stats&gt;
+        &lt;in-pkts&gt;77855&lt;/in-pkts&gt;
+        &lt;in-octets&gt;6251314&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;77998&lt;/out-pkts&gt;
+        &lt;out-octets&gt;8175687&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;77998&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v4-protocol-stats&gt;
+      &lt;v6-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;0&lt;/out-pkts&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;0&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v6-protocol-stats&gt;
+      &lt;bia-address&gt;52:54:00:1e:ba:5d&lt;/bia-address&gt;
+      &lt;ipv4-tcp-adjust-mss&gt;0&lt;/ipv4-tcp-adjust-mss&gt;
+      &lt;ipv6-tcp-adjust-mss&gt;0&lt;/ipv6-tcp-adjust-mss&gt;
+      &lt;intf-ext-state-support/&gt;
+      &lt;intf-ext-state&gt;
+        &lt;error-type&gt;port-error-none&lt;/error-type&gt;
+        &lt;port-error-reason&gt;port-err-none&lt;/port-error-reason&gt;
+        &lt;auto-mdix-enabled&gt;false&lt;/auto-mdix-enabled&gt;
+        &lt;mdix-oper-status-enabled&gt;false&lt;/mdix-oper-status-enabled&gt;
+        &lt;fec-enabled&gt;false&lt;/fec-enabled&gt;
+        &lt;mgig-downshift-enabled&gt;false&lt;/mgig-downshift-enabled&gt;
+      &lt;/intf-ext-state&gt;
+      &lt;storm-control&gt;
+        &lt;broadcast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/broadcast&gt;
+        &lt;multicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/multicast&gt;
+        &lt;unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unicast&gt;
+        &lt;unknown-unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unknown-unicast&gt;
+      &lt;/storm-control&gt;
+      &lt;auto-upstream-bandwidth&gt;0&lt;/auto-upstream-bandwidth&gt;
+      &lt;auto-downstream-bandwidth&gt;0&lt;/auto-downstream-bandwidth&gt;
+      &lt;ether-state&gt;
+        &lt;negotiated-duplex-mode&gt;full-duplex&lt;/negotiated-duplex-mode&gt;
+        &lt;negotiated-port-speed&gt;speed-1gb&lt;/negotiated-port-speed&gt;
+        &lt;auto-negotiate&gt;true&lt;/auto-negotiate&gt;
+        &lt;enable-flow-control&gt;false&lt;/enable-flow-control&gt;
+        &lt;media-type&gt;ether-media-type-virtual&lt;/media-type&gt;
+      &lt;/ether-state&gt;
+      &lt;ether-stats&gt;
+        &lt;in-mac-control-frames&gt;0&lt;/in-mac-control-frames&gt;
+        &lt;in-mac-pause-frames&gt;0&lt;/in-mac-pause-frames&gt;
+        &lt;in-oversize-frames&gt;0&lt;/in-oversize-frames&gt;
+        &lt;in-jabber-frames&gt;0&lt;/in-jabber-frames&gt;
+        &lt;in-fragment-frames&gt;0&lt;/in-fragment-frames&gt;
+        &lt;in-8021q-frames&gt;98166&lt;/in-8021q-frames&gt;
+        &lt;out-mac-control-frames&gt;0&lt;/out-mac-control-frames&gt;
+        &lt;out-mac-pause-frames&gt;0&lt;/out-mac-pause-frames&gt;
+        &lt;out-8021q-frames&gt;79104&lt;/out-8021q-frames&gt;
+      &lt;/ether-stats&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet2.10&lt;/name&gt;
+      &lt;interface-type&gt;iana-iftype-ethernet-csmacd&lt;/interface-type&gt;
+      &lt;admin-status&gt;if-state-up&lt;/admin-status&gt;
+      &lt;oper-status&gt;if-oper-state-ready&lt;/oper-status&gt;
+      &lt;last-change&gt;2026-04-05T09:24:21.585+00:00&lt;/last-change&gt;
+      &lt;if-index&gt;17&lt;/if-index&gt;
+      &lt;phys-address&gt;52:54:00:1e:ba:5d&lt;/phys-address&gt;
+      &lt;speed&gt;1000000000&lt;/speed&gt;
+      &lt;statistics&gt;
+        &lt;discontinuity-time&gt;1970-01-01T00:00:00+00:00&lt;/discontinuity-time&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-unicast-pkts&gt;0&lt;/in-unicast-pkts&gt;
+        &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+        &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+        &lt;in-discards&gt;0&lt;/in-discards&gt;
+        &lt;in-errors&gt;0&lt;/in-errors&gt;
+        &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-unicast-pkts&gt;0&lt;/out-unicast-pkts&gt;
+        &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+        &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+        &lt;out-discards&gt;0&lt;/out-discards&gt;
+        &lt;out-errors&gt;0&lt;/out-errors&gt;
+        &lt;rx-pps&gt;0&lt;/rx-pps&gt;
+        &lt;rx-kbps&gt;0&lt;/rx-kbps&gt;
+        &lt;tx-pps&gt;0&lt;/tx-pps&gt;
+        &lt;tx-kbps&gt;0&lt;/tx-kbps&gt;
+        &lt;num-flaps&gt;0&lt;/num-flaps&gt;
+        &lt;in-crc-errors&gt;0&lt;/in-crc-errors&gt;
+        &lt;in-discards-64&gt;0&lt;/in-discards-64&gt;
+        &lt;in-errors-64&gt;0&lt;/in-errors-64&gt;
+        &lt;in-unknown-protos-64&gt;0&lt;/in-unknown-protos-64&gt;
+        &lt;out-octets-64&gt;0&lt;/out-octets-64&gt;
+      &lt;/statistics&gt;
+      &lt;vrf&gt;challenge-a2&lt;/vrf&gt;
+      &lt;ipv4&gt;10.104.10.1&lt;/ipv4&gt;
+      &lt;ipv4-subnet-mask&gt;255.255.255.252&lt;/ipv4-subnet-mask&gt;
+      &lt;description/&gt;
+      &lt;mtu&gt;1500&lt;/mtu&gt;
+      &lt;input-security-acl/&gt;
+      &lt;output-security-acl/&gt;
+      &lt;v4-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;90570&lt;/out-pkts&gt;
+        &lt;out-octets&gt;7064460&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;90570&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v4-protocol-stats&gt;
+      &lt;v6-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;0&lt;/out-pkts&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;0&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v6-protocol-stats&gt;
+      &lt;bia-address&gt;52:54:00:1e:ba:5d&lt;/bia-address&gt;
+      &lt;ipv4-tcp-adjust-mss&gt;0&lt;/ipv4-tcp-adjust-mss&gt;
+      &lt;ipv6-tcp-adjust-mss&gt;0&lt;/ipv6-tcp-adjust-mss&gt;
+      &lt;intf-ext-state-support/&gt;
+      &lt;intf-ext-state&gt;
+        &lt;error-type&gt;port-error-none&lt;/error-type&gt;
+        &lt;port-error-reason&gt;port-err-none&lt;/port-error-reason&gt;
+        &lt;auto-mdix-enabled&gt;false&lt;/auto-mdix-enabled&gt;
+        &lt;mdix-oper-status-enabled&gt;false&lt;/mdix-oper-status-enabled&gt;
+        &lt;fec-enabled&gt;false&lt;/fec-enabled&gt;
+        &lt;mgig-downshift-enabled&gt;false&lt;/mgig-downshift-enabled&gt;
+      &lt;/intf-ext-state&gt;
+      &lt;storm-control&gt;
+        &lt;broadcast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/broadcast&gt;
+        &lt;multicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/multicast&gt;
+        &lt;unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unicast&gt;
+        &lt;unknown-unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unknown-unicast&gt;
+      &lt;/storm-control&gt;
+      &lt;auto-upstream-bandwidth&gt;0&lt;/auto-upstream-bandwidth&gt;
+      &lt;auto-downstream-bandwidth&gt;0&lt;/auto-downstream-bandwidth&gt;
+      &lt;ether-state&gt;
+        &lt;negotiated-duplex-mode&gt;full-duplex&lt;/negotiated-duplex-mode&gt;
+        &lt;negotiated-port-speed&gt;speed-10mb&lt;/negotiated-port-speed&gt;
+        &lt;auto-negotiate&gt;false&lt;/auto-negotiate&gt;
+        &lt;enable-flow-control&gt;false&lt;/enable-flow-control&gt;
+        &lt;media-type&gt;ether-media-type-none&lt;/media-type&gt;
+      &lt;/ether-state&gt;
+      &lt;ether-stats&gt;
+        &lt;in-mac-control-frames&gt;0&lt;/in-mac-control-frames&gt;
+        &lt;in-mac-pause-frames&gt;0&lt;/in-mac-pause-frames&gt;
+        &lt;in-oversize-frames&gt;0&lt;/in-oversize-frames&gt;
+        &lt;in-jabber-frames&gt;0&lt;/in-jabber-frames&gt;
+        &lt;in-fragment-frames&gt;0&lt;/in-fragment-frames&gt;
+        &lt;in-8021q-frames&gt;0&lt;/in-8021q-frames&gt;
+        &lt;out-mac-control-frames&gt;0&lt;/out-mac-control-frames&gt;
+        &lt;out-mac-pause-frames&gt;0&lt;/out-mac-pause-frames&gt;
+        &lt;out-8021q-frames&gt;90574&lt;/out-8021q-frames&gt;
+      &lt;/ether-stats&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet2.101&lt;/name&gt;
+      &lt;interface-type&gt;iana-iftype-ethernet-csmacd&lt;/interface-type&gt;
+      &lt;admin-status&gt;if-state-up&lt;/admin-status&gt;
+      &lt;oper-status&gt;if-oper-state-ready&lt;/oper-status&gt;
+      &lt;last-change&gt;2026-04-05T09:24:21.585+00:00&lt;/last-change&gt;
+      &lt;if-index&gt;18&lt;/if-index&gt;
+      &lt;phys-address&gt;52:54:00:1e:ba:5d&lt;/phys-address&gt;
+      &lt;speed&gt;1000000000&lt;/speed&gt;
+      &lt;statistics&gt;
+        &lt;discontinuity-time&gt;1970-01-01T00:00:00+00:00&lt;/discontinuity-time&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-unicast-pkts&gt;0&lt;/in-unicast-pkts&gt;
+        &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+        &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+        &lt;in-discards&gt;0&lt;/in-discards&gt;
+        &lt;in-errors&gt;0&lt;/in-errors&gt;
+        &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-unicast-pkts&gt;0&lt;/out-unicast-pkts&gt;
+        &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+        &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+        &lt;out-discards&gt;0&lt;/out-discards&gt;
+        &lt;out-errors&gt;0&lt;/out-errors&gt;
+        &lt;rx-pps&gt;0&lt;/rx-pps&gt;
+        &lt;rx-kbps&gt;0&lt;/rx-kbps&gt;
+        &lt;tx-pps&gt;0&lt;/tx-pps&gt;
+        &lt;tx-kbps&gt;0&lt;/tx-kbps&gt;
+        &lt;num-flaps&gt;0&lt;/num-flaps&gt;
+        &lt;in-crc-errors&gt;0&lt;/in-crc-errors&gt;
+        &lt;in-discards-64&gt;0&lt;/in-discards-64&gt;
+        &lt;in-errors-64&gt;0&lt;/in-errors-64&gt;
+        &lt;in-unknown-protos-64&gt;0&lt;/in-unknown-protos-64&gt;
+        &lt;out-octets-64&gt;0&lt;/out-octets-64&gt;
+      &lt;/statistics&gt;
+      &lt;vrf/&gt;
+      &lt;ipv4&gt;10.38.10.1&lt;/ipv4&gt;
+      &lt;ipv4-subnet-mask&gt;255.255.255.252&lt;/ipv4-subnet-mask&gt;
+      &lt;description/&gt;
+      &lt;mtu&gt;1500&lt;/mtu&gt;
+      &lt;input-security-acl/&gt;
+      &lt;output-security-acl/&gt;
+      &lt;v4-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;48846&lt;/out-pkts&gt;
+        &lt;out-octets&gt;5568444&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;48846&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v4-protocol-stats&gt;
+      &lt;v6-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;0&lt;/out-pkts&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;0&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v6-protocol-stats&gt;
+      &lt;bia-address&gt;52:54:00:1e:ba:5d&lt;/bia-address&gt;
+      &lt;ipv4-tcp-adjust-mss&gt;0&lt;/ipv4-tcp-adjust-mss&gt;
+      &lt;ipv6-tcp-adjust-mss&gt;0&lt;/ipv6-tcp-adjust-mss&gt;
+      &lt;intf-ext-state-support/&gt;
+      &lt;intf-ext-state&gt;
+        &lt;error-type&gt;port-error-none&lt;/error-type&gt;
+        &lt;port-error-reason&gt;port-err-none&lt;/port-error-reason&gt;
+        &lt;auto-mdix-enabled&gt;false&lt;/auto-mdix-enabled&gt;
+        &lt;mdix-oper-status-enabled&gt;false&lt;/mdix-oper-status-enabled&gt;
+        &lt;fec-enabled&gt;false&lt;/fec-enabled&gt;
+        &lt;mgig-downshift-enabled&gt;false&lt;/mgig-downshift-enabled&gt;
+      &lt;/intf-ext-state&gt;
+      &lt;storm-control&gt;
+        &lt;broadcast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/broadcast&gt;
+        &lt;multicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/multicast&gt;
+        &lt;unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unicast&gt;
+        &lt;unknown-unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unknown-unicast&gt;
+      &lt;/storm-control&gt;
+      &lt;auto-upstream-bandwidth&gt;0&lt;/auto-upstream-bandwidth&gt;
+      &lt;auto-downstream-bandwidth&gt;0&lt;/auto-downstream-bandwidth&gt;
+      &lt;ether-state&gt;
+        &lt;negotiated-duplex-mode&gt;full-duplex&lt;/negotiated-duplex-mode&gt;
+        &lt;negotiated-port-speed&gt;speed-10mb&lt;/negotiated-port-speed&gt;
+        &lt;auto-negotiate&gt;false&lt;/auto-negotiate&gt;
+        &lt;enable-flow-control&gt;false&lt;/enable-flow-control&gt;
+        &lt;media-type&gt;ether-media-type-none&lt;/media-type&gt;
+      &lt;/ether-state&gt;
+      &lt;ether-stats&gt;
+        &lt;in-mac-control-frames&gt;0&lt;/in-mac-control-frames&gt;
+        &lt;in-mac-pause-frames&gt;0&lt;/in-mac-pause-frames&gt;
+        &lt;in-oversize-frames&gt;0&lt;/in-oversize-frames&gt;
+        &lt;in-jabber-frames&gt;0&lt;/in-jabber-frames&gt;
+        &lt;in-fragment-frames&gt;0&lt;/in-fragment-frames&gt;
+        &lt;in-8021q-frames&gt;0&lt;/in-8021q-frames&gt;
+        &lt;out-mac-control-frames&gt;0&lt;/out-mac-control-frames&gt;
+        &lt;out-mac-pause-frames&gt;0&lt;/out-mac-pause-frames&gt;
+        &lt;out-8021q-frames&gt;48850&lt;/out-8021q-frames&gt;
+      &lt;/ether-stats&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet3.10&lt;/name&gt;
+      &lt;interface-type&gt;iana-iftype-ethernet-csmacd&lt;/interface-type&gt;
+      &lt;admin-status&gt;if-state-up&lt;/admin-status&gt;
+      &lt;oper-status&gt;if-oper-state-ready&lt;/oper-status&gt;
+      &lt;last-change&gt;2026-04-01T13:42:20.021+00:00&lt;/last-change&gt;
+      &lt;if-index&gt;19&lt;/if-index&gt;
+      &lt;phys-address&gt;52:54:00:2e:3c:95&lt;/phys-address&gt;
+      &lt;speed&gt;1000000000&lt;/speed&gt;
+      &lt;statistics&gt;
+        &lt;discontinuity-time&gt;1970-01-01T00:00:00+00:00&lt;/discontinuity-time&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-unicast-pkts&gt;0&lt;/in-unicast-pkts&gt;
+        &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+        &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+        &lt;in-discards&gt;0&lt;/in-discards&gt;
+        &lt;in-errors&gt;0&lt;/in-errors&gt;
+        &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-unicast-pkts&gt;0&lt;/out-unicast-pkts&gt;
+        &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+        &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+        &lt;out-discards&gt;0&lt;/out-discards&gt;
+        &lt;out-errors&gt;0&lt;/out-errors&gt;
+        &lt;rx-pps&gt;0&lt;/rx-pps&gt;
+        &lt;rx-kbps&gt;0&lt;/rx-kbps&gt;
+        &lt;tx-pps&gt;0&lt;/tx-pps&gt;
+        &lt;tx-kbps&gt;0&lt;/tx-kbps&gt;
+        &lt;num-flaps&gt;0&lt;/num-flaps&gt;
+        &lt;in-crc-errors&gt;0&lt;/in-crc-errors&gt;
+        &lt;in-discards-64&gt;0&lt;/in-discards-64&gt;
+        &lt;in-errors-64&gt;0&lt;/in-errors-64&gt;
+        &lt;in-unknown-protos-64&gt;0&lt;/in-unknown-protos-64&gt;
+        &lt;out-octets-64&gt;0&lt;/out-octets-64&gt;
+      &lt;/statistics&gt;
+      &lt;vrf&gt;challenge-a2&lt;/vrf&gt;
+      &lt;ipv4&gt;10.104.10.5&lt;/ipv4&gt;
+      &lt;ipv4-subnet-mask&gt;255.255.255.252&lt;/ipv4-subnet-mask&gt;
+      &lt;description/&gt;
+      &lt;mtu&gt;1500&lt;/mtu&gt;
+      &lt;input-security-acl/&gt;
+      &lt;output-security-acl/&gt;
+      &lt;v4-protocol-stats&gt;
+        &lt;in-pkts&gt;90565&lt;/in-pkts&gt;
+        &lt;in-octets&gt;7064535&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;90598&lt;/out-pkts&gt;
+        &lt;out-octets&gt;7067319&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;90598&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v4-protocol-stats&gt;
+      &lt;v6-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;0&lt;/out-pkts&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;0&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v6-protocol-stats&gt;
+      &lt;bia-address&gt;52:54:00:2e:3c:95&lt;/bia-address&gt;
+      &lt;ipv4-tcp-adjust-mss&gt;0&lt;/ipv4-tcp-adjust-mss&gt;
+      &lt;ipv6-tcp-adjust-mss&gt;0&lt;/ipv6-tcp-adjust-mss&gt;
+      &lt;intf-ext-state-support/&gt;
+      &lt;intf-ext-state&gt;
+        &lt;error-type&gt;port-error-none&lt;/error-type&gt;
+        &lt;port-error-reason&gt;port-err-none&lt;/port-error-reason&gt;
+        &lt;auto-mdix-enabled&gt;false&lt;/auto-mdix-enabled&gt;
+        &lt;mdix-oper-status-enabled&gt;false&lt;/mdix-oper-status-enabled&gt;
+        &lt;fec-enabled&gt;false&lt;/fec-enabled&gt;
+        &lt;mgig-downshift-enabled&gt;false&lt;/mgig-downshift-enabled&gt;
+      &lt;/intf-ext-state&gt;
+      &lt;storm-control&gt;
+        &lt;broadcast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/broadcast&gt;
+        &lt;multicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/multicast&gt;
+        &lt;unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unicast&gt;
+        &lt;unknown-unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unknown-unicast&gt;
+      &lt;/storm-control&gt;
+      &lt;auto-upstream-bandwidth&gt;0&lt;/auto-upstream-bandwidth&gt;
+      &lt;auto-downstream-bandwidth&gt;0&lt;/auto-downstream-bandwidth&gt;
+      &lt;ether-state&gt;
+        &lt;negotiated-duplex-mode&gt;full-duplex&lt;/negotiated-duplex-mode&gt;
+        &lt;negotiated-port-speed&gt;speed-10mb&lt;/negotiated-port-speed&gt;
+        &lt;auto-negotiate&gt;false&lt;/auto-negotiate&gt;
+        &lt;enable-flow-control&gt;false&lt;/enable-flow-control&gt;
+        &lt;media-type&gt;ether-media-type-none&lt;/media-type&gt;
+      &lt;/ether-state&gt;
+      &lt;ether-stats&gt;
+        &lt;in-mac-control-frames&gt;0&lt;/in-mac-control-frames&gt;
+        &lt;in-mac-pause-frames&gt;0&lt;/in-mac-pause-frames&gt;
+        &lt;in-oversize-frames&gt;0&lt;/in-oversize-frames&gt;
+        &lt;in-jabber-frames&gt;0&lt;/in-jabber-frames&gt;
+        &lt;in-fragment-frames&gt;0&lt;/in-fragment-frames&gt;
+        &lt;in-8021q-frames&gt;90659&lt;/in-8021q-frames&gt;
+        &lt;out-mac-control-frames&gt;0&lt;/out-mac-control-frames&gt;
+        &lt;out-mac-pause-frames&gt;0&lt;/out-mac-pause-frames&gt;
+        &lt;out-8021q-frames&gt;90686&lt;/out-8021q-frames&gt;
+      &lt;/ether-stats&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet3.103&lt;/name&gt;
+      &lt;interface-type&gt;iana-iftype-ethernet-csmacd&lt;/interface-type&gt;
+      &lt;admin-status&gt;if-state-up&lt;/admin-status&gt;
+      &lt;oper-status&gt;if-oper-state-ready&lt;/oper-status&gt;
+      &lt;last-change&gt;2026-04-01T13:42:20.021+00:00&lt;/last-change&gt;
+      &lt;if-index&gt;20&lt;/if-index&gt;
+      &lt;phys-address&gt;52:54:00:2e:3c:95&lt;/phys-address&gt;
+      &lt;speed&gt;1000000000&lt;/speed&gt;
+      &lt;statistics&gt;
+        &lt;discontinuity-time&gt;1970-01-01T00:00:00+00:00&lt;/discontinuity-time&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-unicast-pkts&gt;0&lt;/in-unicast-pkts&gt;
+        &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+        &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+        &lt;in-discards&gt;0&lt;/in-discards&gt;
+        &lt;in-errors&gt;0&lt;/in-errors&gt;
+        &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-unicast-pkts&gt;0&lt;/out-unicast-pkts&gt;
+        &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+        &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+        &lt;out-discards&gt;0&lt;/out-discards&gt;
+        &lt;out-errors&gt;0&lt;/out-errors&gt;
+        &lt;rx-pps&gt;0&lt;/rx-pps&gt;
+        &lt;rx-kbps&gt;0&lt;/rx-kbps&gt;
+        &lt;tx-pps&gt;0&lt;/tx-pps&gt;
+        &lt;tx-kbps&gt;0&lt;/tx-kbps&gt;
+        &lt;num-flaps&gt;0&lt;/num-flaps&gt;
+        &lt;in-crc-errors&gt;0&lt;/in-crc-errors&gt;
+        &lt;in-discards-64&gt;0&lt;/in-discards-64&gt;
+        &lt;in-errors-64&gt;0&lt;/in-errors-64&gt;
+        &lt;in-unknown-protos-64&gt;0&lt;/in-unknown-protos-64&gt;
+        &lt;out-octets-64&gt;0&lt;/out-octets-64&gt;
+      &lt;/statistics&gt;
+      &lt;vrf/&gt;
+      &lt;ipv4&gt;10.0.12.12&lt;/ipv4&gt;
+      &lt;ipv4-subnet-mask&gt;255.255.255.0&lt;/ipv4-subnet-mask&gt;
+      &lt;description/&gt;
+      &lt;mtu&gt;1500&lt;/mtu&gt;
+      &lt;input-security-acl/&gt;
+      &lt;output-security-acl/&gt;
+      &lt;v4-protocol-stats&gt;
+        &lt;in-pkts&gt;84720&lt;/in-pkts&gt;
+        &lt;in-octets&gt;8934015&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;81413&lt;/out-pkts&gt;
+        &lt;out-octets&gt;8704097&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;81413&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v4-protocol-stats&gt;
+      &lt;v6-protocol-stats&gt;
+        &lt;in-pkts&gt;0&lt;/in-pkts&gt;
+        &lt;in-octets&gt;0&lt;/in-octets&gt;
+        &lt;in-error-pkts&gt;0&lt;/in-error-pkts&gt;
+        &lt;in-forwarded-pkts&gt;0&lt;/in-forwarded-pkts&gt;
+        &lt;in-forwarded-octets&gt;0&lt;/in-forwarded-octets&gt;
+        &lt;in-discarded-pkts&gt;0&lt;/in-discarded-pkts&gt;
+        &lt;out-pkts&gt;0&lt;/out-pkts&gt;
+        &lt;out-octets&gt;0&lt;/out-octets&gt;
+        &lt;out-error-pkts&gt;0&lt;/out-error-pkts&gt;
+        &lt;out-forwarded-pkts&gt;0&lt;/out-forwarded-pkts&gt;
+        &lt;out-forwarded-octets&gt;0&lt;/out-forwarded-octets&gt;
+        &lt;out-discarded-pkts&gt;0&lt;/out-discarded-pkts&gt;
+      &lt;/v6-protocol-stats&gt;
+      &lt;bia-address&gt;52:54:00:2e:3c:95&lt;/bia-address&gt;
+      &lt;ipv4-tcp-adjust-mss&gt;0&lt;/ipv4-tcp-adjust-mss&gt;
+      &lt;ipv6-tcp-adjust-mss&gt;0&lt;/ipv6-tcp-adjust-mss&gt;
+      &lt;intf-ext-state-support/&gt;
+      &lt;intf-ext-state&gt;
+        &lt;error-type&gt;port-error-none&lt;/error-type&gt;
+        &lt;port-error-reason&gt;port-err-none&lt;/port-error-reason&gt;
+        &lt;auto-mdix-enabled&gt;false&lt;/auto-mdix-enabled&gt;
+        &lt;mdix-oper-status-enabled&gt;false&lt;/mdix-oper-status-enabled&gt;
+        &lt;fec-enabled&gt;false&lt;/fec-enabled&gt;
+        &lt;mgig-downshift-enabled&gt;false&lt;/mgig-downshift-enabled&gt;
+      &lt;/intf-ext-state&gt;
+      &lt;storm-control&gt;
+        &lt;broadcast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/broadcast&gt;
+        &lt;multicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/multicast&gt;
+        &lt;unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unicast&gt;
+        &lt;unknown-unicast&gt;
+          &lt;filter-state&gt;inactive&lt;/filter-state&gt;
+        &lt;/unknown-unicast&gt;
+      &lt;/storm-control&gt;
+      &lt;auto-upstream-bandwidth&gt;0&lt;/auto-upstream-bandwidth&gt;
+      &lt;auto-downstream-bandwidth&gt;0&lt;/auto-downstream-bandwidth&gt;
+      &lt;ether-state&gt;
+        &lt;negotiated-duplex-mode&gt;full-duplex&lt;/negotiated-duplex-mode&gt;
+        &lt;negotiated-port-speed&gt;speed-10mb&lt;/negotiated-port-speed&gt;
+        &lt;auto-negotiate&gt;false&lt;/auto-negotiate&gt;
+        &lt;enable-flow-control&gt;false&lt;/enable-flow-control&gt;
+        &lt;media-type&gt;ether-media-type-none&lt;/media-type&gt;
+      &lt;/ether-state&gt;
+      &lt;ether-stats&gt;
+        &lt;in-mac-control-frames&gt;0&lt;/in-mac-control-frames&gt;
+        &lt;in-mac-pause-frames&gt;0&lt;/in-mac-pause-frames&gt;
+        &lt;in-oversize-frames&gt;0&lt;/in-oversize-frames&gt;
+        &lt;in-jabber-frames&gt;0&lt;/in-jabber-frames&gt;
+        &lt;in-fragment-frames&gt;0&lt;/in-fragment-frames&gt;
+        &lt;in-8021q-frames&gt;84814&lt;/in-8021q-frames&gt;
+        &lt;out-mac-control-frames&gt;0&lt;/out-mac-control-frames&gt;
+        &lt;out-mac-pause-frames&gt;0&lt;/out-mac-pause-frames&gt;
+        &lt;out-8021q-frames&gt;81501&lt;/out-8021q-frames&gt;
+      &lt;/ether-stats&gt;
+    &lt;/interface&gt;
+  &lt;/interfaces&gt;
+&lt;/data&gt;
+
+Interface GigabitEthernet1 in-pkts=1418683 | out-pkts=787163
+Interface GigabitEthernet2 in-pkts=77855 | out-pkts=77998
+Interface GigabitEthernet2.10 in-pkts=0 | out-pkts=90570
+Interface GigabitEthernet2.101 in-pkts=0 | out-pkts=48846
+Interface GigabitEthernet3.10 in-pkts=90565 | out-pkts=90598
+Interface GigabitEthernet3.103 in-pkts=84720 | out-pkts=81413
+
+--- TODO-9: OpenConfig Interfaces — Gigabit + UP + Bytes ---
+&lt;data xmlns=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot; xmlns:nc=&quot;urn:ietf:params:xml:ns:netconf:base:1.0&quot;&gt;
+  &lt;interfaces xmlns=&quot;http://openconfig.net/yang/interfaces&quot;&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet1&lt;/name&gt;
+      &lt;state&gt;
+        &lt;counters&gt;
+          &lt;in-octets&gt;225567196&lt;/in-octets&gt;
+          &lt;in-unicast-pkts&gt;1633611&lt;/in-unicast-pkts&gt;
+          &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+          &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+          &lt;in-discards&gt;0&lt;/in-discards&gt;
+          &lt;in-errors&gt;0&lt;/in-errors&gt;
+          &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+          &lt;in-fcs-errors&gt;0&lt;/in-fcs-errors&gt;
+          &lt;out-octets&gt;113379189&lt;/out-octets&gt;
+          &lt;out-unicast-pkts&gt;802482&lt;/out-unicast-pkts&gt;
+          &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+          &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+          &lt;out-discards&gt;0&lt;/out-discards&gt;
+          &lt;out-errors&gt;0&lt;/out-errors&gt;
+          &lt;last-clear&gt;1775050874000000000&lt;/last-clear&gt;
+        &lt;/counters&gt;
+      &lt;/state&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet2&lt;/name&gt;
+      &lt;state&gt;
+        &lt;counters&gt;
+          &lt;in-octets&gt;8555294&lt;/in-octets&gt;
+          &lt;in-unicast-pkts&gt;88020&lt;/in-unicast-pkts&gt;
+          &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+          &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+          &lt;in-discards&gt;0&lt;/in-discards&gt;
+          &lt;in-errors&gt;0&lt;/in-errors&gt;
+          &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+          &lt;in-fcs-errors&gt;0&lt;/in-fcs-errors&gt;
+          &lt;out-octets&gt;20844181&lt;/out-octets&gt;
+          &lt;out-unicast-pkts&gt;217970&lt;/out-unicast-pkts&gt;
+          &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+          &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+          &lt;out-discards&gt;0&lt;/out-discards&gt;
+          &lt;out-errors&gt;0&lt;/out-errors&gt;
+          &lt;last-clear&gt;1775050874000000000&lt;/last-clear&gt;
+        &lt;/counters&gt;
+      &lt;/state&gt;
+    &lt;/interface&gt;
+    &lt;interface&gt;
+      &lt;name&gt;GigabitEthernet3&lt;/name&gt;
+      &lt;state&gt;
+        &lt;counters&gt;
+          &lt;in-octets&gt;16007844&lt;/in-octets&gt;
+          &lt;in-unicast-pkts&gt;175429&lt;/in-unicast-pkts&gt;
+          &lt;in-broadcast-pkts&gt;0&lt;/in-broadcast-pkts&gt;
+          &lt;in-multicast-pkts&gt;0&lt;/in-multicast-pkts&gt;
+          &lt;in-discards&gt;0&lt;/in-discards&gt;
+          &lt;in-errors&gt;0&lt;/in-errors&gt;
+          &lt;in-unknown-protos&gt;0&lt;/in-unknown-protos&gt;
+          &lt;in-fcs-errors&gt;0&lt;/in-fcs-errors&gt;
+          &lt;out-octets&gt;15779864&lt;/out-octets&gt;
+          &lt;out-unicast-pkts&gt;172143&lt;/out-unicast-pkts&gt;
+          &lt;out-broadcast-pkts&gt;0&lt;/out-broadcast-pkts&gt;
+          &lt;out-multicast-pkts&gt;0&lt;/out-multicast-pkts&gt;
+          &lt;out-discards&gt;0&lt;/out-discards&gt;
+          &lt;out-errors&gt;0&lt;/out-errors&gt;
+          &lt;last-clear&gt;1775050874000000000&lt;/last-clear&gt;
+        &lt;/counters&gt;
+      &lt;/state&gt;
+    &lt;/interface&gt;
+  &lt;/interfaces&gt;
+&lt;/data&gt;
+
+Interface GigabitEthernet1 in-octets=225567196 | out-octets=113379189
+Interface GigabitEthernet2 in-octets=8555294 | out-octets=20844181
+Interface GigabitEthernet3 in-octets=16007844 | out-octets=15779864
+```
+</pre>
+            </details>
+
+            <h2>📐 XPath Concepts & Explanation</h2>
+<h3>TODO-by-TODO Breakdown</h3>
+
+<hr>
+
+<h4>TODO-1 & TODO-2: OSPF Neighbor State</h4>
+
+<strong>What it tests:</strong> Navigating the OSPF operational YANG model, single vs multi-neighbor XPath predicates, <code>or</code> logic.
+
+<strong>YANG model:</strong> <code>Cisco-IOS-XE-ospf-oper</code>
+
+<pre>ospf-oper-data                              ← root container
+  └── ospf-state                            ← container (easy to miss!)
+        └── ospf-instance                   ← list
+              └── ospf-area                 ← list
+                    └── ospf-interface      ← list
+                          └── ospf-neighbor ← list   ← YOUR TARGET
+                                ├── address ← leaf (dotted-decimal IP)
+                                ├── nbr-id  ← leaf (decimal integer, NOT dotted IP)
+                                └── state   ← leaf (e.g., ospf-nbr-full)
+</pre>
+
+<strong>Key gotcha:</strong> <code>ospf-state</code> sits between <code>ospf-oper-data</code> and <code>ospf-instance</code>. Omitting it returns empty <code><data/></code>. Use YANG Suite to confirm the path.
+
+<strong>nbr-id format:</strong> <code>nbr-id</code> stores the router-ID as a decimal integer (10.0.0.72 = 167772232). The <code>address</code> field stores the normal dotted-decimal IP.
+
+<strong>TODO-1</strong> appends <code>/state</code> to the filter — device returns only the <code><state></code> element. <strong>TODO-2</strong> drops <code>/state</code> so the full <code>ospf-neighbor</code> block is returned, enabling lxml to extract both <code>address</code> and <code>state</code>.
+
+<hr>
+
+<h4>TODO-3 & TODO-4: BGP Neighbor Filtering</h4>
+
+<strong>What it tests:</strong> Combining <code>and</code>/<code>or</code> predicates, numeric comparison (<code><15</code>), navigating nested paths in predicates.
+
+<strong>YANG model:</strong> <code>Cisco-IOS-XE-bgp-oper</code>
+
+<pre>bgp-state-data                              ← root container
+  └── neighbors                             ← container
+        └── neighbor                        ← list
+              ├── neighbor-id               ← leaf
+              ├── description               ← leaf
+              ├── as                        ← leaf (remote AS number)
+              ├── connection                ← container
+              │     └── state               ← leaf (e.g., &quot;established&quot;)
+              └── prefix-activity           ← container
+                    └── received            ← container
+                          └── current-prefixes ← leaf (integer)
+</pre>
+
+<strong>TODO-3</strong> filters a single AS (<code>as="65002"</code>) and appends <code>/description</code> — returns only the description leaf. <strong>TODO-4</strong> adds <code>or</code> for two AS numbers and drops the child path — returns full neighbor blocks so lxml can extract <code>neighbor-id</code>, <code>description</code>, and <code>current-prefixes</code>.
+
+<strong>Predicate nesting:</strong> <code>connection/state</code> and <code>prefix-activity/received/current-prefixes</code> are nested paths inside the predicate — they're relative to <code>neighbor</code>, not absolute.
+
+<hr>
+
+<h4>TODO-5: BGP Subtree Filter</h4>
+
+<strong>What it tests:</strong> Subtree vs XPath filtering trade-offs, local Python post-filtering.
+
+<p>Uses the same <code>Cisco-IOS-XE-bgp-oper</code> YANG tree as TODO-3/4.</p>
+
+<strong>Subtree filter:</strong> You build an XML block selecting specific leaves (<code><neighbor-id/></code>, <code><description/></code>, <code><as/></code>). Empty tags mean "return this field." Tags with values (like <code><state>established</state></code>) mean "match on this value."
+
+<strong>Why it differs from XPath:</strong>
+<p>- Subtree can't do <code>or</code> (two AS values) or <code><15</code> (numeric comparison) — handle those locally with Python</p>
+<p>- Subtree can't exclude neighbors where <code><connection></code> is entirely absent — the filter condition is silently skipped</p>
+<p>- Subtree returns a cleaner response (only selected leaves), XPath returns the full node</p>
+
+<strong>Local guard:</strong> Always check <code>state_elem is None</code> before comparing <code>.text</code> — a neighbor without <code><connection></code> would crash on <code>.text</code> access.
+
+<hr>
+
+<h4>TODO-6: BGP Config — update-source Loopback</h4>
+
+<strong>What it tests:</strong> <code>get_config()</code> vs <code>get()</code>, navigating the native BGP configuration model.
+
+<strong>YANG model:</strong> <code>Cisco-IOS-XE-bgp</code> (config model, under <code>Cisco-IOS-XE-native</code>)
+
+<pre>native                                      ← root (Cisco-IOS-XE-native)
+  └── router                                ← container
+        └── bgp                             ← list (Cisco-IOS-XE-bgp)
+              ├── id                        ← leaf (local AS)
+              └── neighbor                  ← list
+                    ├── id                  ← leaf (key: neighbor IP)
+                    └── update-source       ← container
+                          └── interface     ← container
+                                └── Loopback ← leaf (number only, e.g., 404)
+</pre>
+
+<strong>Key distinction:</strong> This is <strong>configuration data</strong>, so use <code>get_config(source='running')</code> — not <code>get()</code>. The namespace is <code>Cisco-IOS-XE-bgp</code> (not <code>bgp-oper</code>).
+
+<strong>Predicate format:</strong> <code>neighbor[id="10.44.10.2"]</code> — filter on the <code>id</code> key directly, not <code>neighbor/id[id="..."]</code>.
+
+<hr>
+
+<h4>TODO-7 & TODO-8: Interface Packet Counters (Cisco Native)</h4>
+
+<strong>What it tests:</strong> <code>or</code> logic with nested predicates, <code>/name</code> vs full-node selection, lxml <code>find()</code> with namespace prefixes.
+
+<strong>YANG model:</strong> <code>Cisco-IOS-XE-interfaces-oper</code>
+
+<pre>interfaces                                  ← root container
+  └── interface                             ← list (key: name)
+        ├── name                            ← leaf
+        ├── admin-status                    ← leaf (e.g., &quot;if-state-up&quot;)
+        ├── oper-status                     ← leaf (e.g., &quot;if-oper-state-ready&quot;)
+        ├── statistics                      ← container
+        │     ├── in-octets                 ← leaf (ALL bytes, any protocol)
+        │     └── out-octets                ← leaf
+        └── v4-protocol-stats               ← container
+              ├── in-pkts                   ← leaf (IPv4 packets only)
+              ├── out-pkts                  ← leaf
+              ├── in-octets                 ← leaf (IPv4 bytes only)
+              └── out-octets                ← leaf
+</pre>
+
+<strong>TODO-7</strong> appends <code>/name</code> — device returns only <code><name></code> per interface. Quick and clean. <strong>TODO-8</strong> omits <code>/name</code> — device returns the entire interface block (hundreds of fields). lxml then extracts <code>name</code>, <code>in-pkts</code>, <code>out-pkts</code>.
+
+<strong>in-pkts vs in-octets:</strong> <code>in-pkts > 0</code> guarantees <code>in-octets > 0</code> (packets carry bytes). But <code>in-octets > 0</code> does NOT guarantee <code>in-pkts > 0</code> (could be L2 traffic: CDP, LLDP, STP). Exam says "packets" → use <code>in-pkts</code>/<code>out-pkts</code>. Exam says "traffic" → use <code>in-octets</code>/<code>out-octets</code>.
+
+<strong>lxml prefixing:</strong> Every element in <code>find()</code> needs the namespace prefix: <code>interfaces:v4-protocol-stats/interfaces:in-pkts</code> — not <code>interfaces:v4-protocol-stats/in-pkts</code>. Dropping the prefix on any element means "no namespace" which won't match.
+
+<hr>
+
+<h4>TODO-9: OpenConfig Interfaces</h4>
+
+<strong>What it tests:</strong> OpenConfig vs Cisco Native model differences, <code>starts-with()</code> XPath function, different status values.
+
+<strong>YANG model:</strong> <code>openconfig-interfaces</code>
+
+<pre>interfaces                                  ← root (openconfig-interfaces)
+  └── interface                             ← list (key: name)
+        ├── name                            ← leaf
+        ├── state                           ← container
+        │     ├── oper-status               ← leaf (&quot;UP&quot; not &quot;if-oper-state-ready&quot;)
+        │     ├── admin-status              ← leaf (&quot;UP&quot; not &quot;if-state-up&quot;)
+        │     └── counters                  ← container
+        │           ├── in-octets           ← leaf
+        │           ├── out-octets          ← leaf
+        │           ├── in-unicast-pkts     ← leaf
+        │           └── out-unicast-pkts    ← leaf
+        └── config                          ← container
+</pre>
+
+<strong>OpenConfig vs Cisco Native:</strong>
+
+<table>
+<thead><tr><th>Aspect</th><th>OpenConfig</th><th>Cisco Native</th></tr></thead>
+<tbody>
+<tr><td>Namespace</td><td><code>http://openconfig.net/yang/interfaces</code></td><td><code>http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper</code></td></tr>
+<tr><td>Oper status UP</td><td><code>oper-status="UP"</code></td><td><code>oper-status="if-oper-state-ready"</code></td></tr>
+<tr><td>Admin status UP</td><td><code>admin-status="UP"</code></td><td><code>admin-status="if-state-up"</code></td></tr>
+<tr><td>Byte counters</td><td><code>state/counters/in-octets</code></td><td><code>statistics/in-octets</code></td></tr>
+<tr><td>Packet counters</td><td><code>state/counters/in-pkts</code></td><td><code>v4-protocol-stats/in-pkts</code></td></tr>
+</tbody></table>
+<strong><code>starts-with()</code> and <code>contains()</code>:</strong> These are XPath 1.0 functions that work in NETCONF device-side filters. <code>starts-with(name,"Gigabit")</code> matches GigabitEthernet but not Loopback. <code>contains(name,"Ethernet")</code> matches anything with "Ethernet" in the name.
+
+<strong>Predicate paths are relative:</strong> Inside <code>[state/oper-status="UP"]</code>, the path is relative to <code>interface</code> (the current node). A leading <code>/</code> would jump to the document root — almost never what you want.
+
+<hr>
+
+<h3>General XPath Concepts</h3>
+
+<hr>
+
+<h4>Two Contexts for XPath</h4>
+
+<table>
+<thead><tr><th>Context</th><th>Where it runs</th><th>Namespace handling</th></tr></thead>
+<tbody>
+<tr><td><strong>NETCONF XPath</strong></td><td>On the device (server-side filter)</td><td>No prefix needed</td></tr>
+<tr><td><strong>lxml XPath</strong></td><td>Locally in Python</td><td>Must use prefixed namespaces</td></tr>
+</tbody></table>
+<hr>
+
+<h4>NETCONF XPath Does NOT Use Namespace Prefixes</h4>
+
+<pre># WRONG — device-side XPath with prefixes
+&#x27;/native/router/ios-bgp:bgp/ios-bgp:neighbor[id=&quot;10.44.10.2&quot;]&#x27;
+
+# RIGHT — no prefixes for NETCONF
+&#x27;//bgp/neighbor[id=&quot;10.44.10.2&quot;]/update-source/interface/Loopback&#x27;
+</pre>
+
+<p>Prefixed style (<code>ios-bgp:bgp</code>, <code>ospf:state</code>) is only for lxml (local Python parsing).</p>
+
+<hr>
+
+<h4>lxml XPath — Local Python Parsing</h4>
+
+<pre>root = etree.fromstring(reply.data_xml.encode())
+ns = {&quot;ios&quot;: &quot;http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper&quot;}
+
+interfaces = root.xpath(&quot;//ios:interface&quot;, namespaces=ns)
+for intf in interfaces:
+    name = intf.find(&quot;ios:name&quot;, ns).text
+    pkts = intf.find(&quot;ios:v4-protocol-stats/ios:in-pkts&quot;, ns).text
+</pre>
+
+<strong>Key Rules:</strong>
+<p>- <code>find()</code> takes the namespace dict as second argument — <strong>not</strong> an XPath string</p>
+<p>- Prefix and element are one unit: <code>ios:name</code> (not <code>ios:/name</code>)</p>
+<p>- Every element needs the prefix: <code>ios:v4-protocol-stats/ios:out-pkts</code> (not <code>ios:v4-protocol-stats/out-pkts</code>)</p>
+<p>- Prefix name is arbitrary (<code>ios</code>, <code>interfaces</code>, <code>abc</code>) — only the URI matters</p>
+
+<strong>How <code>xpath()</code> and <code>find()</code> work together:</strong>
+
+<p>1. <code>xpath("//ios:interface")</code> — searches the entire XML tree, returns a list of all <code><interface></code> elements</p>
+<p>2. <code>for entry in data:</code> — each <code>entry</code> is one <code><interface></code> block</p>
+<p>3. <code>entry.find("ios:name", ns)</code> — searches <strong>within</strong> that one block for <code><name></code></p>
+<p>4. Next iteration, <code>entry</code> moves to the next <code><interface></code>, so <code>find()</code> returns different values</p>
+
+<hr>
+
+<h4>get() vs get_config()</h4>
+
+<table>
+<thead><tr><th>Method</th><th>Use for</th></tr></thead>
+<tbody>
+<tr><td><code>get()</code></td><td>Operational/state data (counters, neighbors, status)</td></tr>
+<tr><td><code>get_config()</code></td><td>Configuration data (what's in running-config)</td></tr>
+</tbody></table>
+<hr>
+
+<h4>XPath vs Subtree Filtering</h4>
+
+<table>
+<thead><tr><th>Feature</th><th>Subtree</th><th>XPath</th></tr></thead>
+<tbody>
+<tr><td>Pick specific fields</td><td>Yes</td><td>Only one child path</td></tr>
+<tr><td>Numeric comparison (<code><15</code>)</td><td>No</td><td>Yes</td></tr>
+<tr><td>OR logic</td><td>No</td><td>Yes</td></tr>
+<tr><td>Response size</td><td>Clean/small</td><td>Verbose/full node</td></tr>
+<tr><td>Missing elements</td><td>Can't exclude</td><td>Correctly excludes</td></tr>
+</tbody></table>
+<strong>Best pattern:</strong> XPath on device for complex filtering → lxml locally to extract fields.
+
+<hr>
+
+<h4>Common Mistakes</h4>
+
+<strong>Broken path after predicates:</strong>
+<pre># WRONG — /interfaces/interface[...]/interfaces/interface/name
+&#x27;/interfaces/interface[pred]/interfaces/interface/name&#x27;
+# RIGHT — just append /name
+&#x27;/interfaces/interface[pred]/name&#x27;
+</pre>
+
+<strong>Predicate key syntax:</strong>
+<pre># RIGHT — filter on key directly
+&quot;neighbor[id=&#x27;65001&#x27;]&quot;
+# WRONG — navigating into the key
+&quot;neighbor/id[id=&#x27;65001&#x27;]&quot;
+</pre>
+
+<strong>Selecting multiple fields:</strong> You can't pick two specific children in one NETCONF XPath filter. Either append one child (<code>/name</code>) or get the full node and extract locally.
+
+<hr>
+
+<h4>Key XPath Functions for the Exam</h4>
+
+<table>
+<thead><tr><th>Function</th><th>Example</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td><code>starts-with()</code></td><td><code>starts-with(name,"Gi")</code></td><td>String begins with value</td></tr>
+<tr><td><code>contains()</code></td><td><code>contains(name,"Ethernet")</code></td><td>String contains value</td></tr>
+<tr><td><code>=</code></td><td><code>state/oper-status="UP"</code></td><td>Exact match</td></tr>
+<tr><td><code>></code> / <code><</code></td><td><code>in-octets > 0</code></td><td>Numeric comparison</td></tr>
+<tr><td><code>and</code> / <code>or</code></td><td><code>[pred1 and pred2]</code></td><td>Combine predicates</td></tr>
+</tbody></table>
+<hr>
+
+<h4>Python String Concatenation Trick</h4>
+
+<pre># These are identical:
+xpath_filter = &#x27;/interfaces/interface[admin-status=&quot;if-state-up&quot;]/name&#x27;
+
+xpath_filter = (
+    &#x27;/interfaces/interface&#x27;
+    &#x27;[admin-status=&quot;if-state-up&quot;]&#x27;
+    &#x27;/name&#x27;
+)
+</pre>
+
+<p>No commas = single string. Add commas = tuple (breaks things).</p>
+
+<hr>
+
+<h4>Predicate Paths Are Relative</h4>
+
+<p>Inside <code>[ ]</code>, paths are relative to the current node:</p>
+
+<pre>[state/oper-status=&quot;UP&quot;]        ← relative from interface (correct) ✅
+[/state/oper-status=&quot;UP&quot;]       ← absolute from root (wrong) ❌
+</pre>
+
+<div class="tip-box">⚠️ <strong>Exam trap:</strong> A leading <code>/</code> inside a predicate jumps to the document root — almost never what you want.</div>
+
+
+        </section>
+
+        <section id="quiz" class="section">
+            <h1>MCQ Practice — XPath Filtering</h1>
+            <p class="intro-text">13 questions covering all 9 TODO tasks. Each question includes the relevant YANG tree.</p>
+            <div class="quiz-header"><div>
+                <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+                <span class="score-display">Score: <span class="score-correct" id="correctCount">0</span> <span class="score-total">/ <span id="totalAnswered">0</span> answered</span></span>
+            </div><div class="quiz-controls">
+                <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
+                <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+            </div></div>
+            <div id="quizContainer"></div>
+        </section>
+    </main>
+    <script>
+        // YANG Trees
+        const TREE_OSPF = "ospf-oper-data                              \u2190 root container\n  \u2514\u2500\u2500 ospf-state                            \u2190 container (easy to miss!)\n        \u2514\u2500\u2500 ospf-instance                   \u2190 list\n              \u2514\u2500\u2500 ospf-area                 \u2190 list\n                    \u2514\u2500\u2500 ospf-interface      \u2190 list\n                          \u2514\u2500\u2500 ospf-neighbor \u2190 list   \u2190 YOUR TARGET\n                                \u251C\u2500\u2500 address \u2190 leaf (dotted-decimal IP)\n                                \u251C\u2500\u2500 nbr-id  \u2190 leaf (decimal integer)\n                                \u2514\u2500\u2500 state   \u2190 leaf (e.g., ospf-nbr-full)";
+
+        const TREE_BGP_OPER = "bgp-state-data                              \u2190 root container\n  \u2514\u2500\u2500 neighbors                             \u2190 container\n        \u2514\u2500\u2500 neighbor                        \u2190 list\n              \u251C\u2500\u2500 neighbor-id               \u2190 leaf\n              \u251C\u2500\u2500 description               \u2190 leaf\n              \u251C\u2500\u2500 as                        \u2190 leaf (remote AS)\n              \u251C\u2500\u2500 connection                \u2190 container\n              \u2502     \u2514\u2500\u2500 state               \u2190 leaf\n              \u2514\u2500\u2500 prefix-activity           \u2190 container\n                    \u2514\u2500\u2500 received            \u2190 container\n                          \u2514\u2500\u2500 current-prefixes \u2190 leaf";
+
+        const TREE_BGP_CONFIG = "native                                      \u2190 root (Cisco-IOS-XE-native)\n  \u2514\u2500\u2500 router                                \u2190 container\n        \u2514\u2500\u2500 bgp                             \u2190 list (Cisco-IOS-XE-bgp)\n              \u251C\u2500\u2500 id                        \u2190 leaf (local AS)\n              \u2514\u2500\u2500 neighbor                  \u2190 list\n                    \u251C\u2500\u2500 id                  \u2190 leaf (key: neighbor IP)\n                    \u2514\u2500\u2500 update-source       \u2190 container\n                          \u2514\u2500\u2500 interface     \u2190 container\n                                \u2514\u2500\u2500 Loopback \u2190 leaf (number)";
+
+        const TREE_INTF = "interfaces                                  \u2190 root container\n  \u2514\u2500\u2500 interface                             \u2190 list (key: name)\n        \u251C\u2500\u2500 name                            \u2190 leaf\n        \u251C\u2500\u2500 admin-status                    \u2190 leaf (\"if-state-up\")\n        \u251C\u2500\u2500 oper-status                     \u2190 leaf (\"if-oper-state-ready\")\n        \u251C\u2500\u2500 statistics                      \u2190 container\n        \u2502     \u251C\u2500\u2500 in-octets                 \u2190 leaf (ALL bytes)\n        \u2502     \u2514\u2500\u2500 out-octets                \u2190 leaf\n        \u2514\u2500\u2500 v4-protocol-stats               \u2190 container\n              \u251C\u2500\u2500 in-pkts                   \u2190 leaf (IPv4 only)\n              \u2514\u2500\u2500 out-pkts                  \u2190 leaf";
+
+        const TREE_OC_INTF = "interfaces                                  \u2190 root (openconfig-interfaces)\n  \u2514\u2500\u2500 interface                             \u2190 list (key: name)\n        \u251C\u2500\u2500 name                            \u2190 leaf\n        \u2514\u2500\u2500 state                           \u2190 container\n              \u251C\u2500\u2500 oper-status               \u2190 leaf (\"UP\")\n              \u251C\u2500\u2500 admin-status              \u2190 leaf (\"UP\")\n              \u2514\u2500\u2500 counters                  \u2190 container\n                    \u251C\u2500\u2500 in-octets           \u2190 leaf\n                    \u2514\u2500\u2500 out-octets          \u2190 leaf";
+
+        const XML_OSPF = '<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <ospf-oper-data xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper">\n    <ospf-state>\n      <ospf-instance>\n        <af>address-family-ipv4</af>\n        <router-id>167772231</router-id>\n        <ospf-area>\n          <area-id>0</area-id>\n          <ospf-interface>\n            <n>GigabitEthernet3.103</n>\n            <ospf-neighbor>\n              <neighbor-id>10.0.0.72</neighbor-id>\n              <state>ospf-nbr-full</state>\n            </ospf-neighbor>\n          </ospf-interface>\n        </ospf-area>\n      </ospf-instance>\n    </ospf-state>\n  </ospf-oper-data>\n</data>';
+
+        const XML_INTF = '<data xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">\n  <interfaces xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper">\n    <interface>\n      <n>GigabitEthernet1</n>\n      <admin-status>if-state-up</admin-status>\n      <oper-status>if-oper-state-ready</oper-status>\n      <statistics>\n        <in-octets>229481534</in-octets>\n        <out-octets>116312503</out-octets>\n      </statistics>\n      <v4-protocol-stats>\n        <in-pkts>1448939</in-pkts>\n        <out-pkts>802341</out-pkts>\n      </v4-protocol-stats>\n      <!-- ... v6-protocol-stats, ether-state, etc. ... -->\n    </interface>\n    <interface>\n      <n>GigabitEthernet2</n>\n      <!-- ... same structure, hundreds of fields ... -->\n    </interface>\n    <!-- ... 4 more matching interfaces ... -->\n  </interfaces>\n</data>';
+
+        const questions = [
+            // Q1: TODO-1 - Build OSPF single neighbor XPath (blocks)
+            {id:1,type:"blocks",tree:TREE_OSPF,question:"TODO-1: OSPF \u2014 Single Neighbor State\n\nBuild the NETCONF XPath to get the state for OSPF neighbor 10.0.12.21.\nDrag the segments in correct order:",blocks:[{title:"NETCONF XPath Filter",slots:8,answer:["/ospf-oper-data","/ospf-state","/ospf-instance","/ospf-area","/ospf-interface","/ospf-neighbor",'[address="10.0.12.21"]',"/state"]}],pool:["/ospf-oper-data","/ospf-state","/ospf-instance","/ospf-area","/ospf-interface","/ospf-neighbor",'[address="10.0.12.21"]',"/state","/ospf-oper","/ospf-config",'[nbr-id="10.0.12.21"]',"/neighbor-id","/ospf-data"],explanation:"Correct XPath:\n/ospf-oper-data/ospf-state/ospf-instance/ospf-area/ospf-interface/ospf-neighbor[address=\"10.0.12.21\"]/state\n\nKey points:\n\u2022 ospf-state sits between ospf-oper-data and ospf-instance \u2014 omitting it returns empty <data/>\n\u2022 Use address (dotted IP), NOT nbr-id (decimal integer)\n\u2022 /state appended returns only the state leaf\n\nDistractors:\n  /ospf-oper, /ospf-config, /ospf-data \u2192 not real YANG containers\n  [nbr-id=\"10.0.12.21\"] \u2192 nbr-id uses decimal format (167772232), not dotted IP\n  /neighbor-id \u2192 wrong leaf name for the filter target"},
+
+            // Q2: TODO-1 lxml extract (MCQ, answer=C)
+            {id:2,type:"single",count:1,tree:TREE_OSPF,xml_output:XML_OSPF,question:"TODO-1: lxml XPath \u2014 Extract OSPF state locally\n\nThe NETCONF XPath filter returned the XML response shown above.\nNow extract the state value using lxml XPath in Python.\n\nNamespace: http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper\n\nWhich namespace dict + lxml XPath is correct?",options:[{text:'ns = {"ospf": "http://cisco.com/ns/yang/Cisco-IOS-XE-ospf"}\nxpath = "//ospf:state"',correct:false},{text:'ns = {"ospf": "http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper"}\nxpath = "//state"',correct:false},{text:'ns = {"ospf": "http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper"}\nxpath = "//ospf:state"',correct:true},{text:'ns = {"ospf": "http://cisco.com/ns/yang/Cisco-IOS-XE-ospf-oper"}\nxpath = "//ospf:ospf-state"',correct:false}],explanation:"lxml requires namespace prefix on every element. URI must match exactly.\n\n    A \u2192 \u274C Wrong URI: Cisco-IOS-XE-ospf (config) vs Cisco-IOS-XE-ospf-oper (operational).\n    B \u2192 \u274C '//state' has no prefix \u2014 lxml interprets as 'no namespace', won't match.\n    D \u2192 \u274C 'ospf-state' is a container, not the target leaf 'state' inside ospf-neighbor."},
+
+            // Q3: TODO-2 - Build OSPF multi-neighbor XPath (blocks)
+            {id:3,type:"blocks",tree:TREE_OSPF,question:"TODO-2: OSPF \u2014 Multiple Neighbors (OR logic)\n\nBuild the NETCONF XPath to get BOTH neighbors 10.0.12.21 AND 10.0.13.31.\nDrag segments in correct order:",blocks:[{title:"NETCONF XPath Filter",slots:7,answer:["/ospf-oper-data","/ospf-state","/ospf-instance","/ospf-area","/ospf-interface","/ospf-neighbor",'[address="10.0.12.21" or address="10.0.13.31"]']}],pool:["/ospf-oper-data","/ospf-state","/ospf-instance","/ospf-area","/ospf-interface","/ospf-neighbor",'[address="10.0.12.21" or address="10.0.13.31"]','[address="10.0.12.21" and address="10.0.13.31"]','[address="10.0.12.21"]','[address="10.0.13.31"]',"/ospf-config","/state","/ospf-data"],explanation:"Correct XPath:\n/ospf-oper-data/ospf-state/ospf-instance/ospf-area/ospf-interface/ospf-neighbor[address=\"10.0.12.21\" or address=\"10.0.13.31\"]\n\nKey points:\n\u2022 Use 'or' inside one predicate to match EITHER address\n\u2022 No /state appended \u2014 returns full ospf-neighbor blocks so lxml can extract both address and state\n\nDistractors:\n  [... and ...] \u2192 'and' requires BOTH on same element \u2014 impossible\n  Two separate [address=...] predicates \u2192 would chain as AND, not OR\n  /state \u2192 not used here; we need the full neighbor block"},
+
+            // Q4: TODO-3 - Build BGP single AS XPath (blocks)
+            {id:4,type:"blocks",tree:TREE_BGP_OPER,question:"TODO-3: BGP \u2014 Single AS + Prefix Filter\n\nFind BGP neighbor description where AS=65002, state=established, prefixes<15.\nDrag segments in correct order:",blocks:[{title:"NETCONF XPath Filter",slots:5,answer:["/bgp-state-data","/neighbors","/neighbor",'[as="65002" and connection/state="established" and prefix-activity/received/current-prefixes<15]',"/description"]}],pool:["/bgp-state-data","/neighbors","/neighbor",'[as="65002" and connection/state="established" and prefix-activity/received/current-prefixes<15]',"/description",'[as="65002" and state="established" and current-prefixes<15]','[as="65002"]',"/connection/state","/bgp-oper-data","/neighbor-id","/prefix-activity"],explanation:"Correct XPath:\n/bgp-state-data/neighbors/neighbor[as=\"65002\" and connection/state=\"established\" and prefix-activity/received/current-prefixes<15]/description\n\nKey points:\n\u2022 All predicates on 'neighbor' use RELATIVE paths: connection/state, prefix-activity/received/current-prefixes\n\u2022 /description appended returns only the description leaf\n\nDistractors:\n  [... state=\"established\" and current-prefixes<15] \u2192 state and current-prefixes aren't direct children of neighbor\n  /bgp-oper-data \u2192 wrong root; correct is /bgp-state-data"},
+
+            // Q5: TODO-4 - Build BGP multi-AS XPath (blocks)
+            {id:5,type:"blocks",tree:TREE_BGP_OPER,question:"TODO-4: BGP \u2014 Multiple AS with OR + Prefix Filter\n\nFind neighbors where (AS=65002 OR 65003) AND state=established AND prefixes<15.\nDrag segments in correct order:",blocks:[{title:"NETCONF XPath Filter",slots:6,answer:["/bgp-state-data","/neighbors","/neighbor",'[(as="65002" or as="65003")','and connection/state="established"','and prefix-activity/received/current-prefixes<15]']}],pool:["/bgp-state-data","/neighbors","/neighbor",'[(as="65002" or as="65003")','[as="65002" or as="65003"','[(as="65002" and as="65003")','and connection/state="established"','and state="established"','and prefix-activity/received/current-prefixes<15]','and current-prefixes<15]',"/bgp-oper-data","/description","/neighbor-id"],explanation:"Correct XPath:\n/bgp-state-data/neighbors/neighbor[(as=\"65002\" or as=\"65003\") and connection/state=\"established\" and prefix-activity/received/current-prefixes<15]\n\nKey points:\n\u2022 Parentheses around OR are critical: (as=\"65002\" or as=\"65003\")\n\u2022 Without parentheses, 'and' binds tighter: as=65002 OR (as=65003 AND state AND prefix)\n\u2022 No child path appended \u2014 returns full neighbor blocks for lxml extraction\n\nDistractors:\n  Missing parentheses version \u2192 wrong operator precedence\n  (as=65002 AND as=65003) \u2192 impossible \u2014 one neighbor can't have two AS numbers"},
+
+            // Q6: TODO-5 Subtree vs XPath (MCQ, answer=B)
+            {id:6,type:"single",count:1,tree:null,question:"TODO-5: Subtree vs XPath Filtering\n\nYou want to find BGP neighbors where AS=65002 OR 65003 AND prefixes<15.\nWhich statement about subtree filtering is correct?",options:[{text:'Subtree supports OR logic using multiple <as> elements in the filter XML',correct:false},{text:"Subtree can filter on state=established, but CANNOT do OR (two AS) or numeric comparison (<15) \u2014 handle locally in Python",correct:true},{text:'Subtree does numeric comparison: <current-prefixes>15</current-prefixes> means less than 15',correct:false},{text:"Subtree returns the same verbose response as XPath filtering",correct:false}],explanation:"Subtree can match exact values (like <state>established</state>) but cannot do OR or numeric comparisons.\n\n    A \u2192 \u274C Multiple <as> elements is invalid XML (duplicate siblings).\n    C \u2192 \u274C <current-prefixes>15</current-prefixes> matches EXACTLY 15, not less than.\n    D \u2192 \u274C Subtree returns clean/selected leaves only. XPath returns the full node."},
+
+            // Q7: TODO-6 - Build BGP config XPath (blocks)
+            {id:7,type:"blocks",tree:TREE_BGP_CONFIG,question:"TODO-6: BGP Config \u2014 update-source Loopback\n\nFind the Loopback used as update-source for BGP neighbor 10.44.10.2.\nThis is configuration data. Build the XPath:",blocks:[{title:"NETCONF XPath Filter",slots:5,answer:["//bgp","/neighbor",'[id="10.44.10.2"]',"/update-source/interface","/Loopback"]}],pool:["//bgp","/neighbor",'[id="10.44.10.2"]',"/update-source/interface","/Loopback","/native/router","//ios-bgp:bgp",'/neighbor/id[id="10.44.10.2"]',"/loopback","/update-source","/interface/loopback"],explanation:"Correct XPath:\n//bgp/neighbor[id=\"10.44.10.2\"]/update-source/interface/Loopback\n\nKey points:\n\u2022 // skips native/router and goes directly to bgp\n\u2022 No namespace prefix in NETCONF XPath (ios-bgp: is only for lxml)\n\u2022 neighbor[id=\"...\"] \u2014 filter on key directly, NOT neighbor/id[id=\"...\"]\n\u2022 Case-sensitive: Loopback (capital L), not loopback\n\u2022 This is config data, but session.get() also works on IOS-XE\n\nDistractors:\n  //ios-bgp:bgp \u2192 NETCONF XPath does NOT use namespace prefixes\n  /neighbor/id[id=...] \u2192 navigates INTO id leaf then tries to filter\n  /loopback \u2192 case-sensitive mismatch (lowercase)"},
+
+            // Q8: TODO-7 - Build interface names XPath (blocks)
+            {id:8,type:"blocks",tree:TREE_INTF,question:"TODO-7: Interfaces \u2014 Names with IPv4 packets\n\nFind interface NAMES where admin UP, oper UP, and (in-pkts>0 OR out-pkts>0).\nDrag segments in correct order:",blocks:[{title:"NETCONF XPath Filter",slots:6,answer:["/interfaces","/interface",'[admin-status="if-state-up"','and oper-status="if-oper-state-ready"','and (v4-protocol-stats/in-pkts>0 or v4-protocol-stats/out-pkts>0)]',"/name"]}],pool:["/interfaces","/interface",'[admin-status="if-state-up"','[admin-status="UP"','and oper-status="if-oper-state-ready"','and oper-status="UP"','and (v4-protocol-stats/in-pkts>0 or v4-protocol-stats/out-pkts>0)]','and v4-protocol-stats/in-pkts>0 or v4-protocol-stats/out-pkts>0]','and (statistics/in-octets>0 or statistics/out-octets>0)]',"/name","/interface-name","/status"],explanation:"Correct XPath:\n/interfaces/interface[admin-status=\"if-state-up\" and oper-status=\"if-oper-state-ready\" and (v4-protocol-stats/in-pkts>0 or v4-protocol-stats/out-pkts>0)]/name\n\nKey points:\n\u2022 Parentheses around OR are essential for correct precedence\n\u2022 Cisco Native status: \"if-state-up\" and \"if-oper-state-ready\" (NOT \"UP\")\n\u2022 v4-protocol-stats/in-pkts for IPv4 packets (NOT statistics/in-octets which is ALL bytes)\n\u2022 /name appended \u2192 returns only <n> elements\n\nDistractors:\n  Missing parentheses \u2192 wrong operator precedence\n  \"UP\" status values \u2192 that's OpenConfig, not Cisco Native\n  statistics/in-octets \u2192 counts ALL bytes including L2 (CDP, LLDP, STP)"},
+
+            // Q9: TODO-8 lxml find (MCQ, answer=D)
+            {id:9,type:"single",count:1,tree:TREE_INTF,xml_output:XML_INTF,question:"TODO-8: lxml find() with namespace\n\nThe XPath filter returned full interface blocks (shown above).\nNow extract in-pkts from each entry using lxml.\n\nNamespace: http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper\n\nWhich lxml code correctly extracts in-pkts?",options:[{text:'ns = {"interfaces": "http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper"}\nin_pkt = entry.find("interfaces:v4-protocol-stats/in-pkts", ns).text',correct:false},{text:'ns = {"interfaces": "http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper"}\nin_pkt = entry.find("v4-protocol-stats/interfaces:in-pkts", ns).text',correct:false},{text:'ns = {"interfaces": "http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper"}\nin_pkt = entry.find("interfaces:v4-protocol-stats:in-pkts", ns).text',correct:false},{text:'ns = {"interfaces": "http://cisco.com/ns/yang/Cisco-IOS-XE-interfaces-oper"}\nin_pkt = entry.find("interfaces:v4-protocol-stats/interfaces:in-pkts", ns).text',correct:true}],explanation:"Every element in find() needs the namespace prefix: interfaces:v4-protocol-stats/interfaces:in-pkts.\n\n    A \u2192 \u274C 'in-pkts' missing prefix \u2014 lxml interprets as 'no namespace', won't match.\n    B \u2192 \u274C 'v4-protocol-stats' missing prefix \u2014 same issue.\n    C \u2192 \u274C Uses colon (:) instead of slash (/) between path elements. 'v4-protocol-stats:in-pkts' looks like one prefixed element."},
+
+            // Q10: TODO-9 - Build OpenConfig XPath (blocks)
+            {id:10,type:"blocks",tree:TREE_OC_INTF,question:"TODO-9: OpenConfig Interfaces\n\nFind interfaces where name starts with 'Gigabit', oper-status='UP', and in-octets>0.\nDrag segments in correct order:",blocks:[{title:"NETCONF XPath Filter",slots:5,answer:["/interfaces","/interface",'[starts-with(name,"Gigabit")]','[state/oper-status="UP"]','/state/counters[in-octets > 0]']}],pool:["/interfaces","/interface",'[starts-with(name,"Gigabit")]','[state/oper-status="UP"]','/state/counters[in-octets > 0]','[state/oper-status="if-oper-state-ready"]','[oper-status="UP"]','/statistics/counters[in-octets > 0]','[/state/oper-status="UP"]','[contains(name,"Gigabit")]',"/name"],explanation:"Correct XPath:\n/interfaces/interface[starts-with(name,\"Gigabit\")][state/oper-status=\"UP\"]/state/counters[in-octets > 0]\n\nKey points:\n\u2022 OpenConfig uses \"UP\" (not \"if-oper-state-ready\")\n\u2022 Counters path: state/counters/ (not statistics/)\n\u2022 starts-with() is XPath 1.0 \u2014 works in NETCONF device-side filters\n\u2022 [state/oper-status=...] is relative to interface (no leading /)\n\nDistractors:\n  \"if-oper-state-ready\" \u2192 Cisco Native value, not OpenConfig\n  [oper-status=\"UP\"] \u2192 oper-status is under state/, not direct child of interface\n  /statistics/counters \u2192 Cisco Native path, not OpenConfig\n  [/state/oper-status=...] \u2192 leading / jumps to document ROOT"},
+
+            // Q11: Predicate vs Child Node — OSPF (MCQ, answer=B)
+            {id:11,type:"single",count:1,tree:null,question:"TODO-1 Concept: You need BOTH the state AND address for OSPF neighbor 10.0.12.21. Which XPath filter returns both fields?",options:[{text:'/ospf-oper-data/ospf-state/.../ospf-neighbor[address="10.0.12.21"]/state',correct:false},{text:'/ospf-oper-data/ospf-state/.../ospf-neighbor[address="10.0.12.21"]/address',correct:false},{text:'/ospf-oper-data/ospf-state/.../ospf-neighbor[address="10.0.12.21"]',correct:true},{text:'/ospf-oper-data/ospf-state/.../ospf-neighbor/state[address="10.0.12.21"]',correct:false}],explanation:"C is correct. You need two sibling fields (address + state). Appending a child path like /state (A) returns ONLY <state> \u2014 you lose <address>. Appending /address (B) returns ONLY <address> \u2014 you lose <state>.\nOption C uses predicate only (no child path) \u2192 returns the full ospf-neighbor block with ALL children.\nOption D puts the predicate on state instead of ospf-neighbor \u2014 wrong node.\n\n\u2022 Rule: Need ONE field \u2192 append child path. Need MULTIPLE fields \u2192 stop at the list, extract with lxml locally."},
+
+            // Q12: Predicate vs Child Node — OpenConfig interfaces (MCQ, answer=C)
+            {id:12,type:"single",count:1,tree:TREE_OC_INTF,question:"TODO-9 Concept: You need name, description (under config/), AND in-octets (under state/counters/) for OpenConfig interfaces that are operationally UP. Which XPath returns all three?",options:[{text:'/interfaces/interface[state/oper-status="UP"]/state/counters',correct:false},{text:'/interfaces/interface[state/oper-status="UP"]/config/description',correct:false},{text:'/interfaces/interface[state/oper-status="UP"]',correct:true},{text:'/interfaces/interface[state/oper-status="UP"]/name',correct:false}],explanation:"C is correct. The three fields live in DIFFERENT branches:\n\u2022 name \u2192 direct child of interface\n\u2022 description \u2192 under config/\n\u2022 in-octets \u2192 under state/counters/\n\nAppending any child path navigates into ONE branch and loses the others:\n  A \u2192 /state/counters \u2014 loses description (under config/)\n  B \u2192 /config/description \u2014 loses in-octets (under state/counters/)\n  D \u2192 /name \u2014 loses both description and counters\n\nOnly C (predicate only, no child path) returns the full interface block. Use lxml locally to extract each field."},
+
+            // Q13: Predicate syntax — BGP OR + AND (MCQ, answer=D)
+            {id:13,type:"single",count:1,tree:TREE_BGP_OPER,question:"You need BGP neighbors where AS is 65002 OR 65003 AND connection/state is established. Which predicate syntax is valid?",options:[{text:'[as="65002" or as="65003"][connection/state="established"]',correct:false},{text:'[as="65002"] or [as="65003"] and [connection/state="established"]',correct:false},{text:'[(as="65002" or as="65003") and connection/state="established"]',correct:false},{text:"Both A and C are correct",correct:true}],explanation:"D is correct \u2014 both A and C work.\n\nOption A uses chained predicates: [or logic][and condition]. The or is inside the first [], and chaining [][] is implicit AND. This is valid XPath.\n\nOption C puts everything in one predicate with explicit and + parentheses for grouping. Also valid.\n\nBoth produce the same result.\n\nOption B is INVALID \u2014 or and and cannot go between ][ as bare keywords. The syntax [pred1] or [pred2] is not valid XPath."}
+        ];
+
+        let answers={},submitted={},score=0;
+        const blockState={};
+
+        function showSection(id){document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active')});document.getElementById(id).classList.add('active');event.target.classList.add('active');}
+
+        function initQuiz(){
+            var c=document.getElementById('quizContainer');
+            c.innerHTML=questions.map(function(q,i){return renderQ(q,i)}).join('');
+            questions.forEach(function(q){if(q.type==='blocks'){blockState[q.id]={slots:{},usedPool:[]};q.blocks.forEach(function(b,bi){blockState[q.id].slots[bi]=new Array(b.slots).fill(null);});}});
+            updateProgress();
+        }
+
+        function renderQ(q,idx){
+            var e=q.explanation.replace(/\n/g,'<br>');
+            var treeHtml=q.tree?'<pre style="margin:0.75rem 0;font-size:0.68rem;line-height:1.35;background:var(--code-bg);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;overflow-x:auto">'+q.tree.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>':'';
+            var xmlHtml=q.xml_output?'<div style="margin:0.75rem 0"><div style="font-size:0.8rem;font-weight:600;color:var(--accent-cyan);margin-bottom:0.25rem">\uD83D\uDCC4 XML Response from NETCONF:</div><pre style="font-size:0.63rem;line-height:1.3;background:var(--code-bg);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;overflow-x:auto;max-height:280px">'+q.xml_output.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre></div>':'';
+
+            if(q.type==='single'){
+                var typeLabel='Choose 1';
+                return '<div class="question-card" id="q'+q.id+'"><div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">'+typeLabel+'</span></div><div class="question-text">'+q.question.replace(/\n/g,'<br>').replace(/ {2}/g,'&nbsp;&nbsp;')+treeHtml+xmlHtml+'</div><div class="options-list">'+q.options.map(function(o,i){var h=o.text.replace(/</g,'&lt;').replace(/>/g,'&gt;');if(o.text.indexOf('\n')>-1)h='<pre>'+h+'</pre>';return '<div class="option-item" data-qid="'+q.id+'" data-idx="'+i+'" onclick="sel('+q.id+','+i+')"><div class="option-checkbox">'+String.fromCharCode(65+i)+'</div><div class="option-text">'+h+'</div></div>'}).join('')+'</div><button class="submit-btn" id="sub'+q.id+'" onclick="subMCQ('+q.id+')" disabled>Submit Answer</button><div class="explanation" id="exp'+q.id+'"><div class="explanation-title">\uD83D\uDCD6 Explanation</div><div class="explanation-text">'+e+'</div></div></div>';
+            }
+            if(q.type==='blocks'){
+                return '<div class="question-card" id="q'+q.id+'"><div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Build the XPath</span></div><div class="question-text">'+q.question.replace(/\n/g,'<br>').replace(/ {2}/g,'&nbsp;&nbsp;')+treeHtml+xmlHtml+'</div><div class="block-container" id="blocks'+q.id+'">'+q.blocks.map(function(b,bi){var s='';for(var si=0;si<b.slots;si++){s+='<div class="block-slot" data-qid="'+q.id+'" data-block="'+bi+'" data-slot="'+si+'" ondrop="dropBlock(event,'+q.id+','+bi+','+si+')" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" onclick="removeFromSlot('+q.id+','+bi+','+si+')"><span class="slot-text" style="opacity:0.4">'+(si+1)+'</span><span class="slot-remove">\u2715</span></div>';}return '<div class="block-section"><div class="block-title">'+b.title+'</div><div class="block-slots">'+s+'</div></div>';}).join('')+'</div><div class="cmd-pool" id="pool'+q.id+'"><div class="cmd-pool-title">\uD83D\uDCE6 XPath Segments \u2014 drag into the slots above</div>'+q.pool.map(function(cmd,ci){return '<div class="cmd-chip" draggable="true" data-qid="'+q.id+'" data-cmd="'+cmd.replace(/"/g,'&quot;')+'" ondragstart="dragChip(event,this)" id="chip'+q.id+'_'+ci+'">'+cmd.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>';}).join('')+'</div><button class="submit-btn" id="sub'+q.id+'" onclick="subBlocks('+q.id+')" disabled>Submit Answer</button><div class="explanation" id="exp'+q.id+'"><div class="explanation-title">\uD83D\uDCD6 Explanation</div><div class="explanation-text">'+e+'</div></div></div>';
+            }
+            return '';
+        }
+
+        // MCQ
+        function sel(qid,idx){if(submitted[qid])return;answers[qid]=[idx];document.querySelectorAll('.option-item[data-qid="'+qid+'"]').forEach(function(el,j){el.classList.toggle('selected',j===idx)});document.getElementById('sub'+qid).disabled=false;}
+        function subMCQ(qid){if(submitted[qid])return;submitted[qid]=true;var q=questions.find(function(x){return x.id===qid});var correct=q.options.map(function(o,i){return o.correct?i:-1}).filter(function(i){return i>-1});var user=answers[qid]||[];var ok=user.length===1&&correct.includes(user[0]);if(ok)score++;document.querySelectorAll('.option-item[data-qid="'+qid+'"]').forEach(function(el,i){el.classList.add('disabled');el.classList.remove('selected');if(q.options[i].correct)el.classList.add('correct');else if(user.includes(i))el.classList.add('incorrect')});markQ(qid,ok);}
+
+        // Blocks
+        function dragChip(e,el){e.dataTransfer.setData('text/plain',el.dataset.cmd);}
+        function dropBlock(e,qid,bi,si){e.preventDefault();e.target.classList.remove('drag-over');if(submitted[qid])return;var cmd=e.dataTransfer.getData('text/plain');if(!cmd)return;var bs=blockState[qid];Object.keys(bs.slots).forEach(function(b){bs.slots[b].forEach(function(v,s){if(v===cmd)bs.slots[b][s]=null;});});bs.slots[bi][si]=cmd;refreshBlock(qid);}
+        function removeFromSlot(qid,bi,si){if(submitted[qid])return;var bs=blockState[qid];if(!bs.slots[bi][si])return;bs.slots[bi][si]=null;refreshBlock(qid);}
+        function refreshBlock(qid){var bs=blockState[qid];var used=[];Object.keys(bs.slots).forEach(function(bi){bs.slots[bi].forEach(function(v,si){var el=document.querySelector('.block-slot[data-qid="'+qid+'"][data-block="'+bi+'"][data-slot="'+si+'"]');if(v){el.classList.add('filled');el.querySelector('.slot-text').textContent=v;el.querySelector('.slot-text').style.opacity='1';used.push(v);}else{el.classList.remove('filled');el.querySelector('.slot-text').textContent=(parseInt(si)+1);el.querySelector('.slot-text').style.opacity='0.4';}});});bs.usedPool=used;document.querySelectorAll('.cmd-chip[data-qid="'+qid+'"]').forEach(function(el){el.classList.toggle('used',used.includes(el.dataset.cmd));});var allFilled=true;var q=questions.find(function(x){return x.id===qid});q.blocks.forEach(function(b,bi){bs.slots[bi].forEach(function(v){if(!v)allFilled=false;});});document.getElementById('sub'+qid).disabled=!allFilled;}
+        function subBlocks(qid){if(submitted[qid])return;submitted[qid]=true;var q=questions.find(function(x){return x.id===qid});var bs=blockState[qid];var allCorrect=true;q.blocks.forEach(function(b,bi){bs.slots[bi].forEach(function(v,si){var el=document.querySelector('.block-slot[data-qid="'+qid+'"][data-block="'+bi+'"][data-slot="'+si+'"]');var ok=v===b.answer[si];if(!ok)allCorrect=false;el.classList.remove('filled');el.classList.add(ok?'correct-slot':'wrong-slot');el.querySelector('.slot-remove').style.display='none';el.onclick=null;});});document.querySelectorAll('.cmd-chip[data-qid="'+qid+'"]').forEach(function(el){el.removeAttribute('draggable');el.classList.add('used');el.style.cursor='default';});if(allCorrect)score++;markQ(qid,allCorrect);}
+
+        // Common
+        function markQ(qid,ok){document.getElementById('q'+qid).classList.add(ok?'answered-correct':'answered-incorrect');var b=document.getElementById('sub'+qid);b.textContent=ok?'\u2713 Correct!':'\u2717 Incorrect';b.style.background=ok?'var(--accent-green)':'var(--accent-red)';b.disabled=true;document.getElementById('exp'+qid).classList.add('show');document.getElementById('correctCount').textContent=score;document.getElementById('totalAnswered').textContent=Object.keys(submitted).length;updateProgress();}
+        function updateProgress(){document.getElementById('progressBar').style.width=(Object.keys(submitted).length/questions.length*100)+'%';}
+        function resetQuiz(){answers={};submitted={};score=0;Object.keys(blockState).forEach(function(k){delete blockState[k];});document.getElementById('correctCount').textContent='0';document.getElementById('totalAnswered').textContent='0';initQuiz();}
+        function showAllAnswers(){questions.forEach(function(q){if(submitted[q.id])return;if(q.type==='single'){answers[q.id]=q.options.map(function(o,i){return o.correct?i:-1}).filter(function(i){return i>-1}).slice(0,1);subMCQ(q.id);}else if(q.type==='blocks'){if(!blockState[q.id]){blockState[q.id]={slots:{},usedPool:[]};q.blocks.forEach(function(b,bi){blockState[q.id].slots[bi]=new Array(b.slots).fill(null);});}q.blocks.forEach(function(b,bi){b.answer.forEach(function(a,si){blockState[q.id].slots[bi][si]=a;});});refreshBlock(q.id);subBlocks(q.id);}});}
+        initQuiz();
+    </script>
+
+
+</body>
+</html>

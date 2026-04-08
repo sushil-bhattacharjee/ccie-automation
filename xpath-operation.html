@@ -2265,6 +2265,82 @@ xpath_filter = (
 <div class="tip-box">⚠️ <strong>Exam trap:</strong> A leading <code>/</code> inside a predicate jumps to the document root — almost never what you want.</div>
 
 
+            <h2>🎯 Child Path vs Predicate Only</h2>
+            <p>Two ways to structure a filter — they control what the device returns:</p>
+            <p><strong>Child path</strong> (navigate into a child): <code>/interfaces/interface[pred]/state/counters</code><br>
+            <strong>Predicate only</strong> (filter without navigating): <code>/interfaces/interface[pred]</code></p>
+
+            <table>
+                <thead><tr><th>Aspect</th><th>Child Path</th><th>Predicate Only</th></tr></thead>
+                <tbody>
+                    <tr><td>Response size</td><td>Small — only the targeted child</td><td>Large — entire node with all siblings</td></tr>
+                    <tr><td>List key (<code>name</code>)</td><td>Included (device always returns keys)</td><td>Included</td></tr>
+                    <tr><td>Non-key siblings (<code>description</code>, <code>config</code>)</td><td>Lost — you navigated past them</td><td>Available</td></tr>
+                    <tr><td>lxml extraction</td><td>Simple — data is already narrowed</td><td>Need <code>find()</code> to dig out specific fields</td></tr>
+                    <tr><td>When to use</td><td>You only need one specific child</td><td>You need multiple fields from the node</td></tr>
+                </tbody>
+            </table>
+
+            <p><strong>Example — the trade-off in action:</strong></p>
+<pre># Child path: get only counters (clean response, but no description)
+'/interfaces/interface[state/oper-status="UP"]/state/counters'
+
+# Predicate only: get full block (verbose, but description is available)
+'/interfaces/interface[state/oper-status="UP"]'</pre>
+
+            <div class="golden-box">
+                <strong>🏆 Rule of thumb:</strong> If the question asks for <strong>one field</strong>, use a child path. If it asks for <strong>multiple fields</strong> (name + description + counters), drop the child path and extract with lxml.
+            </div>
+
+            <p><strong>None guard:</strong> Even with the full block, optional fields like <code>description</code> may not exist if not configured. Always guard:</p>
+<pre>desc_elem = entry.find("oc-if:config/oc-if:description", ns_oc)
+description = desc_elem.text if desc_elem is not None else "N/A"</pre>
+
+            <h2>🔧 How to Build Predicates</h2>
+            <p>Predicates go inside <code>[]</code> and filter nodes <strong>without</strong> changing which node you're on. Three patterns:</p>
+
+            <h3>1. Chained predicates <code>[][]</code> — implicit AND</h3>
+<pre>'/interfaces/interface[starts-with(name,"Gigabit")][state/oper-status="UP"]'</pre>
+            <p>Each <code>[]</code> is a filter applied in sequence. ALL must be true. Equivalent to <code>and</code>.</p>
+
+            <h3>2. <code>and</code> / <code>or</code> inside a single predicate</h3>
+<pre># AND — same result as chaining
+'[starts-with(name,"Gigabit") and state/oper-status="UP"]'
+
+# OR — only possible inside [], cannot chain with [][]
+'[as="65002" or as="65003"]'</pre>
+
+            <h3>3. Parentheses <code>()</code> for grouping — controls precedence</h3>
+<pre># Without (): "and" binds tighter — could give wrong results
+# With (): OR is evaluated first, then AND
+'[(as="65002" or as="65003") and connection/state="established"]'</pre>
+
+            <h3>Quick Reference</h3>
+            <table>
+                <thead><tr><th>Syntax</th><th>Purpose</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td><code>[][]</code></td><td>AND only (chain filters)</td><td><code>[pred1][pred2]</code></td></tr>
+                    <tr><td><code>[A and B]</code></td><td>AND inside one predicate</td><td><code>[status="UP" and pkts&gt;0]</code></td></tr>
+                    <tr><td><code>[A or B]</code></td><td>OR (only works inside <code>[]</code>)</td><td><code>[as="65002" or as="65003"]</code></td></tr>
+                    <tr><td><code>[(A or B) and C]</code></td><td>Grouped logic</td><td><code>[(as="65002" or as="65003") and state="established"]</code></td></tr>
+                </tbody>
+            </table>
+
+            <h3>Invalid Syntax — <code>or</code> between predicates</h3>
+<pre># WRONG — "or" between ][ is not XPath syntax
+'[as="65002"] or [as="65003"]'
+
+# WRONG — "and" between ][ with literal keyword
+'[as="65002"] and [state="established"]'
+
+# RIGHT — everything inside one [] or use [][] for AND
+'[as="65002" or as="65003"]'
+'[as="65002"][state="established"]'</pre>
+
+            <div class="warning-box">
+                <strong>⚠️ Think of <code>[]</code> as a filter box.</strong> All logic (<code>and</code>, <code>or</code>, <code>()</code>) goes <strong>inside</strong> the box. Multiple boxes <code>[][]</code> are always AND.
+            </div>
+
         </section>
 
         <section id="quiz" class="section">

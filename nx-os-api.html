@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NX-OS API (DME, RESTCONF, NX-API CLI) - DevNet Expert Study Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-tertiary:#21262d;--text-primary:#e6edf3;--text-secondary:#8b949e;--accent-blue:#58a6ff;--accent-green:#3fb950;--accent-red:#f85149;--accent-orange:#d29922;--accent-purple:#a371f7;--accent-cyan:#39c5cf;--border-color:#30363d;--code-bg:#0d1117}
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.7}
+        .nav-container{position:fixed;top:0;left:0;right:0;background:var(--bg-secondary);border-bottom:1px solid var(--border-color);z-index:1000;padding:1rem 2rem}
+        .nav-content{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}.nav-title{font-size:1.2rem;font-weight:700;color:var(--accent-cyan)}
+        .nav-tabs{display:flex;gap:0.5rem}.nav-tab{padding:0.6rem 1.5rem;border:none;background:transparent;color:var(--text-secondary);font-family:inherit;font-size:0.95rem;font-weight:500;cursor:pointer;border-radius:8px;transition:all 0.2s}
+        .nav-tab:hover{background:var(--bg-tertiary);color:var(--text-primary)}.nav-tab.active{background:var(--accent-cyan);color:var(--bg-primary)}
+        .main-content{max-width:1200px;margin:0 auto;padding:6rem 2rem 3rem}.section{display:none}.section.active{display:block}
+        h1{font-size:2.2rem;font-weight:700;margin-bottom:1rem}h2{font-size:1.6rem;font-weight:600;margin:2rem 0 1rem;color:var(--accent-blue);padding-bottom:0.5rem;border-bottom:2px solid var(--border-color)}
+        h3{font-size:1.2rem;font-weight:600;margin:1.5rem 0 0.75rem;color:var(--accent-purple)}h4{font-size:1.05rem;font-weight:600;margin:1rem 0 0.5rem;color:var(--accent-cyan)}
+        p{margin-bottom:0.75rem;color:var(--text-secondary)}.intro-text{font-size:1.1rem;color:var(--text-secondary);margin-bottom:2rem}
+        pre{background:var(--code-bg);border:1px solid var(--border-color);border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;margin:1rem 0;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.5;white-space:pre}
+        code{font-family:'JetBrains Mono',monospace;background:var(--bg-tertiary);padding:0.15rem 0.4rem;border-radius:4px;font-size:0.85em}pre code{background:none;padding:0}
+        table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.82rem}th,td{padding:0.5rem 0.7rem;text-align:left;border:1px solid var(--border-color)}
+        th{background:var(--bg-tertiary);font-weight:600;color:var(--text-primary)}td{background:var(--bg-secondary);color:var(--text-secondary)}
+        .tip-box{background:rgba(88,166,255,0.1);border:1px solid var(--accent-blue);border-radius:8px;padding:1rem;margin:1rem 0}.tip-box strong{color:var(--accent-blue)}
+        .warning-box{background:rgba(248,81,73,0.1);border:1px solid var(--accent-red);border-radius:8px;padding:1rem;margin:1rem 0}.warning-box strong{color:var(--accent-red)}
+        .golden-box{background:rgba(210,153,34,0.15);border:2px solid var(--accent-orange);border-radius:8px;padding:1.25rem;margin:1.5rem 0}.golden-box strong{color:var(--accent-orange)}
+        .comment{color:#3fb950;font-style:italic}
+        details{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;margin:0.75rem 0;padding:0.75rem 1rem}
+        summary{cursor:pointer;color:var(--accent-blue);font-weight:600;font-size:0.95rem;padding:0.25rem 0}summary:hover{color:var(--accent-cyan)}
+        summary h2,summary h3{display:inline;font-size:inherit;border:none;padding:0;margin:0;color:inherit}
+        hr{border:none;border-top:1px solid var(--border-color);margin:1.5rem 0}
+        ul,ol{margin:0.5rem 0 1rem 1.5rem;color:var(--text-secondary)}li{margin-bottom:0.25rem}
+
+        /* Block-fill */
+        .block-container{display:flex;flex-direction:column;gap:1rem}
+        .block-section{background:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:10px;padding:1rem 1.25rem}
+        .block-title{font-size:0.85rem;font-weight:600;color:var(--accent-orange);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.5px}
+        .block-slots{display:flex;flex-wrap:wrap;gap:0.4rem;min-height:40px}
+        .block-slot{min-height:38px;border:2px dashed var(--border-color);border-radius:6px;display:flex;align-items:center;padding:0.4rem 0.75rem;font-size:0.72rem;color:var(--text-secondary);font-family:'JetBrains Mono',monospace;transition:border-color 0.2s;min-width:60px}
+        .block-slot.drag-over{border-color:var(--accent-blue);background:rgba(88,166,255,0.05)}
+        .block-slot.filled{border-style:solid;border-color:var(--accent-purple);background:rgba(163,113,247,0.1);color:var(--text-primary);cursor:pointer}
+        .block-slot.filled:hover{border-color:var(--accent-red)}
+        .block-slot.correct-slot{border-color:var(--accent-green);background:rgba(63,185,80,0.1);border-style:solid}
+        .block-slot.wrong-slot{border-color:var(--accent-red);background:rgba(248,81,73,0.1);border-style:solid}
+        .block-slot .slot-remove{margin-left:auto;color:var(--accent-red);font-size:0.75rem;opacity:0;transition:opacity 0.15s}
+        .block-slot.filled:hover .slot-remove{opacity:1}
+        .cmd-pool{display:flex;flex-wrap:wrap;gap:0.5rem;padding:1rem;background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:10px;margin-top:0.5rem}
+        .cmd-pool-title{font-size:0.8rem;font-weight:600;color:var(--accent-cyan);width:100%;margin-bottom:0.25rem}
+        .cmd-chip{padding:0.4rem 0.9rem;background:var(--bg-tertiary);border:2px solid var(--border-color);border-radius:6px;cursor:grab;color:var(--text-primary);font-family:'JetBrains Mono',monospace;font-size:0.68rem;user-select:none;transition:all 0.2s;white-space:nowrap}
+        .cmd-chip:hover:not(.used){border-color:var(--accent-blue);background:rgba(88,166,255,0.1)}
+        .cmd-chip.used{opacity:0.3;cursor:default;border-style:dashed}
+
+        /* Quiz */
+        .quiz-header{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+        .score-display{font-size:1.25rem;font-weight:600}.score-correct{color:var(--accent-green)}.score-total{color:var(--text-secondary)}
+        .quiz-controls{display:flex;gap:0.75rem}.btn{padding:0.6rem 1.25rem;border:none;border-radius:8px;font-family:inherit;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s}
+        .btn-primary{background:var(--accent-blue);color:var(--bg-primary)}.btn-primary:hover{background:#79b8ff}.btn-secondary{background:var(--bg-tertiary);color:var(--text-primary)}.btn-secondary:hover{background:var(--border-color)}
+        .question-card{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+        .question-card.answered-correct{border-color:var(--accent-green)}.question-card.answered-incorrect{border-color:var(--accent-red)}
+        .question-header{display:flex;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem}
+        .question-number{font-size:0.8rem;font-weight:600;color:var(--accent-cyan);background:var(--bg-tertiary);padding:0.25rem 0.75rem;border-radius:20px}
+        .question-type{font-size:0.8rem;font-weight:500;color:var(--accent-orange)}
+        .question-text{font-size:0.95rem;font-weight:500;color:var(--text-primary);margin-bottom:1.25rem;line-height:1.5}
+        .question-text pre{font-size:0.65rem;margin:0.75rem 0}
+        .submit-btn{margin-top:1rem;width:100%;padding:0.75rem;background:var(--accent-blue);color:var(--bg-primary);border:none;border-radius:8px;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer}
+        .submit-btn:hover:not(:disabled){background:#79b8ff}.submit-btn:disabled{background:var(--bg-tertiary);color:var(--text-secondary);cursor:not-allowed}
+        .explanation{margin-top:1rem;padding:1rem;background:var(--bg-primary);border-radius:8px;border-left:4px solid var(--accent-blue);display:none}
+        .explanation.show{display:block}.explanation-title{font-weight:600;color:var(--accent-blue);margin-bottom:0.5rem}
+        .explanation-text{color:var(--text-primary);font-size:0.88rem;white-space:pre-wrap;line-height:1.8;font-family:'JetBrains Mono','Plus Jakarta Sans',monospace}
+        .progress-bar{width:100%;height:8px;background:var(--bg-tertiary);border-radius:4px;overflow:hidden;margin-bottom:1rem}
+        .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-blue));border-radius:4px;transition:width 0.3s ease}
+
+        /* Inline slots inside pre */
+        .cmd-block{position:relative;margin:0.75rem 0}
+        .cmd-pre{position:relative;font-size:0.72rem;line-height:1.7}
+        .inline-slot{display:inline;padding:2px 8px;border:2px dashed var(--accent-orange);border-radius:4px;color:var(--accent-orange);font-weight:600;cursor:pointer;background:rgba(210,153,34,0.1);min-width:40px;transition:all 0.15s}
+        .inline-slot.drag-over{border-color:var(--accent-blue);background:rgba(88,166,255,0.15);color:var(--accent-blue)}
+        .inline-slot.filled{border-color:var(--accent-purple);background:rgba(163,113,247,0.15);color:var(--accent-purple);font-weight:500;border-style:solid}
+        .inline-slot.filled:hover{border-color:var(--accent-red);text-decoration:line-through;cursor:pointer}
+        .inline-slot.slot-correct{border-color:var(--accent-green);background:rgba(63,185,80,0.15);color:var(--accent-green);border-style:solid;cursor:default}
+        .inline-slot.slot-wrong{border-color:var(--accent-red);background:rgba(248,81,73,0.15);color:var(--accent-red);border-style:solid;cursor:help}
+        .copy-btn{margin-top:0.5rem;padding:0.5rem 1rem;background:var(--accent-green);color:var(--bg-primary);border:none;border-radius:6px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer}
+        .copy-btn:hover{background:#56d364}
+
+        @media(max-width:768px){.nav-content{flex-direction:column;gap:1rem}.main-content{padding:8rem 1rem 2rem}h1{font-size:1.75rem}.quiz-header{flex-direction:column;text-align:center}pre{font-size:0.58rem}}
+    </style>
+</head>
+<body>
+    <nav class="nav-container"><div class="nav-content">
+        <div class="nav-title">📡 NX-OS API (DME, RESTCONF, NX-API CLI) - DevNet Expert</div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
+            <button class="nav-tab" onclick="showSection('quiz')">📝 Lab Practice</button>
+        </div>
+    </div></nav>
+    <main class="main-content">
+        <section id="learn" class="section active">
+<h1>e5 — NX-OS API (DME, RESTCONF, NX-API CLI)</h1>
+
+<hr>
+<h2>NX-OS-API-STUDY</h2>
+<details>
+<summary><h2>📘 NX-OS-API-STUDY (click to expand)</h2></summary>
+
+<hr>
+
+<details>
+<summary><h3>1. Three API Types on NX-OS</h3></summary>
+
+<table>
+<thead><tr><th>API</th><th>Endpoint</th><th>Auth Method</th><th>Model</th><th>Feature</th></tr></thead>
+<tbody>
+<tr><td>NX-API CLI</td><td><code>/ins</code></td><td>Basic Auth (<code>-u user:pass</code>)</td><td>CLI over HTTP</td><td><code>feature nxapi</code></td></tr>
+<tr><td>NX-API REST (DME)</td><td><code>/api/mo/</code>, <code>/api/class/</code></td><td><code>aaaLogin.json</code> → <code>Cookie: APIC-cookie=<token></code></td><td>ACI-style MIT tree</td><td><code>feature nxapi</code></td></tr>
+<tr><td>RESTCONF</td><td><code>/restconf/data/</code></td><td>Basic Auth (<code>-u user:pass</code>)</td><td>YANG</td><td><code>feature nxapi</code> + <code>feature restconf</code></td></tr>
+</tbody></table>
+<h4>Enable on switch</h4>
+
+<pre>switch(config)# feature nxapi
+switch(config)# nxapi https port 443
+switch(config)# feature restconf
+</pre>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>2. Platform API Support Matrix</h3></summary>
+
+<table>
+<thead><tr><th>Platform</th><th>NETCONF</th><th>RESTCONF</th><th>gRPC</th><th>NX-API CLI</th><th>NX-API REST (DME)</th></tr></thead>
+<tbody>
+<tr><td><strong>IOS-XE</strong></td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td><td>No</td></tr>
+<tr><td><strong>IOS-XR</strong></td><td>Yes</td><td><strong>No</strong></td><td>Yes</td><td>No</td><td>No</td></tr>
+<tr><td><strong>NX-OS</strong></td><td>Yes</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+<tr><td><strong>ACI (APIC)</strong></td><td>No</td><td>No</td><td>No</td><td>No</td><td>Yes (DME)</td></tr>
+</tbody></table>
+<div class="tip-box">IOS-XR does <strong>NOT</strong> support RESTCONF — only NETCONF and gRPC for YANG.</div>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>3. Authentication Quick Reference</h3></summary>
+
+<h4>NX-API REST (DME) — Token-based</h4>
+
+<pre># Step 1: Login (-d implies POST)
+export token=$(curl -sk &quot;https://$NXOS_URI/api/aaaLogin.json&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -d &#x27;{
+        &quot;aaaUser&quot; : {
+            &quot;attributes&quot; : {
+                &quot;name&quot; : &quot;expert&quot;,
+                &quot;pwd&quot; : &quot;1234QWer!&quot;
+            }
+        }
+}&#x27; | jq -r &#x27;.imdata[0].aaaLogin.attributes.token&#x27;)
+
+# Step 2: Use token
+curl -sk &quot;https://$NXOS_URI/api/class/l2BD.json&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot;
+</pre>
+
+<h4>RESTCONF & NX-API CLI — Basic Auth</h4>
+
+<pre># Using -u (curl encodes for you)
+curl -sk &quot;https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System&quot; \
+  -u expert:&#x27;1234QWer!&#x27;
+
+# Using Authorization header (you encode manually)
+echo -n &#x27;expert:1234QWer!&#x27; | base64
+# ZXhwZXJ0OjEyMzRRV2VyIQ==
+
+curl -sk &quot;https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System&quot; \
+  -H &#x27;Authorization: Basic ZXhwZXJ0OjEyMzRRV2VyIQ==&#x27;
+</pre>
+
+<div class="tip-box">Both <code>-u user:pass</code> and <code>-H 'Authorization: Basic <base64>'</code> are identical.</div>
+<div class="tip-box"><code>-u</code> can go anywhere in the curl command — position doesn't matter.</div>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>4. APIC (ACI) vs NX-OS (Standalone) — DME Comparison</h3></summary>
+
+<table>
+<thead><tr><th></th><th>ACI (APIC)</th><th>NX-OS (Standalone)</th></tr></thead>
+<tbody>
+<tr><td>Root DN</td><td><code>uni/</code></td><td><code>sys/</code></td></tr>
+<tr><td>VLAN / BD</td><td><code>uni/tn-X/BD-Y</code></td><td><code>sys/bd/bd-[vlan-X]</code></td></tr>
+<tr><td>Interface</td><td><code>topology/pod-1/node-1/sys/phys-[eth1/1]</code></td><td><code>sys/intf/phys-[eth1/1]</code></td></tr>
+<tr><td>BD Class</td><td><code>fvBD</code></td><td><code>l2BD</code></td></tr>
+<tr><td>Subnet Class</td><td><code>fvSubnet</code></td><td>—</td></tr>
+<tr><td>Interface Class</td><td><code>l1PhysIf</code></td><td><code>l1PhysIf</code></td></tr>
+<tr><td>SVI Class</td><td>—</td><td><code>sviIf</code></td></tr>
+<tr><td>Query mechanics</td><td><code>query-target</code>, <code>rsp-subtree</code>, filters</td><td><strong>Identical</strong></td></tr>
+<tr><td>Filter syntax</td><td><code>eq()</code>, <code>wcard()</code>, <code>and()</code>, <code>or()</code></td><td><strong>Identical</strong></td></tr>
+<tr><td>Token path</td><td><code>.imdata[0].aaaLogin.attributes.token</code></td><td><strong>Identical</strong></td></tr>
+</tbody></table>
+<h4>Key differences</h4>
+<p>- ACI tree starts at <code>uni/</code> (tenants, APs, EPGs, BDs)</p>
+<p>- NX-OS tree starts at <code>sys/</code> (interfaces, routing, VLANs)</p>
+<p>- Class names are different but query patterns are the same</p>
+<p>- Both require <code>--globoff</code> for DNs with square brackets</p>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>5. Class vs MO — Two Ways to Query DME</h3></summary>
+
+<table>
+<thead><tr><th></th><th><code>/api/class/</code></th><th><code>/api/mo/</code></th></tr></thead>
+<tbody>
+<tr><td>Purpose</td><td>Query <strong>all objects</strong> of a class</td><td>Query a <strong>specific object</strong> by DN</td></tr>
+<tr><td>Filter</td><td><code>query-target-filter=eq(class.attr,"val")</code></td><td><code>query-target</code>, <code>rsp-subtree</code></td></tr>
+<tr><td>Example</td><td><code>/api/class/l2BD.json</code></td><td><code>/api/mo/sys/bd/bd-[vlan-2110].json</code></td></tr>
+<tr><td>Needs <code>--globoff</code></td><td>No (usually)</td><td>Yes (DNs have <code>[]</code>)</td></tr>
+</tbody></table>
+<h4>Class Name vs RN (Relative Name) in MO Path</h4>
+
+<table>
+<thead><tr><th>Class Name</th><th>RN in MO Path</th><th>DN Example</th></tr></thead>
+<tbody>
+<tr><td><code>l2BD</code></td><td><code>bd-[vlan-XXXX]</code></td><td><code>sys/bd/bd-[vlan-2110]</code></td></tr>
+<tr><td><code>l1PhysIf</code></td><td><code>phys-[ethX/Y]</code></td><td><code>sys/intf/phys-[eth1/1]</code></td></tr>
+<tr><td><code>sviIf</code></td><td><code>svi-[vlanXXXX]</code></td><td><code>sys/intf/svi-[vlan2110]</code></td></tr>
+<tr><td><code>pcAggrIf</code></td><td><code>aggr-[poX]</code></td><td><code>sys/intf/aggr-[po1]</code></td></tr>
+<tr><td><code>l3LbRtdIf</code></td><td><code>lb-[loX]</code></td><td><code>sys/intf/lb-[lo0]</code></td></tr>
+</tbody></table>
+<div class="tip-box"><strong>Never put class name in MO path</strong> — <code>sys/intf/sviIf.json</code> does NOT work.</div>
+<div class="tip-box">MO path uses RN (<code>svi-[vlan2110]</code>), not class name (<code>sviIf</code>).</div>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>6. DME vs RESTCONF vs NX-API CLI — Same Data, Different Paths</h3></summary>
+
+<h4>Example: Query VLAN 2110</h4>
+
+<pre># DME — by MO
+curl -sk --globoff &quot;https://$NXOS_URI/api/mo/sys/bd/bd-[vlan-2110].json&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot;
+
+# DME — by class with filter
+curl -sk &quot;https://$NXOS_URI/api/class/l2BD.json?query-target-filter=eq(l2BD.id,\&quot;2110\&quot;)&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot;
+
+# RESTCONF
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/bd-items/bd-items/BD-list=vlan-2110&quot; \
+  -H &#x27;accept: application/yang-data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD
+
+# NX-API CLI
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;show vlan id 2110&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27;
+</pre>
+
+<h4>Example: Query interface eth1/2</h4>
+
+<pre># DME
+curl -sk --globoff &quot;https://$NXOS_URI/api/mo/sys/intf/phys-[eth1/2].json&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot;
+
+# RESTCONF (encode slash as %2F)
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/intf-items/phys-items/PhysIf-list=eth1%2F2&quot; \
+  -H &#x27;accept: application/yang-data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD
+
+# NX-API CLI
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;show interface eth1/2&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27;
+</pre>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>7. YANG Tree — NX-OS RESTCONF (Simplified)</h3></summary>
+
+<pre>Cisco-NX-OS-device:System
+│
+├── bd-items
+│   └── bd-items
+│       └── BD-list=&lt;vlan-XXXX&gt;              ← VLANs (L2 Bridge Domains)
+│           ├── name
+│           ├── id
+│           ├── fabEncap
+│           └── adminSt
+│
+├── intf-items
+│   ├── phys-items
+│   │   └── PhysIf-list=&lt;ethX/Y&gt;            ← Physical interfaces (L2 only)
+│   ├── svi-items
+│   │   └── If-list=&lt;vlanXXXX&gt;              ← SVIs
+│   ├── lb-items
+│   │   └── LbRtdIf-list=&lt;loX&gt;             ← Loopbacks
+│   └── aggr-items
+│       └── AggrIf-list=&lt;poX&gt;              ← Port-channels
+│
+├── ipv4-items                               ← IP addresses (NOT under intf-items!)
+│   └── inst-items
+│       └── dom-items
+│           └── Dom-list=&lt;vrf&gt;
+│               └── if-items
+│                   └── If-list=&lt;intf&gt;       ← IPv4 addresses per interface
+│
+├── bgp-items
+│   └── inst-items
+│       └── dom-items
+│           └── Dom-list=&lt;vrf&gt;              ← BGP config
+│
+├── ospf-items
+│   └── inst-items
+│       └── Inst-list=&lt;n&gt;                ← OSPF instances
+│
+├── isis-items
+│   └── inst-items
+│       └── Inst-list=&lt;n&gt;                ← IS-IS instances
+│
+├── eps-items                                ← VXLAN/EVPN
+├── fm-items                                 ← Feature manager
+└── host-items                               ← Hostname
+</pre>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>8. RESTCONF Paths Quick Reference</h3></summary>
+
+<pre>BASE: https://&lt;switch&gt;/restconf/data/Cisco-NX-OS-device:System
+
+# INTERFACES
+/intf-items/phys-items/PhysIf-list                          ← All physical
+/intf-items/phys-items/PhysIf-list=eth1%2F1                  ← Specific (encode /)
+/intf-items/svi-items/If-list                                ← All SVIs
+/intf-items/svi-items/If-list=vlan2110                       ← Specific SVI
+/intf-items/lb-items/LbRtdIf-list                            ← All loopbacks
+/intf-items/aggr-items/AggrIf-list                           ← All port-channels
+
+# VLANs
+/bd-items                                                    ← All VLANs
+/bd-items/bd-items/BD-list=vlan-2110                         ← Specific VLAN
+
+# IP ADDRESSES
+/ipv4-items/inst-items/dom-items/Dom-list=default/if-items/If-list            ← All IPv4
+/ipv4-items/inst-items/dom-items/Dom-list=default/if-items/If-list=eth1%2F2   ← Specific
+
+# ROUTING
+/bgp-items/inst-items/dom-items/Dom-list=default             ← BGP
+/ospf-items/inst-items/Inst-list=UNDERLAY                    ← OSPF
+/isis-items/inst-items/Inst-list=ISIS                        ← IS-IS
+
+# SYSTEM
+/host-items                                                  ← Hostname
+/fm-items                                                    ← Enabled features
+</pre>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>9. DME Filter Syntax Reference</h3></summary>
+
+<pre># query-target-filter — filters the queried objects (class queries)
+/api/class/l2BD.json?query-target-filter=eq(l2BD.id,&quot;2110&quot;)
+
+# rsp-subtree-filter — filters children (MO queries with subtree)
+/api/mo/sys/bd.json?rsp-subtree=children&amp;rsp-subtree-class=l2BD&amp;rsp-subtree-filter=eq(l2BD.fabEncap,&quot;vlan-2110&quot;)&amp;rsp-subtree-include=required
+
+# wcard — wildcard match
+?query-target-filter=wcard(l2BD.name,&quot;Challenge&quot;)
+
+# eq — exact match
+?query-target-filter=eq(l2BD.id,&quot;2110&quot;)
+</pre>
+
+<h4>Filter gotchas</h4>
+<p>- <strong>Double quotes</strong> around string values — single quotes cause invalid responses</p>
+<p>- <strong>No space</strong> after comma — <code>eq(l2BD.id,"2110")</code> not <code>eq(l2BD.id, "2110")</code></p>
+<p>- <strong>Escape quotes</strong> in bash — <code>\"2110\"</code> inside double-quoted URLs</p>
+<p>- <code>query-target-filter</code> filters the class; <code>rsp-subtree-filter</code> filters children</p>
+<p>- <code>rsp-subtree-include=required</code> filters parent objects based on matching children</p>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>10. NX-API CLI Response Structure & jq Gotchas</h3></summary>
+
+<p>NX-API CLI always wraps arrays in <code>TABLE_*</code> / <code>ROW_*</code> pairs:</p>
+
+<pre>{
+  &quot;ins_api&quot;: {
+    &quot;outputs&quot;: {
+      &quot;output&quot;: {
+        &quot;body&quot;: {
+          &quot;TABLE_intf&quot;: {
+            &quot;ROW_intf&quot;: [ ... ]
+          }
+        }
+      }
+    }
+  }
+}
+</pre>
+
+<h4>jq gotchas</h4>
+<p>- <strong>Hyphenated keys</strong> need bracket syntax: <code>.["intf-name"]</code> not <code>.intf-name</code></p>
+<p>- <strong>Leading dot</strong> required: <code>.prefix</code> not <code>prefix</code></p>
+<p>- <strong>No trailing comma</strong> before <code>}</code></p>
+<p>- <strong>Single result</strong> = object, <strong>multiple results</strong> = array — watch for inconsistency</p>
+<p>- <strong>Shorthand</strong> <code>{foo}</code> only works for simple keys, hyphenated keys need <code>{name: .["intf-name"]}</code></p>
+<p>- <strong>Array iterator <code>[]</code></strong> must be outside quotes: <code>."BD-list"[]</code> not <code>."BD-list[]"</code></p>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>11. curl Tips for Exam</h3></summary>
+
+<pre># GET is default — no need for -X GET or --request GET
+curl -sk &quot;https://host/api/class/l2BD.json&quot;
+
+# -d implies POST — no need for -X POST
+curl -sk &quot;https://host/api/aaaLogin.json&quot; -d &#x27;{...}&#x27;
+
+# -u can go anywhere — position doesn&#x27;t matter
+curl -sk &quot;https://host/ins&quot; -H &#x27;content-type: application/json&#x27; -u user:pass -d &#x27;{...}&#x27;
+
+# --globoff for DNs with square brackets
+curl -sk --globoff &quot;https://host/api/mo/sys/bd/bd-[vlan-2110].json&quot;
+
+# URL-encode slashes in RESTCONF keys
+eth1/14 → eth1%2F14
+
+# -k skips certificate verification (lab use)
+</pre>
+
+</details>
+
+<hr>
+
+<details>
+<summary><h3>12. How to Discover URIs in the Exam</h3></summary>
+
+<table>
+<thead><tr><th>Method</th><th>Use For</th></tr></thead>
+<tbody>
+<tr><td><strong>NX-API Sandbox</strong> (<code>https://<switch>/sandbox</code>)</td><td>Convert CLI → DME payload, find DNs</td></tr>
+<tr><td><strong>Visore</strong> (<code>https://<switch>/visore.html</code>)</td><td>Browse DME object tree, search by class</td></tr>
+<tr><td><strong>Walk RESTCONF tree</strong> from top</td><td>Start at <code>/restconf/data/Cisco-NX-OS-device:System</code>, drill down</td></tr>
+<tr><td><strong>YANG model file</strong> on bootflash</td><td><code>grep</code> for keywords in <code>Cisco-NX-OS-device.yang</code></td></tr>
+<tr><td><strong>Query by class</strong></td><td><code>curl /api/class/<className>.json</code> → shows all objects with their DNs</td></tr>
+</tbody></table>
+</details>
+
+<hr>
+
+</details>
+
+            <h2>🐍 Initial Code</h2>
+            <details><summary>📄 Click to expand initial code (with #TODO placeholders)</summary>
+<pre>#!/bin/bash
+###############################################################################
+#! NX-OS has THREE API types:
+#!
+#! API              | Endpoint              | Auth Method                          | Model
+#! -----------------|-----------------------|--------------------------------------|----------------
+#! NX-API CLI       | /ins                  | Basic Auth (-u user:pass)            | CLI over HTTP
+#! NX-API REST(DME) | /api/mo/, /api/class/ | aaaLogin.json -&gt; APIC-cookie token   | ACI-style MIT
+#! RESTCONF         | /restconf/data/       | Basic Auth (-u user:pass)            | YANG
+#!
+#! feature nxapi    -&gt; enables NX-API CLI + NX-API REST(DME) + HTTP server
+#! feature restconf -&gt; enables RESTCONF (runs on top of nxapi HTTP server)
+#!
+#! switch(config)# feature nxapi
+#! switch(config)# nxapi https port 443
+#! switch(config)# feature restconf
+###############################################################################
+
+export NXOS_USERNAME=&quot;expert&quot;
+export NXOS_PASSWORD=&#x27;1234QWer!&#x27;
+export NXOS_URI=&quot;192.168.89.73&quot;
+
+###############################################################################
+#! NX-API DME (feature nxapi) — uses APIC-cookie token
+###############################################################################
+
+#! TODO-1 : Login and extract token (-d implies POST, no need for -X POST)
+export token=$(curl -sk &quot;https://$NXOS_URI/api/aaaLogin.json&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -d &quot;{
+        \&quot;aaaUser\&quot; : {
+            \&quot;attributes\&quot; : {
+                \&quot;name\&quot; : &quot;$NXOS_USERNAME&quot;,
+                \&quot;pwd\&quot; : &quot;$NXOS_PASSWORD&quot;
+            }
+        }
+    }&quot; | jq -r &#x27;.imdata[0].aaaLogin.attributes.token&#x27;)
+
+echo $token
+
+#! TODO-2 : Query all VLANs via DME (GET is default, no need for -X GET)
+echo &quot;PRINTING ALL VLANS VIA DME&quot;
+
+curl -sk &quot;https://$NXOS_URI/api/mo/sys/#TODO \
+  -H &quot;#TODO&quot; \
+  | jq &#x27;.imdata[].bdEntity.children[].l2BD.attributes | {id, name, fabEncap}&#x27;
+
+#! TODO-3 : Query specific VLAN 2110 via DME
+echo &quot;PRINTING VLAN 2110 VIA DME&quot;
+
+curl -sk --globoff &quot;https://$NXOS_URI/api/mo/#TODO&quot; \
+  -H &quot;#TODO&quot; | jq &#x27;.imdata[].l2BD.attributes | {id, dn, fabEncap}&#x27;
+
+#! TODO-3a : Query specific VLAN 2110 via DME
+echo &quot;PRINTING VLAN 2110 VIA DME USING class&quot;
+curl -sk &quot;https://$NXOS_URI/api/class/#TODO&quot; \
+  -H &quot;#TODO&quot; | jq -r &#x27;.imdata[0].l2BD.attributes.fabEncap&#x27;
+
+#! TODO-4 : Query all SVIs via DME
+echo &quot;PRINTING ALL SVIs VIA DME&quot;
+
+curl -sk &quot;https://$NXOS_URI/api/mo/#TODO&quot; \
+  -H &quot;#TODO&quot; | jq &#x27;.imdata[].sviIf.attributes | {id, adminSt, operSt}&#x27;
+
+#! TODO-4a : Query all SVIs via DME USING class
+echo &quot;PRINTING ALL SVIs VIA DME USING class&quot;
+curl -sk &quot;https://$NXOS_URI/api/class/#TODO&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; | jq &#x27;.imdata[].sviIf.attributes | {id, adminSt, operSt}&#x27;
+
+# ###############################################################################
+# #! RESTCONF (feature restconf) — uses Basic Auth, no token needed
+# ###############################################################################
+
+#! TODO-5 : Query SVI via RESTCONF
+echo &quot;PRINTING ALL THE SVI VIA RESTCONF&quot;
+
+curl -sk &quot;https://$NXOS_URI/restconf/data/#TODO&quot; \
+  -H &#x27;accept: application/yang.data+json&#x27; \
+  -u #TODO | jq &#x27;.&quot;bd-items&quot;.&quot;bd-items&quot;.&quot;BD-list&quot;[] | {fabEncap, id}&#x27;
+
+#! TODO-5a : Query SVI vlan2110 via RESTCONF
+echo &quot;PRINTING THE SVI VLAN2110 VIA RESTCONF&quot;
+curl -sk &quot;https://$NXOS_URI/restconf/data/#TODO&quot; \
+  -H &#x27;accept: application/yang.data+json&#x27; \
+  -u #TODO | jq &#x27;#TODO&#x27;
+
+echo &quot;PRINTING THE SVI VLAN2110 VIA RESTCONF VLAN-NAME&quot;
+curl -sk &quot;https://$NXOS_URI/restconf/data/#TODO&quot; \
+  -H &#x27;accept: application/yang.data+json&#x27; \
+  -u TODO | jq -r &#x27;#TODO&#x27;
+
+# ###############################################################################
+# #! NX-API CLI (feature nxapi) — uses Basic Auth, sends CLI commands over HTTP
+# ###############################################################################
+
+#! TODO-6 : &quot;show vlan brief&quot; via NX-API CLI (output JSON)
+echo &quot;PRINTING SHOW VLAN BRIEF VIA NX-API CLI&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u #TODO \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;#TODO&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27; | jq &#x27;.ins_api.outputs.output.body.TABLE_vlanbriefxbrief.ROW_vlanbriefxbrief[] | {id: .[&quot;vlanshowbr-vlanid&quot;], name: .[&quot;vlanshowbr-vlanname&quot;]}&#x27;
+
+#! TODO-7 : &quot;show ip int brief&quot; via NX-API CLI (output JSON)
+echo &quot;PRINTING SHOW IP INT BRIEF VIA NX-API CLI&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u #TODO \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;#TODO&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27; | jq &#x27;.ins_api.outputs.output.body.TABLE_intf.ROW_intf[] | {name: .[&quot;intf-name&quot;], ip: .prefix}&#x27;
+
+#! TODO-8 : &quot;show vlan name prod99&quot; via NX-API CLI (output JSON)
+echo &quot;PRINTING SHOW VLAN NAME PROD99 VIA NX-API CLI&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u #TODO \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;#TODO&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27; | jq &#x27;{ports: .ins_api.outputs.output.body.TABLE_vlanbriefname.ROW_vlanbriefname[&quot;vlanshowplist-ifidx&quot;], mode: .ins_api.outputs.output.body.TABLE_mtuinfoname.ROW_mtuinfoname[&quot;vlanshowinfo-vlanmode&quot;]}&#x27;
+
+# #! TODO-9 : &quot;show running-config bgp&quot; via NX-API CLI (output XML)
+echo &quot;PRINTING SHOW RUNNING-CONFIG BGP VIA NX-API CLI (XML)&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u #TODO \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show_ascii&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;#TODO&quot;,
+      &quot;output_format&quot;: &quot;xml&quot;
+    }
+}&#x27;
+</pre>
+            </details>
+
+            <h2>✅ Solution Code</h2>
+            <details><summary>⚠️ Click to reveal complete solution</summary>
+<pre>#!/bin/bash
+###############################################################################
+#! NX-OS has THREE API types:
+#!
+#! API              | Endpoint              | Auth Method                          | Model
+#! -----------------|-----------------------|--------------------------------------|----------------
+#! NX-API CLI       | /ins                  | Basic Auth (-u user:pass)            | CLI over HTTP
+#! NX-API REST(DME) | /api/mo/, /api/class/ | aaaLogin.json -&gt; APIC-cookie token   | ACI-style MIT
+#! RESTCONF         | /restconf/data/       | Basic Auth (-u user:pass)            | YANG
+#!
+#! feature nxapi    -&gt; enables NX-API CLI + NX-API REST(DME) + HTTP server
+#! feature restconf -&gt; enables RESTCONF (runs on top of nxapi HTTP server)
+#!
+#! switch(config)# feature nxapi
+#! switch(config)# nxapi https port 443
+#! switch(config)# feature restconf
+###############################################################################
+
+export NXOS_USERNAME=&quot;expert&quot;
+export NXOS_PASSWORD=&#x27;1234QWer!&#x27;
+export NXOS_URI=&quot;192.168.89.73&quot;
+
+###############################################################################
+#! NX-API DME (feature nxapi) — uses APIC-cookie token
+###############################################################################
+
+#! TODO-1 : Login and extract token (-d implies POST, no need for -X POST)
+export token=$(curl -sk &quot;https://$NXOS_URI/api/aaaLogin.json&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -d &quot;{
+        \&quot;aaaUser\&quot; : {
+            \&quot;attributes\&quot; : {
+                \&quot;name\&quot; : &quot;$NXOS_USERNAME&quot;,
+                \&quot;pwd\&quot; : &quot;$NXOS_PASSWORD&quot;
+            }
+        }
+    }&quot; | jq -r &#x27;.imdata[0].aaaLogin.attributes.token&#x27;)
+
+echo $token
+
+#! TODO-2 : Query all VLANs via DME (GET is default, no need for -X GET)
+echo &quot;PRINTING ALL VLANS VIA DME&quot;
+
+curl -sk &quot;https://$NXOS_URI/api/mo/sys/bd.json?rsp-subtree=children&amp;rsp-subtree-filter=wcard(l2BD.fabEncap,\"vlan\")&amp;rsp-subtree-include=required&amp;rsp-subtree-class=l2BD&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; \
+  | jq &#x27;.imdata[].bdEntity.children[].l2BD.attributes | {id, name, fabEncap}&#x27;
+
+#! TODO-3 : Query specific VLAN 2110 via DME
+echo &quot;PRINTING VLAN 2110 VIA DME&quot;
+
+curl -sk --globoff &quot;https://$NXOS_URI/api/mo/sys/bd/bd-[vlan-2110].json&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; | jq &#x27;.imdata[].l2BD.attributes | {id, dn, fabEncap}&#x27;
+
+echo &quot;PRINTING VLAN 2110 VIA DME USING class&quot;
+curl -sk &quot;https://$NXOS_URI/api/class/l2BD.json?query-target-filter=eq(l2BD.id,\&quot;2110\&quot;)&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; | jq -r &#x27;.imdata[0].l2BD.attributes.fabEncap&#x27;
+
+#! TODO-4 : Query all SVIs via DME
+echo &quot;PRINTING ALL SVIs VIA DME&quot;
+
+curl -sk &quot;https://$NXOS_URI/api/mo/sys/intf.json?query-target=subtree&amp;target-subtree-class=sviIf&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; | jq &#x27;.imdata[].sviIf.attributes | {id, adminSt, operSt}&#x27;
+
+echo &quot;PRINTING ALL SVIs VIA DME SUING class&quot;
+curl -sk &quot;https://$NXOS_URI/api/class/sviIf.json&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; | jq &#x27;.imdata[].sviIf.attributes | {id, adminSt, operSt}&#x27;
+
+# ###############################################################################
+# #! RESTCONF (feature restconf) — uses Basic Auth, no token needed
+# ###############################################################################
+
+#! TODO-5 : Query SVI vlan2110 via RESTCONF
+echo &quot;PRINTING ALL THE SVI VIA RESTCONF&quot;
+
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/bd-items&quot; \
+  -H &#x27;accept: application/yang.data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD | jq &#x27;.&quot;bd-items&quot;.&quot;bd-items&quot;.&quot;BD-list&quot;[] | {fabEncap, id}&#x27;
+
+echo &quot;PRINTING ALL SVI VLAN2110 VIA RESTCONF&quot;
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/bd-items/bd-items/BD-list=vlan-1010&quot; \
+  -H &#x27;accept: application/yang.data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD | jq &#x27;.&quot;BD-list&quot;[] | {fabEncap, id}&#x27;
+
+echo &quot;PRINTING ALL SVI VLAN2110 VIA RESTCONF VLAN-NAME&quot;
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/bd-items/bd-items/BD-list=vlan-1010&quot; \
+  -H &#x27;accept: application/yang.data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD | jq -r &#x27;.&quot;BD-list&quot;[0].fabEncap&#x27;
+
+# ###############################################################################
+# #! NX-API CLI (feature nxapi) — uses Basic Auth, sends CLI commands over HTTP
+# ###############################################################################
+
+#! TODO-6 : &quot;show vlan brief&quot; via NX-API CLI (output JSON)
+echo &quot;PRINTING SHOW VLAN BRIEF VIA NX-API CLI&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;show vlan brief&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27; | jq &#x27;.ins_api.outputs.output.body.TABLE_vlanbriefxbrief.ROW_vlanbriefxbrief[] | {id: .[&quot;vlanshowbr-vlanid&quot;], name: .[&quot;vlanshowbr-vlanname&quot;]}&#x27;
+
+#! TODO-7 : &quot;show ip int brief&quot; via NX-API CLI (output JSON)
+echo &quot;PRINTING SHOW IP INT BRIEF VIA NX-API CLI&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;show ip interface brief&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27; | jq &#x27;.ins_api.outputs.output.body.TABLE_intf.ROW_intf[] | {name: .[&quot;intf-name&quot;], ip: .prefix}&#x27;
+
+#! TODO-8 : &quot;show vlan name prod99&quot; via NX-API CLI (output JSON)
+echo &quot;PRINTING SHOW VLAN NAME PROD99 VIA NX-API CLI&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;show vlan name prod99&quot;,
+      &quot;output_format&quot;: &quot;json&quot;
+    }
+}&#x27; | jq &#x27;{ports: .ins_api.outputs.output.body.TABLE_vlanbriefname.ROW_vlanbriefname[&quot;vlanshowplist-ifidx&quot;], mode: .ins_api.outputs.output.body.TABLE_mtuinfoname.ROW_mtuinfoname[&quot;vlanshowinfo-vlanmode&quot;]}&#x27;
+
+# #! TODO-9 : &quot;show running-config bgp&quot; via NX-API CLI (output XML)
+echo &quot;PRINTING SHOW RUNNING-CONFIG BGP VIA NX-API CLI (XML)&quot;
+
+curl -sk &quot;https://$NXOS_URI/ins&quot; \
+  -H &#x27;content-type: application/json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  -d &#x27;{
+    &quot;ins_api&quot;: {
+      &quot;version&quot;: &quot;1.0&quot;,
+      &quot;type&quot;: &quot;cli_show_ascii&quot;,
+      &quot;chunk&quot;: &quot;0&quot;,
+      &quot;sid&quot;: &quot;1&quot;,
+      &quot;input&quot;: &quot;show running-config bgp&quot;,
+      &quot;output_format&quot;: &quot;xml&quot;
+    }
+}&#x27;
+```
+</pre>
+            </details>
+
+            <h2>🧪 Expected Output</h2>
+            <details><summary>⚠️ Click to reveal full expected output</summary>
+<pre>$ ./p1_nxos_api.sh 
+uO9sr/mtqFrsTn8wEXH3/BWRL5+VcDryWqtpA0j2d+40JpSZX6a3q3u97K1L1+sbsjuf19GtcppFYI5NvJ/R+rvC/BfX1/aS4ByTc+Eht1PtFEzDH+O2CepVqnMlFBqBGEqw2DJ/KsaqQZsJVPWmHyOjWY5rSlO/qkAAcYx3AOLaCbp7hMK5MIHqQj7N3AnT
+PRINTING ALL VLANS VIA DME
+{
+  &quot;id&quot;: &quot;3399&quot;,
+  &quot;name&quot;: &quot;prod99&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-3399&quot;
+}
+{
+  &quot;id&quot;: &quot;2110&quot;,
+  &quot;name&quot;: &quot;Challenge-201&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-2110&quot;
+}
+{
+  &quot;id&quot;: &quot;3299&quot;,
+  &quot;name&quot;: &quot;test99&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-3299&quot;
+}
+{
+  &quot;id&quot;: &quot;1066&quot;,
+  &quot;name&quot;: &quot;Pod_10_from_cli&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1066&quot;
+}
+{
+  &quot;id&quot;: &quot;5&quot;,
+  &quot;name&quot;: &quot;VLAN_5_Task_112&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-5&quot;
+}
+{
+  &quot;id&quot;: &quot;1174&quot;,
+  &quot;name&quot;: &quot;pyATS_SoTH_VLAN_1174&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1174&quot;
+}
+{
+  &quot;id&quot;: &quot;20&quot;,
+  &quot;name&quot;: &quot;&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-20&quot;
+}
+{
+  &quot;id&quot;: &quot;1000&quot;,
+  &quot;name&quot;: &quot;&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1000&quot;
+}
+{
+  &quot;id&quot;: &quot;3199&quot;,
+  &quot;name&quot;: &quot;dev99&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-3199&quot;
+}
+{
+  &quot;id&quot;: &quot;1020&quot;,
+  &quot;name&quot;: &quot;&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1020&quot;
+}
+{
+  &quot;id&quot;: &quot;1173&quot;,
+  &quot;name&quot;: &quot;pyATS_VLAN-SoTH-Testing&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1173&quot;
+}
+{
+  &quot;id&quot;: &quot;1072&quot;,
+  &quot;name&quot;: &quot;Pod10Task72&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1072&quot;
+}
+{
+  &quot;id&quot;: &quot;1010&quot;,
+  &quot;name&quot;: &quot;&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1010&quot;
+}
+{
+  &quot;id&quot;: &quot;1&quot;,
+  &quot;name&quot;: &quot;&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1&quot;
+}
+{
+  &quot;id&quot;: &quot;1073&quot;,
+  &quot;name&quot;: &quot;Pod10Task73&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-1073&quot;
+}
+{
+  &quot;id&quot;: &quot;4&quot;,
+  &quot;name&quot;: &quot;Print&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-4&quot;
+}
+{
+  &quot;id&quot;: &quot;3&quot;,
+  &quot;name&quot;: &quot;PC&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-3&quot;
+}
+{
+  &quot;id&quot;: &quot;2&quot;,
+  &quot;name&quot;: &quot;Server&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-2&quot;
+}
+PRINTING VLAN 2110 VIA DME
+{
+  &quot;id&quot;: &quot;2110&quot;,
+  &quot;dn&quot;: &quot;sys/bd/bd-[vlan-2110]&quot;,
+  &quot;fabEncap&quot;: &quot;vlan-2110&quot;
+}
+PRINTING VLAN 2110 VIA DME USING class
+vlan-2110
+PRINTING ALL SVIs VIA DME
+{
+  &quot;id&quot;: &quot;vlan1&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan2110&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan1073&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan10&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan3199&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan3299&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;up&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan3399&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan1010&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan1072&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+PRINTING ALL SVIs VIA DME SUING class
+{
+  &quot;id&quot;: &quot;vlan1&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan2110&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan1073&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan10&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan3199&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan3299&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;up&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan3399&quot;,
+  &quot;adminSt&quot;: &quot;up&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan1010&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+{
+  &quot;id&quot;: &quot;vlan1072&quot;,
+  &quot;adminSt&quot;: &quot;down&quot;,
+  &quot;operSt&quot;: &quot;down&quot;
+}
+PRINTING ALL THE SVI VIA RESTCONF
+{
+  &quot;fabEncap&quot;: &quot;vlan-3399&quot;,
+  &quot;id&quot;: 3399
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-2110&quot;,
+  &quot;id&quot;: 2110
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-3299&quot;,
+  &quot;id&quot;: 3299
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1066&quot;,
+  &quot;id&quot;: 1066
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-5&quot;,
+  &quot;id&quot;: 5
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1174&quot;,
+  &quot;id&quot;: 1174
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-20&quot;,
+  &quot;id&quot;: 20
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1000&quot;,
+  &quot;id&quot;: 1000
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-3199&quot;,
+  &quot;id&quot;: 3199
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1020&quot;,
+  &quot;id&quot;: 1020
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1173&quot;,
+  &quot;id&quot;: 1173
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1072&quot;,
+  &quot;id&quot;: 1072
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1010&quot;,
+  &quot;id&quot;: 1010
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1&quot;,
+  &quot;id&quot;: 1
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-1073&quot;,
+  &quot;id&quot;: 1073
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-4&quot;,
+  &quot;id&quot;: 4
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-3&quot;,
+  &quot;id&quot;: 3
+}
+{
+  &quot;fabEncap&quot;: &quot;vlan-2&quot;,
+  &quot;id&quot;: 2
+}
+PRINTING ALL SVI VLAN2110 VIA RESTCONF
+{
+  &quot;fabEncap&quot;: &quot;vlan-1010&quot;,
+  &quot;id&quot;: 1010
+}
+PRINTING ALL SVI VLAN2110 VIA RESTCONF VLAN-NAME
+vlan-1010
+PRINTING SHOW VLAN BRIEF VIA NX-API CLI
+{
+  &quot;id&quot;: &quot;1&quot;,
+  &quot;name&quot;: &quot;default&quot;
+}
+{
+  &quot;id&quot;: &quot;2&quot;,
+  &quot;name&quot;: &quot;Server&quot;
+}
+{
+  &quot;id&quot;: &quot;3&quot;,
+  &quot;name&quot;: &quot;PC&quot;
+}
+{
+  &quot;id&quot;: &quot;4&quot;,
+  &quot;name&quot;: &quot;Print&quot;
+}
+{
+  &quot;id&quot;: &quot;5&quot;,
+  &quot;name&quot;: &quot;VLAN_5_Task_112&quot;
+}
+{
+  &quot;id&quot;: &quot;20&quot;,
+  &quot;name&quot;: &quot;VLAN0020&quot;
+}
+{
+  &quot;id&quot;: &quot;1000&quot;,
+  &quot;name&quot;: &quot;VLAN1000&quot;
+}
+{
+  &quot;id&quot;: &quot;1010&quot;,
+  &quot;name&quot;: &quot;VLAN1010&quot;
+}
+{
+  &quot;id&quot;: &quot;1020&quot;,
+  &quot;name&quot;: &quot;VLAN1020&quot;
+}
+{
+  &quot;id&quot;: &quot;1066&quot;,
+  &quot;name&quot;: &quot;Pod_10_from_cli&quot;
+}
+{
+  &quot;id&quot;: &quot;1072&quot;,
+  &quot;name&quot;: &quot;Pod10Task72&quot;
+}
+{
+  &quot;id&quot;: &quot;1073&quot;,
+  &quot;name&quot;: &quot;Pod10Task73&quot;
+}
+{
+  &quot;id&quot;: &quot;1173&quot;,
+  &quot;name&quot;: &quot;pyATS_VLAN-SoTH-Testing&quot;
+}
+{
+  &quot;id&quot;: &quot;1174&quot;,
+  &quot;name&quot;: &quot;pyATS_SoTH_VLAN_1174&quot;
+}
+{
+  &quot;id&quot;: &quot;2110&quot;,
+  &quot;name&quot;: &quot;Challenge-201&quot;
+}
+{
+  &quot;id&quot;: &quot;3199&quot;,
+  &quot;name&quot;: &quot;dev99&quot;
+}
+{
+  &quot;id&quot;: &quot;3299&quot;,
+  &quot;name&quot;: &quot;test99&quot;
+}
+{
+  &quot;id&quot;: &quot;3399&quot;,
+  &quot;name&quot;: &quot;prod99&quot;
+}
+PRINTING SHOW IP INT BRIEF VIA NX-API CLI
+{
+  &quot;name&quot;: &quot;Vlan10&quot;,
+  &quot;ip&quot;: &quot;192.168.22.3&quot;
+}
+{
+  &quot;name&quot;: &quot;Vlan2110&quot;,
+  &quot;ip&quot;: &quot;201.201.201.201&quot;
+}
+{
+  &quot;name&quot;: &quot;Vlan3199&quot;,
+  &quot;ip&quot;: &quot;10.31.99.1&quot;
+}
+{
+  &quot;name&quot;: &quot;Vlan3299&quot;,
+  &quot;ip&quot;: &quot;10.32.99.1&quot;
+}
+{
+  &quot;name&quot;: &quot;Vlan3399&quot;,
+  &quot;ip&quot;: &quot;10.33.99.1&quot;
+}
+{
+  &quot;name&quot;: &quot;Lo0&quot;,
+  &quot;ip&quot;: &quot;10.0.0.73&quot;
+}
+{
+  &quot;name&quot;: &quot;Eth1/2&quot;,
+  &quot;ip&quot;: &quot;10.0.13.31&quot;
+}
+{
+  &quot;name&quot;: &quot;Eth1/3&quot;,
+  &quot;ip&quot;: &quot;10.4.0.73&quot;
+}
+{
+  &quot;name&quot;: &quot;Eth1/4&quot;,
+  &quot;ip&quot;: &quot;10.1.0.73&quot;
+}
+PRINTING SHOW VLAN NAME PROD99 VIA NX-API CLI
+{
+  &quot;ports&quot;: &quot;Ethernet1/30,Ethernet1/50&quot;,
+  &quot;mode&quot;: &quot;ce-vlan&quot;
+}
+PRINTING SHOW RUNNING-CONFIG BGP VIA NX-API CLI (XML)
+&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;ins_api&gt;
+  &lt;type&gt;cli_show_ascii&lt;/type&gt;
+  &lt;version&gt;1.0&lt;/version&gt;
+  &lt;sid&gt;eoc&lt;/sid&gt;
+  &lt;outputs&gt;
+    &lt;output&gt;
+      &lt;body&gt;
+!Command: show running-config bgp
+!No configuration change since last restart
+!Time: Sat Apr 11 03:56:01 2026
+
+version 9.3(8) Bios:version  
+feature bgp
+
+router bgp 65003
+  router-id 10.0.0.73
+  address-family ipv4 unicast
+    redistribute static route-map nx9K73_BGP_to_cat8Kv71
+    redistribute ospf 111 route-map nx9K73_BGP_to_cat8Kv71
+  neighbor 10.0.13.13
+    remote-as 65001
+    address-family ipv4 unicast
+      route-map nx9K73_BGP_to_cat8Kv71 in
+      route-map nx9K73_BGP_to_cat8Kv71 out
+vrf context challenge-309
+  rd 309:309
+vrf context challenge-309_2
+  rd 99:99
+vrf context challenge-309_3
+  rd 3093:3093
+vrf context challenge-A5
+  rd 53:53
+
+
+&lt;/body&gt;
+      &lt;input&gt;show running-config bgp&lt;/input&gt;
+      &lt;msg&gt;Success&lt;/msg&gt;
+      &lt;code&gt;200&lt;/code&gt;
+    &lt;/output&gt;
+  &lt;/outputs&gt;
+&lt;/ins_api&gt;
+</pre>
+            </details>
+
+        </section>
+
+        <section id="quiz" class="section">
+            <h1>Lab Practice — NX-OS API Fill-in-the-Gaps</h1>
+            <p class="intro-text">9 questions covering all TODO tasks. Drag the correct segments into the curl command blanks.</p>
+            <div class="quiz-header"><div>
+                <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+                <span class="score-display">Score: <span class="score-correct" id="correctCount">0</span> <span class="score-total">/ <span id="totalAnswered">0</span> answered</span></span>
+            </div><div class="quiz-controls">
+                <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
+                <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+            </div></div>
+            <div id="quizContainer"></div>
+        </section>
+    </main>
+    <script>
+        const questions = [
+            {id:1,question:"TODO-1: Login to NX-OS DME and extract the authentication token.\n\nExpected: Token string (e.g., uO9sr/mtqFrsTn8w...)",
+             template:'export token=$(curl -sk "https://192.168.89.73/{{1}}" \\\n  -H \'{{2}}\' \\\n  -d \'{"aaaUser":{"attributes":{"name":"expert","pwd":"1234QWer!"}}}\' \\\n  | jq -r \'{{3}}\')\n\necho $token',
+             answers:["api/aaaLogin.json","content-type: application/json",".imdata[0].aaaLogin.attributes.token"],
+             pool:["api/aaaLogin.json","api/aaaLogin.xml","api/login.json","content-type: application/json","accept: application/json","Cookie: APIC-cookie=$token",".imdata[0].aaaLogin.attributes.token",".imdata[].aaaLogin.token",".aaaLogin.attributes.token",".imdata.token"],
+             explanation:"Correct answers (in order):\n\n[1] api/aaaLogin.json\n    DME login endpoint. -d in curl implies POST.\n\n[2] content-type: application/json\n    Tells server the POST body is JSON.\n\n[3] .imdata[0].aaaLogin.attributes.token\n    jq path: imdata array \u2192 [0] \u2192 aaaLogin \u2192 attributes \u2192 token.\n\n\u2705 Full correct command:\nexport token=$(curl -sk \"https://192.168.89.73/api/aaaLogin.json\" \\\n  -H 'content-type: application/json' \\\n  -d '...credentials...' \\\n  | jq -r '.imdata[0].aaaLogin.attributes.token')\n\nDistractors:\n  api/aaaLogin.xml \u2192 wrong format; we want JSON\n  Cookie: APIC-cookie=$token \u2192 used AFTER login, not during\n  .imdata[].aaaLogin.token \u2192 missing .attributes level\n  .imdata.token \u2192 imdata is an array, needs [0]"},
+
+            {id:2,question:"TODO-2: Query ALL VLANs using NX-OS API (DME)\n\nExpected (trimmed):\n{\"id\":\"3399\",\"name\":\"prod99\",\"fabEncap\":\"vlan-3399\"}\n{\"id\":\"2110\",\"name\":\"Challenge-201\",\"fabEncap\":\"vlan-2110\"}\n...",
+             template:'curl -sk --globoff "https://192.168.89.73/api/mo/sys/{{1}}?{{2}}&{{3}}&{{4}}&{{5}}" \\\n  -H "{{6}}" \\\n  | jq \'.imdata[].bdEntity.children[].l2BD.attributes | {id, name, fabEncap}\'',
+             answers:["bd.json","rsp-subtree=children","rsp-subtree-filter=wcard(l2BD.fabEncap,\"vlan\")","rsp-subtree-include=required","rsp-subtree-class=l2BD","Cookie: APIC-cookie=$token"],flexGroups:[[1,2,3,4]],
+             pool:["bd.json","l2BD.json","bd/bd.json","sviIf.json","rsp-subtree=children","rsp-subtree=subtree","rsp-subtree=full","query-target=children","rsp-subtree-filter=wcard(l2BD.fabEncap,\"vlan\")","rsp-subtree-filter=eq(l2BD.fabEncap,\"vlan\")","query-target-filter=wcard(l2BD.fabEncap,\"vlan\")","rsp-subtree-include=required","rsp-subtree-include=count","rsp-subtree-class=l2BD","rsp-subtree-class=sviIf","target-subtree-class=l2BD","Cookie: APIC-cookie=$token","Authorization: Basic $token","APIC-cookie: $token"],
+             explanation:"Correct answers (in order):\n\n[1] bd.json\n    MO path to BD entity under sys/. Uses RN, NOT class name (l2BD).\n\n\u26a0\ufe0f Note: Query parameters [2]-[5] are order-independent. ?a=1&b=2 is identical to ?b=2&a=1. Any arrangement of these 4 parameters is correct.\n\n[2] rsp-subtree=children\n    Include child objects in response.\n\n[3] rsp-subtree-filter=wcard(l2BD.fabEncap,\"vlan\")\n    Wildcard filter on fabEncap containing \"vlan\".\n\n[4] rsp-subtree-include=required\n    Only return parent if matching children exist.\n\n[5] rsp-subtree-class=l2BD\n    Limit children to l2BD class only.\n\n[6] Cookie: APIC-cookie=$token\n    DME uses cookie-based token auth.\n\n\u2705 Full correct command:\ncurl -sk --globoff \"https://192.168.89.73/api/mo/sys/bd.json?rsp-subtree=children&rsp-subtree-filter=wcard(l2BD.fabEncap,\\\"vlan\\\")&rsp-subtree-include=required&rsp-subtree-class=l2BD\" \\\n  -H \"Cookie: APIC-cookie=$token\" \\\n  | jq '.imdata[].bdEntity.children[].l2BD.attributes | {id, name, fabEncap}'\n\nDistractors:\n  l2BD.json \u2192 class name, not MO RN path\n  rsp-subtree=subtree \u2192 too verbose; children is correct\n  query-target-filter \u2192 filters queried object; rsp-subtree-filter filters children\n  target-subtree-class \u2192 used with query-target, not rsp-subtree\n  Authorization: Basic \u2192 RESTCONF auth, not DME"},
+
+            {id:3,question:"TODO-3: Query specific VLAN 2110 via DME (MO path)\n\nExpected:\n{\"id\":\"2110\",\"dn\":\"sys/bd/bd-[vlan-2110]\",\"fabEncap\":\"vlan-2110\"}",
+             template:'curl -sk {{1}} "https://192.168.89.73/api/mo/{{2}}" \\\n  -H "{{3}}" \\\n  | jq \'.imdata[].l2BD.attributes | {id, dn, fabEncap}\'',
+             answers:["--globoff","sys/bd/bd-[vlan-2110].json","Cookie: APIC-cookie=$token"],
+             pool:["--globoff","-X GET","--insecure","sys/bd/bd-[vlan-2110].json","sys/bd/l2BD-[vlan-2110].json","sys/bd/bd-[2110].json","sys/bd/vlan-2110.json","Cookie: APIC-cookie=$token","-u expert:'1234QWer!'","Authorization: Basic $token"],
+             explanation:"Correct answers (in order):\n\n[1] --globoff\n    Required because DN has square brackets []. curl treats [] as glob patterns.\n\n[2] sys/bd/bd-[vlan-2110].json\n    MO path uses RN: bd-[vlan-XXXX]. NOT class name l2BD.\n\n[3] Cookie: APIC-cookie=$token\n    DME authentication.\n\n\u2705 Full correct command:\ncurl -sk --globoff \"https://192.168.89.73/api/mo/sys/bd/bd-[vlan-2110].json\" \\\n  -H \"Cookie: APIC-cookie=$token\" \\\n  | jq '.imdata[].l2BD.attributes | {id, dn, fabEncap}'\n\nDistractors:\n  -X GET \u2192 GET is default, unnecessary\n  l2BD-[vlan-2110] \u2192 l2BD is CLASS name, RN is bd-[...]\n  bd-[2110] \u2192 missing vlan- prefix\n  -u expert:... \u2192 Basic auth is for RESTCONF, not DME"},
+
+            {id:4,question:"TODO-4: Query all SVIs via DME (MO + subtree)\n\nExpected (trimmed):\n{\"id\":\"vlan2110\",\"adminSt\":\"up\",\"operSt\":\"down\"}\n{\"id\":\"vlan3299\",\"adminSt\":\"up\",\"operSt\":\"up\"}\n...",
+             template:'curl -sk "https://192.168.89.73/api/mo/{{1}}?{{2}}&{{3}}" \\\n  -H "{{4}}" \\\n  | jq \'.imdata[].sviIf.attributes | {id, adminSt, operSt}\'',
+             answers:["sys/intf.json","query-target=subtree","target-subtree-class=sviIf","Cookie: APIC-cookie=$token"],flexGroups:[[1,2]],
+             pool:["sys/intf.json","sys/intf/sviIf.json","sys/intf/svi.json","sys/bd.json","query-target=subtree","query-target=children","query-target=self","rsp-subtree=children","target-subtree-class=sviIf","target-subtree-class=l1PhysIf","rsp-subtree-class=sviIf","Cookie: APIC-cookie=$token","-u expert:'1234QWer!'"],
+             explanation:"Correct answers (in order):\n\n[1] sys/intf.json\n    MO path to the interface entity.\n\n\u26a0\ufe0f Note: Query parameters [2]-[3] are order-independent. Any arrangement is correct.\n\n[2] query-target=subtree\n    Search full subtree under sys/intf.\n\n[3] target-subtree-class=sviIf\n    Limit results to SVI interface class.\n\n[4] Cookie: APIC-cookie=$token\n    DME auth.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/api/mo/sys/intf.json?query-target=subtree&target-subtree-class=sviIf\" \\\n  -H \"Cookie: APIC-cookie=$token\" \\\n  | jq '.imdata[].sviIf.attributes | {id, adminSt, operSt}'\n\nDistractors:\n  sys/intf/sviIf.json \u2192 sviIf is CLASS name; MO uses RN like svi-[vlanXXXX]\n  query-target=children \u2192 only direct children, not full subtree\n  rsp-subtree-class \u2192 used with rsp-subtree=children, different parameter"},
+
+            {id:5,question:"TODO-5: Query all VLANs via RESTCONF\n\nExpected (trimmed):\n{\"fabEncap\":\"vlan-3399\",\"id\":3399}\n{\"fabEncap\":\"vlan-2110\",\"id\":2110}\n...",
+             template:'curl -sk "https://192.168.89.73/restconf/data/{{1}}/{{2}}" \\\n  -H \'{{3}}\' \\\n  -u {{4}} \\\n  | jq \'.\"bd-items\".\"bd-items\".\"BD-list\"[] | {fabEncap, id}\'',
+             answers:["Cisco-NX-OS-device:System","bd-items","accept: application/yang.data+json","$NXOS_USERNAME:$NXOS_PASSWORD"],
+             pool:["Cisco-NX-OS-device:System","Cisco-NX-OS-device:system","NX-OS-device:System","bd-items","bd-items/BD-list","intf-items/svi-items","accept: application/yang.data+json","accept: application/yang-data+json","content-type: application/json","$NXOS_USERNAME:$NXOS_PASSWORD","Cookie: APIC-cookie=$token","expert:1234QWer!"],
+             explanation:"Correct answers (in order):\n\n[1] Cisco-NX-OS-device:System\n    RESTCONF root. Case-sensitive (capital S).\n\n[2] bd-items\n    YANG path to bridge domain items (VLANs).\n\n[3] accept: application/yang.data+json\n    NX-OS uses yang.data (DOT). IOS-XE uses yang-data (HYPHEN).\n\n[4] $NXOS_USERNAME:$NXOS_PASSWORD\n    RESTCONF uses Basic Auth (-u), NOT cookie tokens.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System/bd-items\" \\\n  -H 'accept: application/yang.data+json' \\\n  -u $NXOS_USERNAME:$NXOS_PASSWORD \\\n  | jq '.\"bd-items\".\"bd-items\".\"BD-list\"[] | {fabEncap, id}'\n\nDistractors:\n  Cisco-NX-OS-device:system \u2192 lowercase s fails (case-sensitive)\n  yang-data+json \u2192 IOS-XE format; NX-OS uses yang.data\n  Cookie: APIC-cookie \u2192 DME auth, not RESTCONF"},
+
+            {id:6,question:"TODO-6: \"show vlan brief\" via NX-API CLI\n\nExpected (trimmed):\n{\"id\":\"1\",\"name\":\"default\"}\n{\"id\":\"1066\",\"name\":\"Pod_10_from_cli\"}\n...",
+             template:'curl -sk "https://192.168.89.73/{{1}}" \\\n  -H \'content-type: application/json\' \\\n  -u {{2}} \\\n  -d \'{\n    "ins_api": {\n      "version": "1.0",\n      "type": "{{3}}",\n      "chunk": "0",\n      "sid": "1",\n      "input": "{{4}}",\n      "output_format": "{{5}}"\n    }\n}\' \\\n  | jq \'.ins_api.outputs.output.body.TABLE_vlanbriefxbrief.ROW_vlanbriefxbrief[] | {id: .[\"vlanshowbr-vlanid\"], name: .[\"vlanshowbr-vlanname\"]}\'',
+             answers:["ins","$NXOS_USERNAME:$NXOS_PASSWORD","cli_show","show vlan brief","json"],
+             pool:["ins","api/ins","restconf/data","$NXOS_USERNAME:$NXOS_PASSWORD","Cookie: APIC-cookie=$token","cli_show","cli_show_ascii","cli_conf","show vlan brief","show vlan","show vlan id","json","xml","text"],
+             explanation:"Correct answers (in order):\n\n[1] ins\n    NX-API CLI endpoint is /ins.\n\n[2] $NXOS_USERNAME:$NXOS_PASSWORD\n    NX-API CLI uses Basic Auth.\n\n[3] cli_show\n    Structured JSON output for jq TABLE_/ROW_ parsing.\n\n[4] show vlan brief\n    CLI command to execute.\n\n[5] json\n    Output format for structured parsing.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/ins\" \\\n  -H 'content-type: application/json' \\\n  -u $NXOS_USERNAME:$NXOS_PASSWORD \\\n  -d '{\"ins_api\":{\"type\":\"cli_show\",\"input\":\"show vlan brief\",\"output_format\":\"json\",...}}' \\\n  | jq '.ins_api.outputs.output.body.TABLE_vlanbriefxbrief.ROW_vlanbriefxbrief[] | {id: .[\"vlanshowbr-vlanid\"], name: .[\"vlanshowbr-vlanname\"]}'\n\nDistractors:\n  api/ins \u2192 wrong path; endpoint is /ins\n  cli_show_ascii \u2192 raw text, can't parse with jq TABLE_/ROW_\n  cli_conf \u2192 for config commands, not show"},
+
+            {id:7,question:"TODO-7: \"show ip interface brief\" via NX-API CLI\n\nExpected (trimmed):\n{\"name\":\"Vlan10\",\"ip\":\"192.168.22.3\"}\n{\"name\":\"Lo0\",\"ip\":\"10.0.0.73\"}\n{\"name\":\"Eth1/2\",\"ip\":\"10.0.13.31\"}",
+             template:'curl -sk "https://192.168.89.73/ins" \\\n  -H \'content-type: application/json\' \\\n  -u $NXOS_USERNAME:$NXOS_PASSWORD \\\n  -d \'{\n    "ins_api": {\n      "version": "1.0",\n      "type": "cli_show",\n      "chunk": "0",\n      "sid": "1",\n      "input": "{{1}}",\n      "output_format": "json"\n    }\n}\' \\\n  | jq \'.ins_api.outputs.output.body.{{2}}.{{3}}[] | {name: .[\"{{4}}\"], ip: .{{5}}}\'',
+             answers:["show ip interface brief","TABLE_intf","ROW_intf","intf-name","prefix"],
+             pool:["show ip interface brief","show interface brief","show ip int brief","TABLE_intf","TABLE_intfbrief","TABLE_interface","ROW_intf","ROW_intfbrief","ROW_interface","intf-name","interface-name","name","prefix","ip-address","ipaddr"],
+             explanation:"Correct answers (in order):\n\n[1] show ip interface brief\n    Full CLI command (NX-API needs unabbreviated form).\n\n[2] TABLE_intf\n    NX-API wraps arrays in TABLE_*/ROW_* pairs.\n\n[3] ROW_intf\n    Each row entry in the table.\n\n[4] intf-name\n    Hyphenated key needs bracket syntax: .[\"intf-name\"].\n\n[5] prefix\n    IP address field is called \"prefix\" in NX-API, NOT \"ip-address\".\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/ins\" ... \\\n  -d '{\"ins_api\":{\"type\":\"cli_show\",\"input\":\"show ip interface brief\",\"output_format\":\"json\",...}}' \\\n  | jq '.ins_api.outputs.output.body.TABLE_intf.ROW_intf[] | {name: .[\"intf-name\"], ip: .prefix}'\n\nDistractors:\n  TABLE_intfbrief \u2192 wrong table name; it's TABLE_intf\n  interface-name \u2192 wrong key; NX-API uses intf-name\n  ip-address, ipaddr \u2192 the field is called prefix"},
+
+            {id:8,question:"TODO-8: \"show vlan name prod99\" via NX-API CLI\n\nExpected:\n{\"ports\":\"Ethernet1/30,Ethernet1/50\",\"mode\":\"ce-vlan\"}",
+             template:'curl -sk "https://192.168.89.73/ins" \\\n  -H \'content-type: application/json\' \\\n  -u $NXOS_USERNAME:$NXOS_PASSWORD \\\n  -d \'{\n    "ins_api": {\n      "version": "1.0",\n      "type": "{{1}}",\n      "chunk": "0",\n      "sid": "1",\n      "input": "{{2}}",\n      "output_format": "{{3}}"\n    }\n}\' \\\n  | jq \'{ports: .ins_api.outputs.output.body.TABLE_vlanbriefname.ROW_vlanbriefname[\"vlanshowplist-ifidx\"], mode: .ins_api.outputs.output.body.TABLE_mtuinfoname.ROW_mtuinfoname[\"vlanshowinfo-vlanmode\"]}\'',
+             answers:["cli_show","show vlan name prod99","json"],
+             pool:["cli_show","cli_show_ascii","show vlan name prod99","show vlan id prod99","show vlan prod99","show vlan name 3399","json","xml","text"],
+             explanation:"Correct answers (in order):\n\n[1] cli_show\n    Structured JSON output.\n\n[2] show vlan name prod99\n    Queries by VLAN NAME (prod99), not ID (3399).\n\n[3] json\n    Structured format for jq.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/ins\" ... \\\n  -d '{\"ins_api\":{\"type\":\"cli_show\",\"input\":\"show vlan name prod99\",\"output_format\":\"json\",...}}' \\\n  | jq '{ports: ..., mode: ...}'\n\nDistractors:\n  show vlan id prod99 \u2192 \"id\" expects a number (3399)\n  show vlan name 3399 \u2192 3399 is the VLAN ID, name is prod99\n  cli_show_ascii \u2192 raw text, can't jq parse"},
+
+            {id:9,question:"TODO-9: \"show running-config bgp\" via NX-API CLI (XML output)\n\nThis returns raw text, so use cli_show_ascii + xml format.\n\nExpected: Full BGP running-config wrapped in XML <body> tags.",
+             template:'curl -sk "https://192.168.89.73/ins" \\\n  -H \'content-type: application/json\' \\\n  -u $NXOS_USERNAME:$NXOS_PASSWORD \\\n  -d \'{\n    "ins_api": {\n      "version": "1.0",\n      "type": "{{1}}",\n      "chunk": "0",\n      "sid": "1",\n      "input": "{{2}}",\n      "output_format": "{{3}}"\n    }\n}\'',
+             answers:["cli_show_ascii","show running-config bgp","xml"],
+             pool:["cli_show_ascii","cli_show","cli_conf","show running-config bgp","show bgp","show ip bgp summary","xml","json","text"],
+             explanation:"Correct answers (in order):\n\n[1] cli_show_ascii\n    For raw text output (running-config has no structured JSON).\n\n[2] show running-config bgp\n    CLI command for BGP config.\n\n[3] xml\n    Wraps raw text in XML tags.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/ins\" ... \\\n  -d '{\"ins_api\":{\"type\":\"cli_show_ascii\",\"input\":\"show running-config bgp\",\"output_format\":\"xml\",...}}'\n\nDistractors:\n  cli_show \u2192 expects structured output; running-config is raw text\n  cli_conf \u2192 for config mode, not show commands\n  json \u2192 running-config has no structured JSON representation"}
+        ];
+
+        let submitted={},score=0;
+        const slotState={};
+
+        function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');event.target.classList.add('active');}
+
+        function initQuiz(){
+            document.getElementById('quizContainer').innerHTML=questions.map((q,i)=>renderQ(q,i)).join('');
+            questions.forEach(q=>{
+                slotState[q.id]={values:new Array(q.answers.length).fill(null)};
+            });
+            updateProgress();
+        }
+
+        function renderQ(q,idx){
+            var e=q.explanation.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            // Step 1: Escape the template first
+            var escaped=q.template.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            // Step 2: Replace {{N}} markers with inline slot spans
+            var cmdHtml=escaped;
+            for(var i=0;i<q.answers.length;i++){
+                var slotId='slot_'+q.id+'_'+i;
+                var placeholder='<span class="inline-slot" id="'+slotId+'" data-qid="'+q.id+'" data-idx="'+i+'" ondrop="dropInline(event,'+q.id+','+i+')" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" onclick="removeInline('+q.id+','+i+')">['+(i+1)+']</span>';
+                cmdHtml=cmdHtml.replace('{{'+(i+1)+'}}',placeholder);
+            }
+
+            return '<div class="question-card" id="q'+q.id+'">' +
+                '<div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Fill the Gaps</span></div>' +
+                '<div class="question-text">'+q.question.replace(/\n/g,'<br>')+'</div>' +
+                '<div class="cmd-block"><pre class="cmd-pre" id="cmd_'+q.id+'">'+cmdHtml+'</pre>' +
+                '<button class="copy-btn" id="copy_'+q.id+'" style="display:none" onclick="copyCmd('+q.id+')">📋 Copy Command</button></div>' +
+                '<div class="cmd-pool" id="pool'+q.id+'"><div class="cmd-pool-title">\uD83D\uDCE6 Drag segments into the blanks above</div>' +
+                q.pool.map((cmd,ci)=>'<div class="cmd-chip" draggable="true" data-qid="'+q.id+'" data-cmd="'+cmd.replace(/"/g,'&quot;')+'" ondragstart="dragChip(event,this)" id="chip'+q.id+'_'+ci+'">'+cmd.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>').join('') +
+                '</div>' +
+                '<button class="submit-btn" id="sub'+q.id+'" onclick="subQ('+q.id+')" disabled>Submit Answer</button>' +
+                '<div class="explanation" id="exp'+q.id+'"><div class="explanation-title">\uD83D\uDCD6 Explanation</div><div class="explanation-text">'+e+'</div></div></div>';
+        }
+
+        function dragChip(e,el){e.dataTransfer.setData('text/plain',el.dataset.cmd);}
+
+        function dropInline(e,qid,idx){
+            e.preventDefault();e.stopPropagation();
+            var target=document.getElementById('slot_'+qid+'_'+idx);
+            target.classList.remove('drag-over');
+            if(submitted[qid])return;
+            var cmd=e.dataTransfer.getData('text/plain');if(!cmd)return;
+            var ss=slotState[qid];
+            // Remove from any other slot
+            ss.values.forEach((v,i)=>{if(v===cmd){ss.values[i]=null;updateSlot(qid,i);}});
+            ss.values[idx]=cmd;
+            updateSlot(qid,idx);
+            updateChips(qid);
+            checkComplete(qid);
+        }
+
+        function removeInline(qid,idx){
+            if(submitted[qid])return;
+            var ss=slotState[qid];
+            if(!ss.values[idx])return;
+            ss.values[idx]=null;
+            updateSlot(qid,idx);
+            updateChips(qid);
+            document.getElementById('sub'+qid).disabled=true;
+        }
+
+        function updateSlot(qid,idx){
+            var el=document.getElementById('slot_'+qid+'_'+idx);
+            var val=slotState[qid].values[idx];
+            if(val){
+                el.textContent=val;
+                el.classList.add('filled');
+            }else{
+                el.textContent='['+(idx+1)+']';
+                el.classList.remove('filled');
+            }
+        }
+
+        function updateChips(qid){
+            var used=slotState[qid].values.filter(v=>v!==null);
+            document.querySelectorAll('.cmd-chip[data-qid="'+qid+'"]').forEach(el=>{
+                el.classList.toggle('used',used.includes(el.dataset.cmd));
+            });
+        }
+
+        function checkComplete(qid){
+            var allFilled=slotState[qid].values.every(v=>v!==null);
+            document.getElementById('sub'+qid).disabled=!allFilled;
+        }
+
+        function subQ(qid){
+            if(submitted[qid])return;
+            submitted[qid]=true;
+            var q=questions.find(x=>x.id===qid);
+            var ss=slotState[qid];
+            var allCorrect=true;
+            // Build set of flex slot indices
+            var flexSlots=new Set();
+            var flexGroupMap={};
+            if(q.flexGroups){
+                q.flexGroups.forEach(function(group){
+                    group.forEach(function(idx){flexSlots.add(idx);flexGroupMap[idx]=group;});
+                });
+            }
+            // Check flex groups: values in those slots must match expected answers (any order)
+            var flexChecked=new Set();
+            ss.values.forEach((v,i)=>{
+                var el=document.getElementById('slot_'+qid+'_'+i);
+                var ok;
+                if(flexSlots.has(i)&&!flexChecked.has(i)){
+                    // Check entire flex group at once
+                    var group=flexGroupMap[i];
+                    var expectedSet=group.map(idx=>q.answers[idx]).sort();
+                    var actualSet=group.map(idx=>ss.values[idx]).sort();
+                    var groupOk=expectedSet.every((v,j)=>v===actualSet[j]);
+                    group.forEach(function(idx){
+                        flexChecked.add(idx);
+                        var slotEl=document.getElementById('slot_'+qid+'_'+idx);
+                        // Each slot is correct if its value is anywhere in the expected set
+                        var slotOk=expectedSet.includes(ss.values[idx]);
+                        if(!groupOk)allCorrect=false;
+                        slotEl.classList.remove('filled');
+                        slotEl.classList.add(slotOk?'slot-correct':'slot-wrong');
+                        slotEl.onclick=null;
+                        if(!slotOk)slotEl.title='Expected one of: '+expectedSet.join(', ');
+                    });
+                }else if(!flexSlots.has(i)){
+                    ok=v===q.answers[i];
+                    if(!ok)allCorrect=false;
+                    el.classList.remove('filled');
+                    el.classList.add(ok?'slot-correct':'slot-wrong');
+                    el.onclick=null;
+                    if(!ok)el.title='Correct: '+q.answers[i];
+                }
+            });
+            // Disable chips
+            document.querySelectorAll('.cmd-chip[data-qid="'+qid+'"]').forEach(el=>{
+                el.removeAttribute('draggable');el.classList.add('used');el.style.cursor='default';
+            });
+            if(allCorrect){
+                score++;
+                document.getElementById('copy_'+qid).style.display='inline-block';
+            }
+            document.getElementById('q'+qid).classList.add(allCorrect?'answered-correct':'answered-incorrect');
+            var b=document.getElementById('sub'+qid);
+            b.textContent=allCorrect?'\u2713 Correct! Command ready to copy':'\u2717 Incorrect \u2014 hover slots for correct answers';
+            b.style.background=allCorrect?'var(--accent-green)':'var(--accent-red)';
+            b.disabled=true;
+            document.getElementById('exp'+qid).classList.add('show');
+            document.getElementById('correctCount').textContent=score;
+            document.getElementById('totalAnswered').textContent=Object.keys(submitted).length;
+            updateProgress();
+        }
+
+        function copyCmd(qid){
+            var pre=document.getElementById('cmd_'+qid);
+            var text=pre.textContent;
+            navigator.clipboard.writeText(text).then(()=>{
+                var btn=document.getElementById('copy_'+qid);
+                btn.textContent='\u2705 Copied!';
+                setTimeout(()=>{btn.textContent='\uD83D\uDCCB Copy Command';},1500);
+            });
+        }
+
+        function updateProgress(){document.getElementById('progressBar').style.width=(Object.keys(submitted).length/questions.length*100)+'%';}
+
+        function resetQuiz(){
+            submitted={};score=0;
+            Object.keys(slotState).forEach(k=>delete slotState[k]);
+            document.getElementById('correctCount').textContent='0';
+            document.getElementById('totalAnswered').textContent='0';
+            initQuiz();
+        }
+
+        function showAllAnswers(){
+            questions.forEach(q=>{
+                if(submitted[q.id])return;
+                if(!slotState[q.id])slotState[q.id]={values:new Array(q.answers.length).fill(null)};
+                q.answers.forEach((a,i)=>{slotState[q.id].values[i]=a;updateSlot(q.id,i);});
+                updateChips(q.id);
+                subQ(q.id);
+            });
+        }
+
+        initQuiz();
+    </script>
+
+</body>
+</html>

@@ -492,6 +492,209 @@ eth1/14 → eth1%2F14
 
 <hr>
 
+<details>
+<summary><h3>13. Server vs Client Side Filtering</h3></summary>
+
+<h1>NX-OS Server vs Client Side Filtering</h1>
+
+<hr>
+
+<h2>Overview</h2>
+
+<p>NX-OS offers two main approaches to filter API query results. <strong>DME</strong> supports rich server-side filtering via query parameters. <strong>RESTCONF</strong> has limited server-side options, so complex filtering happens client-side with tools like <code>jq</code>.</p>
+
+<hr>
+
+<h2>Server-side Filtering (DME)</h2>
+
+<p>Filtering happens <strong>on the switch</strong> — only matching objects are returned.</p>
+
+<h3>Comparison Operators</h3>
+
+<table>
+<thead><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><code>eq</code></td><td>equal</td><td><code>eq(l1PhysIf.mtu,"9216")</code></td></tr>
+<tr><td><code>ne</code></td><td>not equal</td><td><code>ne(l1PhysIf.adminSt,"up")</code></td></tr>
+<tr><td><code>ge</code></td><td>>=</td><td><code>ge(l1PhysIf.mtu,"9000")</code></td></tr>
+<tr><td><code>le</code></td><td><=</td><td><code>le(l1PhysIf.mtu,"1500")</code></td></tr>
+<tr><td><code>gt</code></td><td>></td><td><code>gt(l1PhysIf.mtu,"1500")</code></td></tr>
+<tr><td><code>lt</code></td><td><</td><td><code>lt(l1PhysIf.mtu,"9216")</code></td></tr>
+<tr><td><code>wcard</code></td><td>wildcard</td><td><code>wcard(l1PhysIf.id,"eth1")</code></td></tr>
+</tbody></table>
+<h3>Logical Operators</h3>
+
+<pre># AND — all conditions must match
+?query-target-filter=and(eq(l1PhysIf.adminSt,&quot;up&quot;),ge(l1PhysIf.mtu,&quot;9000&quot;))
+
+# OR — any condition matches
+?query-target-filter=or(eq(l2BD.name,&quot;prod99&quot;),eq(l2BD.name,&quot;dev99&quot;))
+</pre>
+
+<h3>Filter Parameter Types</h3>
+
+<table>
+<thead><tr><th>Parameter</th><th>Purpose</th><th>Used With</th></tr></thead>
+<tbody>
+<tr><td><code>query-target-filter</code></td><td>Filters the queried class objects directly</td><td><code>/api/class/</code> queries</td></tr>
+<tr><td><code>rsp-subtree-filter</code></td><td>Filters children within a subtree response</td><td><code>/api/mo/</code> with <code>rsp-subtree=children</code></td></tr>
+</tbody></table>
+<div class="tip-box"><code>rsp-subtree-filter</code> only makes sense when paired with <code>rsp-subtree=children</code> or <code>rsp-subtree=full</code>.</div>
+
+<h3>Examples</h3>
+
+<pre># Simple: Find VLAN 2110
+curl -sk &quot;https://$NXOS_URI/api/class/l2BD.json?query-target-filter=eq(l2BD.id,\&quot;2110\&quot;)&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; \
+  | jq &#x27;.imdata[].l2BD.attributes | {id, name, fabEncap}&#x27;
+
+# Medium: Interfaces with MTU &gt;= 9000
+curl -sk &quot;https://$NXOS_URI/api/class/l1PhysIf.json?query-target-filter=ge(l1PhysIf.mtu,\&quot;9000\&quot;)&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; \
+  | jq &#x27;.imdata[].l1PhysIf.attributes | {id, mtu}&#x27;
+
+# Complex: Interfaces up + up + MTU &gt;= 9000
+curl -sk &quot;https://$NXOS_URI/api/class/l1PhysIf.json?query-target-filter=and(eq(l1PhysIf.adminSt,\&quot;up\&quot;),eq(l1PhysIf.operSt,\&quot;up\&quot;),ge(l1PhysIf.mtu,\&quot;9000\&quot;))&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; \
+  | jq &#x27;.imdata[].l1PhysIf.attributes | {id, adminSt, operSt, mtu}&#x27;
+
+# Subtree: All VLANs under bd entity
+curl -sk --globoff &quot;https://$NXOS_URI/api/mo/sys/bd.json?rsp-subtree=children&amp;rsp-subtree-class=l2BD&amp;rsp-subtree-filter=wcard(l2BD.fabEncap,\&quot;vlan\&quot;)&amp;rsp-subtree-include=required&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; \
+  | jq &#x27;.imdata[].bdEntity.children[].l2BD.attributes | {id, name, fabEncap}&#x27;
+</pre>
+
+<h3>Filter Gotchas (DME)</h3>
+
+<p>- <strong>Double quotes</strong> around string values — single quotes cause invalid responses</p>
+<p>- <strong>No space</strong> after comma — <code>eq(l2BD.id,"2110")</code> not <code>eq(l2BD.id, "2110")</code></p>
+<p>- <strong>Escape quotes</strong> in bash — <code>\"2110\"</code> inside double-quoted URLs</p>
+<p>- <strong>URL-encode</strong> if special characters cause issues — <code>%2C</code> for comma, <code>%22</code> for quotes</p>
+
+<hr>
+
+<h2>Client-side Filtering (RESTCONF + jq)</h2>
+
+<p>Filtering happens <strong>in your terminal</strong> after fetching all data.</p>
+
+<h3>RESTCONF Query Parameters (limited)</h3>
+
+<table>
+<thead><tr><th>Parameter</th><th>Purpose</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><code>content</code></td><td>Config vs operational data</td><td><code>?content=config</code></td></tr>
+<tr><td><code>depth</code></td><td>Limit subtree depth</td><td><code>?depth=2</code></td></tr>
+<tr><td><code>fields</code></td><td>Select specific fields</td><td><code>?fields=id;name</code></td></tr>
+</tbody></table>
+<div class="tip-box">RESTCONF does <strong>NOT</strong> support <code>eq()</code>, <code>ge()</code>, <code>wcard()</code>, <code>and()</code>, <code>or()</code> or any DME-style filter operators.</div>
+
+<h3>jq <code>select()</code> Syntax</h3>
+
+<pre># Basic comparison
+select(.mtu &gt;= 9000)
+
+# Equality
+select(.adminSt == &quot;up&quot;)
+
+# AND — combine with &#x27;and&#x27;
+select(.adminSt == &quot;up&quot; and .operSt == &quot;up&quot;)
+
+# OR — combine with &#x27;or&#x27;
+select(.name == &quot;prod99&quot; or .name == &quot;dev99&quot;)
+
+# NOT
+select(.adminSt != &quot;down&quot;)
+
+# Complex
+select(.adminSt == &quot;up&quot; and .operSt == &quot;up&quot; and .mtu &gt;= 9000)
+</pre>
+
+<h3>Examples</h3>
+
+<pre># Simple: All interfaces with MTU &gt;= 9000
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/intf-items/phys-items&quot; \
+  -H &#x27;accept: application/yang-data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  | jq &#x27;.&quot;phys-items&quot;.&quot;PhysIf-list&quot;[] | select(.mtu &gt;= 9000) | {id, mtu}&#x27;
+
+# Complex: Interfaces up + up + MTU &gt;= 9000
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/intf-items/phys-items&quot; \
+  -H &#x27;accept: application/yang-data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  | jq &#x27;.&quot;phys-items&quot;.&quot;PhysIf-list&quot;[] | select(.adminSt == &quot;up&quot; and .operSt == &quot;up&quot; and .mtu &gt;= 9000) | {id, adminSt, operSt, mtu}&#x27;
+
+# Filter VLANs by name containing &quot;prod&quot;
+curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/bd-items&quot; \
+  -H &#x27;accept: application/yang-data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  | jq &#x27;.&quot;bd-items&quot;.&quot;bd-items&quot;.&quot;BD-list&quot;[] | select(.name | test(&quot;prod&quot;)) | {id, name, fabEncap}&#x27;
+</pre>
+
+<h3>jq Gotchas</h3>
+
+<p>- <strong>Hyphenated keys</strong> need bracket syntax: <code>.["intf-name"]</code> not <code>.intf-name</code></p>
+<p>- <strong>Leading dot</strong> required: <code>.prefix</code> not <code>prefix</code></p>
+<p>- <strong><code>select()</code> string comparison</strong> uses <code>==</code> (double equals)</p>
+<p>- <strong><code>select()</code> numeric comparison</strong> uses <code>>=</code>, <code><=</code>, <code>></code>, <code><</code> — but the value must be a number, not a string</p>
+<p>- <strong><code>test()</code> for regex/substring match</strong> — equivalent of DME's <code>wcard()</code></p>
+
+<hr>
+
+<h2>Side-by-Side Comparison</h2>
+
+<h3>Query: Find physical interfaces with operSt=up, adminSt=up, mtu >= 9000</h3>
+
+<strong>DME (server-side):</strong>
+<pre>curl -sk &quot;https://$NXOS_URI/api/class/l1PhysIf.json?query-target-filter=and(eq(l1PhysIf.adminSt,\&quot;up\&quot;),eq(l1PhysIf.operSt,\&quot;up\&quot;),ge(l1PhysIf.mtu,\&quot;9000\&quot;))&quot; \
+  -H &quot;Cookie: APIC-cookie=$token&quot; \
+  | jq &#x27;.imdata[].l1PhysIf.attributes | {id, adminSt, operSt, mtu}&#x27;
+</pre>
+
+<strong>RESTCONF (client-side):</strong>
+<pre>curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/intf-items/phys-items&quot; \
+  -H &#x27;accept: application/yang-data+json&#x27; \
+  -u $NXOS_USERNAME:$NXOS_PASSWORD \
+  | jq &#x27;.&quot;phys-items&quot;.&quot;PhysIf-list&quot;[] | select(.adminSt == &quot;up&quot; and .operSt == &quot;up&quot; and .mtu &gt;= 9000) | {id, adminSt, operSt, mtu}&#x27;
+</pre>
+
+<hr>
+
+<h2>Decision Matrix</h2>
+
+<table>
+<thead><tr><th>Need</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td>Simple fetch by specific key</td><td>RESTCONF works fine (<code>/PhysIf-list=eth1%2F2</code>)</td></tr>
+<tr><td>Equality filter on one field</td><td>Either — DME cleaner</td></tr>
+<tr><td>Multiple conditions (AND/OR)</td><td>DME preferred — server-side</td></tr>
+<tr><td>Comparison operators (>=, <=)</td><td>DME only server-side; RESTCONF needs jq</td></tr>
+<tr><td>Wildcard / substring match</td><td>DME: <code>wcard()</code> / RESTCONF: jq <code>test()</code></td></tr>
+<tr><td>Parent filtering by child</td><td>DME only (<code>rsp-subtree-include=required</code>)</td></tr>
+<tr><td>Large dataset</td><td>DME — less data over the wire</td></tr>
+<tr><td>Quick one-off query</td><td>Either — whatever you're faster with</td></tr>
+</tbody></table>
+<hr>
+
+<h2>Operator Mapping: DME ↔ jq</h2>
+
+<table>
+<thead><tr><th>DME Operator</th><th>jq Equivalent</th></tr></thead>
+<tbody>
+<tr><td><code>eq(class.attr,"val")</code></td><td><code>select(.attr == "val")</code></td></tr>
+<tr><td><code>ne(class.attr,"val")</code></td><td><code>select(.attr != "val")</code></td></tr>
+<tr><td><code>ge(class.attr,"val")</code></td><td><code>select(.attr >= val)</code></td></tr>
+<tr><td><code>le(class.attr,"val")</code></td><td><code>select(.attr <= val)</code></td></tr>
+<tr><td><code>gt(class.attr,"val")</code></td><td><code>select(.attr > val)</code></td></tr>
+<tr><td><code>lt(class.attr,"val")</code></td><td><code>select(.attr < val)</code></td></tr>
+<tr><td><code>wcard(class.attr,"str")</code></td><td><code>select(.attr \</td><td>test("str"))</code></td></tr>
+<tr><td><code>and(expr1,expr2)</code></td><td><code>select(cond1 and cond2)</code></td></tr>
+<tr><td><code>or(expr1,expr2)</code></td><td><code>select(cond1 or cond2)</code></td></tr>
+</tbody></table>
+
+</details>
+
+<hr>
+
 </details>
 
             <h2>🐍 Initial Code</h2>
@@ -1266,7 +1469,7 @@ vrf context challenge-A5
 
         <section id="quiz" class="section">
             <h1>Lab Practice — NX-OS API Fill-in-the-Gaps</h1>
-            <p class="intro-text">9 questions covering all TODO tasks. Drag the correct segments into the curl command blanks.</p>
+            <p class="intro-text">13 questions covering TODO tasks + DME/RESTCONF filtering. Drag the correct segments into the curl command blanks.</p>
             <div class="quiz-header"><div>
                 <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
                 <span class="score-display">Score: <span class="score-correct" id="correctCount">0</span> <span class="score-total">/ <span id="totalAnswered">0</span> answered</span></span>
@@ -1332,6 +1535,36 @@ vrf context challenge-A5
              answers:["cli_show_ascii","show running-config bgp","xml"],altAnswers:{0:["cli_show"]},
              pool:["cli_show_ascii","cli_show","cli_conf","show running-config bgp","show bgp","show ip bgp summary","xml","json","text"],
              explanation:"Correct answers (in order):\n\n[1] cli_show_ascii\n    For raw text output (running-config has no structured JSON).\n\n[2] show running-config bgp\n    CLI command for BGP config.\n\n[3] xml\n    Wraps raw text in XML tags.\n\n\u2705 Full correct command (recommended):\ncurl -sk \"https://192.168.89.73/ins\" ... \\\n  -d '{\"ins_api\":{\"type\":\"cli_show_ascii\",\"input\":\"show running-config bgp\",\"output_format\":\"xml\",...}}'\n\n\u2705 Also works (with xml output_format):\ncurl -sk \"https://192.168.89.73/ins\" ... \\\n  -d '{\"ins_api\":{\"type\":\"cli_show\",\"input\":\"show running-config bgp\",\"output_format\":\"xml\",...}}'\n\n\u26a0\ufe0f cli_show + xml works because XML wraps everything in <body> tags.\nBut cli_show_ascii is the proper choice for text-only commands like running-config.\n\nDistractors:\n  cli_show \u2192 designed for structured output commands. Works with xml format for running-config,\n    but cli_show_ascii is recommended for text commands\n  cli_conf \u2192 for config mode, not show commands\n  json \u2192 running-config has no structured JSON representation\n\n\U0001f9ea How to test in real-time:\n  1. Browse https://192.168.89.73 (NX-API Sandbox)\n  2. Choose: Method=NXAPI-CLI, Message format=json, Command type=cli\n  3. Type: show running-config bgp\n  \u26a0\ufe0f Set Command type=cli_show_ascii for text commands and click POST \u2014 you get the JSON response"}
+        ,
+
+            // Q10: DME server-side filter — mtu >= 9000
+            {id:10,type:"blocks",question:"DME Server-Side Filtering: Find physical interfaces with MTU >= 9000\n\nUse /api/class/ with query-target-filter to filter on the server.\n\nExpected: Only interfaces where mtu >= 9000",
+             template:'curl -sk "https://192.168.89.73/api/class/{{1}}?query-target-filter={{2}}" \\\n  -H "{{3}}" \\\n  | jq \'.imdata[].l1PhysIf.attributes | {id, mtu}\'',
+             answers:["l1PhysIf.json",'ge(l1PhysIf.mtu,\"9000\")','Cookie: APIC-cookie=$token'],
+             pool:["l1PhysIf.json","sviIf.json","l2BD.json","ethpmPhysIf.json",'ge(l1PhysIf.mtu,\"9000\")','eq(l1PhysIf.mtu,\"9000\")','gt(l1PhysIf.mtu,\"9000\")','wcard(l1PhysIf.mtu,\"9000\")','ge(l1PhysIf.mtu,9000)','Cookie: APIC-cookie=$token',"-u expert:'1234QWer!'","Authorization: Basic $token"],
+             explanation:"Correct answers (in order):\n\n[1] l1PhysIf.json\n    Class name for physical interfaces in DME.\n\n[2] ge(l1PhysIf.mtu,\"9000\")\n    ge = greater-than-or-equal. Server-side filter on the mtu attribute.\n    Value must be quoted: \"9000\" not bare 9000.\n\n[3] Cookie: APIC-cookie=$token\n    DME authentication.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/api/class/l1PhysIf.json?query-target-filter=ge(l1PhysIf.mtu,\\\"9000\\\")\" \\\n  -H \"Cookie: APIC-cookie=$token\" \\\n  | jq '.imdata[].l1PhysIf.attributes | {id, mtu}'\n\nDistractors:\n  eq(...) \u2192 exact match (equals 9000 only), not >=\n  gt(...) \u2192 greater-than (strictly > 9000), not >=\n  wcard(...) \u2192 wildcard string match, not numeric comparison\n  ge(l1PhysIf.mtu,9000) \u2192 value must be quoted in DME filters\n  -u expert:... \u2192 Basic auth is for RESTCONF, not DME\n\n\U0001f9ea How to test in real-time:\n  1. Browse https://192.168.89.73/visore.html\n  2. Search class: l1PhysIf \u2014 check mtu attribute values"},
+
+            // Q11: RESTCONF client-side jq filter — mtu >= 9000
+            {id:11,type:"blocks",question:"RESTCONF Client-Side Filtering (jq): Find physical interfaces with MTU >= 9000\n\nFetch all interfaces via RESTCONF, then filter locally with jq select().\n\nExpected: Only interfaces where mtu >= 9000",
+             template:'curl -sk "https://192.168.89.73/restconf/data/{{1}}/{{2}}" \\\n  -H \'{{3}}\' \\\n  -u {{4}} \\\n  | jq \'.\"phys-items\".\"PhysIf-list\"[] | {{5}} | {id, mtu}\'',
+             answers:["Cisco-NX-OS-device:System","intf-items/phys-items","accept: application/yang.data+json","expert:'1234QWer!'","select(.mtu >= 9000)"],
+             pool:["Cisco-NX-OS-device:System","Cisco-NX-OS-device:system","intf-items/phys-items","intf-items/svi-items","bd-items","accept: application/yang.data+json","accept: application/yang-data+json","expert:'1234QWer!'","Cookie: APIC-cookie=$token","select(.mtu >= 9000)","select(.mtu > 9000)","select(.mtu == 9000)","select(mtu >= 9000)"],
+             explanation:"Correct answers (in order):\n\n[1] Cisco-NX-OS-device:System\n    RESTCONF root (capital S).\n\n[2] intf-items/phys-items\n    YANG path to physical interfaces.\n\n[3] accept: application/yang.data+json\n    NX-OS uses DOT (yang.data), not hyphen.\n\n[4] expert:'1234QWer!'\n    Basic Auth credentials for RESTCONF.\n\n[5] select(.mtu >= 9000)\n    jq client-side filter. Note the DOT before mtu (.mtu) \u2014 required in jq.\n    >= is greater-than-or-equal in jq.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System/intf-items/phys-items\" \\\n  -H 'accept: application/yang.data+json' \\\n  -u expert:'1234QWer!' \\\n  | jq '.\"phys-items\".\"PhysIf-list\"[] | select(.mtu >= 9000) | {id, mtu}'\n\nDistractors:\n  Cisco-NX-OS-device:system \u2192 lowercase s fails\n  yang-data+json \u2192 IOS-XE format; NX-OS uses yang.data\n  select(.mtu > 9000) \u2192 strictly greater, misses mtu=9000\n  select(.mtu == 9000) \u2192 exact match only\n  select(mtu >= 9000) \u2192 missing leading dot; jq requires .mtu\n  Cookie: APIC-cookie \u2192 DME auth, not RESTCONF\n\n\U0001f9ea How to test in real-time:\n  Option A: Browse https://192.168.89.73 \u2192 Method=RESTCONF (Yang), json\n  Option B: Use YangSuite with Cisco-NX-OS-device module"},
+
+            // Q12: DME server-side and() filter — adminSt+operSt=up, mtu>=9000
+            {id:12,type:"blocks",question:"DME Server-Side Filtering with and(): Find interfaces where adminSt=up AND operSt=up AND mtu >= 9000\n\nUse /api/class/ with and() combining multiple conditions.\n\nExpected: Only UP interfaces with jumbo MTU",
+             template:'curl -sk "https://192.168.89.73/api/class/{{1}}?query-target-filter={{2}}({{3}},{{4}},{{5}})" \\\n  -H "{{6}}" \\\n  | jq \'.imdata[].l1PhysIf.attributes | {id, adminSt, operSt, mtu}\'',
+             answers:["l1PhysIf.json","and",'eq(l1PhysIf.adminSt,\"up\")','eq(l1PhysIf.operSt,\"up\")','ge(l1PhysIf.mtu,\"9000\")','Cookie: APIC-cookie=$token'],
+             flexGroups:[[2,3,4]],
+             pool:["l1PhysIf.json","sviIf.json","and","or","not",'eq(l1PhysIf.adminSt,\"up\")','eq(l1PhysIf.adminSt,\"Up\")','eq(l1PhysIf.operSt,\"up\")','eq(l1PhysIf.operSt,\"Up\")','ge(l1PhysIf.mtu,\"9000\")','gt(l1PhysIf.mtu,\"9000\")','eq(l1PhysIf.mtu,\"9000\")','Cookie: APIC-cookie=$token',"-u expert:'1234QWer!'"],
+             explanation:"Correct answers (in order):\n\n[1] l1PhysIf.json\n    Physical interface class.\n\n[2] and\n    DME logical operator combining multiple conditions.\n\n[3] eq(l1PhysIf.adminSt,\"up\")\n    Admin status equals \"up\" (lowercase!).\n\n[4] eq(l1PhysIf.operSt,\"up\")\n    Oper status equals \"up\" (lowercase!).\n\n[5] ge(l1PhysIf.mtu,\"9000\")\n    MTU >= 9000.\n\n[6] Cookie: APIC-cookie=$token\n    DME auth.\n\n\u26a0\ufe0f Conditions [3]-[5] inside and() are order-independent \u2014 any arrangement is correct.\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/api/class/l1PhysIf.json?query-target-filter=and(eq(l1PhysIf.adminSt,\\\"up\\\"),eq(l1PhysIf.operSt,\\\"up\\\"),ge(l1PhysIf.mtu,\\\"9000\\\"))\" \\\n  -H \"Cookie: APIC-cookie=$token\" \\\n  | jq '.imdata[].l1PhysIf.attributes | {id, adminSt, operSt, mtu}'\n\nDistractors:\n  or \u2192 would match interfaces where ANY condition is true\n  eq(l1PhysIf.adminSt,\"Up\") \u2192 case-sensitive! DME uses lowercase \"up\", not \"Up\"\n  gt(l1PhysIf.mtu,...) \u2192 strictly greater-than, misses mtu=9000\n  eq(l1PhysIf.mtu,...) \u2192 exact match only\n\n\U0001f9ea How to test in real-time:\n  1. Browse https://192.168.89.73/visore.html\n  2. Search class: l1PhysIf \u2014 check adminSt, operSt, mtu values\n  3. Note: adminSt/operSt values are lowercase (\"up\"/\"down\")"},
+
+            // Q13: RESTCONF client-side jq and conditions
+            {id:13,type:"blocks",question:"RESTCONF Client-Side Filtering (jq): Find interfaces where adminSt=up AND operSt=up AND mtu >= 9000\n\nFetch all via RESTCONF, filter with jq select() using 'and'.\n\nExpected: Only UP interfaces with jumbo MTU",
+             template:'curl -sk "https://192.168.89.73/restconf/data/{{1}}/{{2}}" \\\n  -H \'{{3}}\' \\\n  -u {{4}} \\\n  | jq \'.\"phys-items\".\"PhysIf-list\"[] | {{5}} | {id, adminSt, operSt, mtu}\'',
+             answers:["Cisco-NX-OS-device:System","intf-items/phys-items","accept: application/yang.data+json","expert:'1234QWer!'",'select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000)'],
+             pool:["Cisco-NX-OS-device:System","Cisco-NX-OS-device:system","intf-items/phys-items","intf-items/svi-items","accept: application/yang.data+json","accept: application/yang-data+json","expert:'1234QWer!'","Cookie: APIC-cookie=$token",'select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000)','select(.adminSt == \"Up\" and .operSt == \"Up\" and .mtu >= 9000)','select(.adminSt == \"up\" or .operSt == \"up\" and .mtu >= 9000)','select(adminSt == \"up\" and operSt == \"up\" and mtu >= 9000)'],
+             explanation:"Correct answers (in order):\n\n[1] Cisco-NX-OS-device:System\n    RESTCONF root.\n\n[2] intf-items/phys-items\n    YANG path to physical interfaces.\n\n[3] accept: application/yang.data+json\n    NX-OS RESTCONF accept header (dot format).\n\n[4] expert:'1234QWer!'\n    Basic Auth credentials.\n\n[5] select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000)\n    jq client-side filter combining three conditions with 'and'.\n    \u2022 Leading dot required: .adminSt, .operSt, .mtu\n    \u2022 String comparison uses == with quotes: == \"up\"\n    \u2022 Numeric comparison: .mtu >= 9000 (no quotes around 9000 in jq)\n    \u2022 Case-sensitive: \"up\" not \"Up\"\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System/intf-items/phys-items\" \\\n  -H 'accept: application/yang.data+json' \\\n  -u expert:'1234QWer!' \\\n  | jq '.\"phys-items\".\"PhysIf-list\"[] | select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000) | {id, adminSt, operSt, mtu}'\n\nDistractors:\n  select(... == \"Up\") \u2192 case-sensitive; RESTCONF returns lowercase \"up\"\n  select(... or ...) \u2192 'or' matches if ANY condition true; need 'and' for ALL\n  select(adminSt == ...) \u2192 missing leading dots; jq requires .adminSt\n  Cisco-NX-OS-device:system \u2192 lowercase s fails\n\n\U0001f9ea How to test in real-time:\n  Option A: Browse https://192.168.89.73 \u2192 Method=RESTCONF (Yang), json\n  Option B: Use YangSuite with Cisco-NX-OS-device module"}
         ];
 
         let submitted={},score=0;

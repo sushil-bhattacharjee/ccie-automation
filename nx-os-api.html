@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NX-OS API (DME, RESTCONF, NX-API CLI) - DevNet Expert Study Guide</title>
+    <title>NXOS-API (DME, RESTCONF, NX-API CLI) - DevNet Expert Study Guide</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root{--bg-primary:#0d1117;--bg-secondary:#161b22;--bg-tertiary:#21262d;--text-primary:#e6edf3;--text-secondary:#8b949e;--accent-blue:#58a6ff;--accent-green:#3fb950;--accent-red:#f85149;--accent-orange:#d29922;--accent-purple:#a371f7;--accent-cyan:#39c5cf;--border-color:#30363d;--code-bg:#0d1117}
@@ -29,6 +29,21 @@
         summary h2,summary h3{display:inline;font-size:inherit;border:none;padding:0;margin:0;color:inherit}
         hr{border:none;border-top:1px solid var(--border-color);margin:1.5rem 0}
         ul,ol{margin:0.5rem 0 1rem 1.5rem;color:var(--text-secondary)}li{margin-bottom:0.25rem}
+
+        /* MCQ option styles */
+        .options-list{display:flex;flex-direction:column;gap:0.75rem}
+        .option-item{display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem 1rem;background:var(--bg-tertiary);border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all 0.2s}
+        .option-item:hover:not(.disabled){background:var(--bg-primary);border-color:var(--border-color)}
+        .option-item.selected{border-color:var(--accent-blue);background:rgba(88,166,255,0.1)}
+        .option-item.correct{border-color:var(--accent-green);background:rgba(63,185,80,0.1)}
+        .option-item.incorrect{border-color:var(--accent-red);background:rgba(248,81,73,0.1)}
+        .option-item.disabled{cursor:default}
+        .option-checkbox{min-width:24px;height:24px;border:2px solid var(--border-color);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.75rem;font-weight:600}
+        .option-item.selected .option-checkbox{border-color:var(--accent-blue);background:var(--accent-blue);color:var(--bg-primary)}
+        .option-item.correct .option-checkbox{border-color:var(--accent-green);background:var(--accent-green);color:var(--bg-primary)}
+        .option-item.incorrect .option-checkbox{border-color:var(--accent-red);background:var(--accent-red);color:white}
+        .option-text{flex:1;color:var(--text-primary);font-size:0.85rem}
+        .option-text pre{font-size:0.63rem;margin:0.4rem 0 0;background:var(--bg-primary);padding:0.5rem;border-radius:6px;line-height:1.5}
 
         /* Block-fill */
         .block-container{display:flex;flex-direction:column;gap:1rem}
@@ -81,25 +96,121 @@
         .copy-btn{margin-top:0.5rem;padding:0.5rem 1rem;background:var(--accent-green);color:var(--bg-primary);border:none;border-radius:6px;font-family:inherit;font-size:0.85rem;font-weight:600;cursor:pointer}
         .copy-btn:hover{background:#56d364}
 
+
+        .q2-scenario{font-size:0.75rem;font-family:'JetBrains Mono',monospace;color:var(--text-secondary);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:10px;white-space:pre-wrap;line-height:1.5;border-left:3px solid var(--border-color)}
+        .q2-tree{font-size:0.68rem;font-family:'JetBrains Mono',monospace;color:var(--text-secondary);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:14px;white-space:pre;line-height:1.55;overflow-x:auto;border-left:3px solid var(--accent-purple)}
+        .q2-tree .hl{background:rgba(210,153,34,0.3);color:var(--accent-orange);padding:1px 4px;border-radius:3px;font-weight:500}
+        .q2-curl{font-family:'JetBrains Mono',monospace;font-size:0.65rem;line-height:1.5;white-space:pre;color:var(--text-secondary);background:var(--code-bg);padding:8px 10px;border-radius:6px;margin-top:6px;overflow-x:auto;position:relative}
+        .q2-copy{position:absolute;top:4px;right:4px;font-size:0.6rem;padding:2px 8px;border:1px solid var(--border-color);border-radius:4px;background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer}
+        .q2-copy:hover{color:var(--text-primary)}
+        .q2-exp{margin-top:14px;padding:14px;background:var(--bg-primary);border-radius:8px;border-left:4px solid var(--accent-green);display:none;font-size:0.83rem;color:var(--text-primary);line-height:1.7;white-space:pre-wrap;font-family:'JetBrains Mono','Plus Jakarta Sans',monospace}
+        .q2-exp strong{color:var(--accent-green)}
+        .q2-exp .exp-tree{font-family:'JetBrains Mono',monospace;font-size:0.7rem;display:block;margin:6px 0;line-height:1.45}
+
+        /* RESTCONF CRUD Reference scoped styles */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f7f7f5;--card:#fff;--text:#1a1a1a;--text2:#555;--text3:#999;--border:#e0e0de;--hover:#f0efeb;--code-bg:#f0efeb;--green:#1d9e75;--green-bg:#e1f5ee;--green-text:#085041;--red:#e24b4a;--red-bg:#fde8e8;--red-text:#791f1f;--blue:#185fa5;--blue-bg:#e8f1fb;--blue-text:#185fa5;--purple:#534ab7;--purple-bg:#ece8ff;--purple-text:#534ab7;--amber-bg:#fff3cd;--amber-text:#856404;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono','SF Mono',monospace}
+/* dark mode handled by variable mapping */
+.crud-ref{--bg:var(--bg-primary);--card:var(--bg-secondary);--text:var(--text-primary);--text2:var(--text-secondary);--text3:#707070;--border:var(--border-color);--hover:var(--bg-tertiary);--code-bg:var(--code-bg);--green:#3fb950;--green-bg:rgba(63,185,80,0.15);--green-text:#3fb950;--red:#f85149;--red-bg:rgba(248,81,73,0.15);--red-text:#f85149;--blue:#58a6ff;--blue-bg:rgba(88,166,255,0.15);--blue-text:#58a6ff;--purple:#a371f7;--purple-bg:rgba(163,113,247,0.15);--purple-text:#a371f7;--amber-bg:rgba(210,153,34,0.2);--amber-text:#d29922;--font:'Plus Jakarta Sans',sans-serif;--mono:'JetBrains Mono',monospace}
+.crud-ref .section{display:block !important}
+        .crud-ref .page{max-width:820px;margin:0 auto;padding:2rem 1.25rem 4rem}
+
+/* Header */
+.crud-ref .header{text-align:center;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.header h1{font-size:1.5rem;font-weight:700;margin-bottom:0.25rem;letter-spacing:-0.02em}
+.header p{font-size:0.85rem;color:var(--text2)}
+
+/* Navigation */
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:2rem;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;position:sticky;top:0.5rem;z-index:10}
+.crud-ref .nav a{font-size:0.72rem;padding:4px 12px;border-radius:6px;text-decoration:none;color:var(--text2);background:var(--code-bg);font-weight:500;transition:all 0.15s}
+.nav a:hover{color:var(--text);background:var(--hover)}
+.crud-ref .nav a.m-get{color:var(--blue-text);background:var(--blue-bg)}
+.crud-ref .nav a.m-post{color:var(--green-text);background:var(--green-bg)}
+.crud-ref .nav a.m-put{color:var(--purple-text);background:var(--purple-bg)}
+.crud-ref .nav a.m-patch{color:var(--amber-text);background:var(--amber-bg)}
+.crud-ref .nav a.m-delete{color:var(--red-text);background:var(--red-bg)}
+
+/* Sections */
+.crud-ref .section{margin-bottom:2.5rem}
+.section h2{font-size:1.15rem;font-weight:600;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border)}
+.section h3{font-size:0.95rem;font-weight:600;margin:1.25rem 0 0.5rem}
+
+/* Cards */
+.crud-ref .method-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.25rem}
+.crud-ref .method-card.crud-ref .border-green{border-left:4px solid var(--green)}
+.crud-ref .method-card.crud-ref .border-blue{border-left:4px solid var(--blue)}
+.crud-ref .method-card.crud-ref .border-purple{border-left:4px solid var(--purple)}
+.crud-ref .method-card.crud-ref .border-amber{border-left:4px solid #c89b0c}
+.crud-ref .method-card.crud-ref .border-red{border-left:4px solid var(--red)}
+
+.crud-ref .method-tag{display:inline-block;font-size:0.7rem;font-weight:600;padding:3px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px}
+.crud-ref .tag-get{background:var(--blue-bg);color:var(--blue-text)}
+.crud-ref .tag-post{background:var(--green-bg);color:var(--green-text)}
+.crud-ref .tag-put{background:var(--purple-bg);color:var(--purple-text)}
+.crud-ref .tag-patch{background:var(--amber-bg);color:var(--amber-text)}
+.crud-ref .tag-delete{background:var(--red-bg);color:var(--red-text)}
+
+.crud-ref .method-title{font-size:1.05rem;font-weight:600;margin-bottom:4px}
+.method-subtitle{font-size:0.82rem;color:var(--text2);margin-bottom:12px;font-style:italic}
+
+/* Code blocks */
+.code{font-family:var(--mono);font-size:0.75rem;background:var(--code-bg);padding:12px 14px;border-radius:8px;line-height:1.6;overflow-x:auto;white-space:pre;margin:8px 0;color:var(--text2)}
+.code .hl{background:var(--amber-bg);color:var(--amber-text);padding:1px 4px;border-radius:3px;font-weight:500}
+.code .err{background:var(--red-bg);color:var(--red-text);padding:1px 4px;border-radius:3px}
+.code .ok{background:var(--green-bg);color:var(--green-text);padding:1px 4px;border-radius:3px}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;font-size:0.82rem;margin:10px 0}
+th{text-align:left;padding:8px 12px;background:var(--code-bg);font-weight:600;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--text3);border-bottom:1px solid var(--border)}
+td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.mono{font-family:var(--mono);font-size:0.75rem}
+
+/* Badges */
+.badge{display:inline-block;font-size:0.68rem;font-weight:600;padding:2px 8px;border-radius:4px;font-family:var(--mono)}
+.b-ok{background:var(--green-bg);color:var(--green-text)}
+.b-err{background:var(--red-bg);color:var(--red-text)}
+.b-warn{background:var(--amber-bg);color:var(--amber-text)}
+.b-info{background:var(--blue-bg);color:var(--blue-text)}
+
+/* Rule boxes */
+.rule{padding:12px 16px;border-radius:8px;margin:10px 0;font-size:0.85rem;line-height:1.6}
+.rule-green{background:var(--green-bg);color:var(--green-text);border-left:3px solid var(--green)}
+.rule-red{background:var(--red-bg);color:var(--red-text);border-left:3px solid var(--red)}
+.rule-blue{background:var(--blue-bg);color:var(--blue-text);border-left:3px solid var(--blue)}
+.rule-amber{background:var(--amber-bg);color:var(--amber-text);border-left:3px solid #c89b0c}
+
+/* Comparison */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.crud-ref .compare-col{background:var(--code-bg);border-radius:8px;padding:12px}
+.compare-col h4{font-size:0.75rem;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;color:var(--text3)}
+@media(max-width:600px){.compare{grid-template-columns:1fr}}
+
+/* Diagram */
+.diagram{font-family:var(--mono);font-size:0.78rem;background:var(--code-bg);padding:16px;border-radius:10px;margin:12px 0;line-height:1.55;white-space:pre;overflow-x:auto;border:1px solid var(--border)}
+</style>
+</head>
+
         @media(max-width:768px){.nav-content{flex-direction:column;gap:1rem}.main-content{padding:8rem 1rem 2rem}h1{font-size:1.75rem}.quiz-header{flex-direction:column;text-align:center}pre{font-size:0.58rem}}
     </style>
 </head>
 <body>
     <nav class="nav-container"><div class="nav-content">
-        <div class="nav-title">📡 NX-OS API (DME, RESTCONF, NX-API CLI) - DevNet Expert</div>
+        <div class="nav-title">📡 NXOS-API (DME, RESTCONF, NX-API CLI) - DevNet Expert</div>
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
             <button class="nav-tab" onclick="showSection('quiz')">📝 Lab Practice</button>
+            <button class="nav-tab" onclick="showSection('quiz2')">📝 Lab Practice-2</button>
         </div>
     </div></nav>
     <main class="main-content">
         <section id="learn" class="section active">
-<h1>e5 — NX-OS API (DME, RESTCONF, NX-API CLI)</h1>
+<h1>NXOS-API (DME, RESTCONF, NX-API CLI)</h1>
 
 <hr>
-<h2>NX-OS-API-STUDY</h2>
+<h2>NXOS-API-STUDY</h2>
 <details>
-<summary><h2>📘 NX-OS-API-STUDY (click to expand)</h2></summary>
+<summary><h2>📘 NXOS-API-STUDY (click to expand)</h2></summary>
 
 <hr>
 
@@ -696,6 +807,568 @@ curl -sk &quot;https://$NXOS_URI/restconf/data/Cisco-NX-OS-device:System/bd-item
 <hr>
 
 </details>
+
+            
+<details>
+<summary><h3>14. RESTCONF CRUD Operations Reference</h3></summary>
+
+<div class="crud-ref"><div class="page">
+
+<div class="header">
+<h1>RESTCONF CRUD — reference guide</h1>
+<p>RFC 8040 &middot; NX-OS 9.3 &middot; URI rules, payload wrapping, error conditions</p>
+</div>
+
+<nav class="nav">
+<a href="#mental-model">Mental model</a>
+<a href="#get" class="m-get">GET</a>
+<a href="#delete" class="m-delete">DELETE</a>
+<a href="#put" class="m-put">PUT</a>
+<a href="#post" class="m-post">POST</a>
+<a href="#patch" class="m-patch">PATCH</a>
+<a href="#wrapping">Wrapping rules</a>
+<a href="#errors">Error conditions</a>
+<a href="#comparison">Method comparison</a>
+<a href="#netconf">NETCONF mapping</a>
+<a href="#gotchas">Exam gotchas</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="mental-model">
+<h2>The mental model — it's a file system</h2>
+
+<p>Think of the YANG tree as a folder structure. The URI is the path, the payload is the file content, and the HTTP method is the action.</p>
+
+<div class="diagram">/System / bd-items / bd-items / BD-list=vlan-100
+   ↑         ↑          ↑            ↑
+  root     folder     folder      THE FILE (target)
+   C:       Users     Documents    report.docx</div>
+
+<div class="rule rule-blue"><strong>One simple rule:</strong> The URI says WHERE. The payload says WHAT. The method says HOW.</div>
+
+<div class="diagram">Method     URI ends at...              Payload contains...
+─────────  ──────────────────────────  ──────────────────────────
+GET        THE FILE (target)           nothing
+DELETE     THE FILE (target)           nothing
+PUT        THE FILE (target)           just the content (bare)
+POST       THE FOLDER (parent)         file name + content (wrapped)
+PATCH      ANY LEVEL (target→root)     fills the gap down to the file</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="get">
+<h2>GET — read a resource</h2>
+
+<div class="method-card border-blue">
+<span class="method-tag tag-get">GET</span>
+<div class="method-title">"Show me what's at this path"</div>
+<div class="method-subtitle">NETCONF equivalent: &lt;get-config&gt; / &lt;get&gt;</div>
+
+<table>
+<tr><th>Rule</th><th>Detail</th></tr>
+<tr><td>URI points to</td><td class="mono">THE TARGET — the object you want to read</td></tr>
+<tr><td>Payload</td><td><span class="badge b-info">NONE</span> — never send a body with GET</td></tr>
+<tr><td>Response</td><td>200 OK + JSON/XML body with resource data</td></tr>
+</table>
+
+<div class="code">GET /restconf/data/.../bd-items/bd-items/BD-list=vlan-100
+                                             ↑
+                                    URI = what you want to read
+                                    payload = NONE</div>
+
+<h3>What can you GET?</h3>
+<div class="code"># Specific VLAN
+GET .../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>          → returns vlan-100
+
+# All VLANs
+GET .../bd-items/<span class="hl">bd-items</span>                          → returns all BD-list entries
+
+# Specific interface
+GET .../phys-items/<span class="hl">PhysIf-list=eth1%2F2</span>           → returns eth1/2
+
+# Entire system
+GET .../Cisco-NX-OS-device:<span class="hl">System</span>                  → returns everything (huge!)</div>
+
+<div class="rule rule-red"><strong>Error:</strong> If you send a payload with GET, the server ignores it — but it's technically a protocol violation. Never include <code>-d</code> with GET requests.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="delete">
+<h2>DELETE — remove a resource</h2>
+
+<div class="method-card border-red">
+<span class="method-tag tag-delete">DELETE</span>
+<div class="method-title">"Remove what's at this path"</div>
+<div class="method-subtitle">NETCONF equivalent: edit-config (operation="delete")</div>
+
+<table>
+<tr><th>Rule</th><th>Detail</th></tr>
+<tr><td>URI points to</td><td class="mono">THE TARGET — the object you want to remove</td></tr>
+<tr><td>Payload</td><td><span class="badge b-info">NONE</span> — DELETE never accepts a body</td></tr>
+<tr><td>Response</td><td>204 No Content (success) or 404 if resource doesn't exist</td></tr>
+<tr><td>Multi-resource?</td><td><span class="badge b-err">NO</span> — one DELETE = one target. Need 2 deletes? Need 2 requests.</td></tr>
+</table>
+
+<div class="code">DELETE /restconf/data/.../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>
+                                                  ↑
+                                         URI = what gets deleted
+                                         payload = NONE</div>
+
+<div class="rule rule-red"><strong>Danger zones:</strong></div>
+<div class="code"><span class="err">DELETE .../bd-items</span>       → deletes ALL VLANs, not just one!
+<span class="err">DELETE .../System</span>         → deletes ENTIRE system config!
+<span class="ok">DELETE .../BD-list=vlan-100</span>  → deletes only vlan-100 ✓</div>
+
+<div class="rule rule-amber"><strong>Cannot batch deletes.</strong> Unlike PATCH which can modify multiple resources at a common ancestor, DELETE has no payload — the URI IS the instruction. Two targets = two requests, always.</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="put">
+<h2>PUT — create or replace a resource</h2>
+
+<div class="method-card border-purple">
+<span class="method-tag tag-put">PUT</span>
+<div class="method-title">"Place this thing exactly here"</div>
+<div class="method-subtitle">NETCONF equivalent: edit-config (operation="create/replace")</div>
+
+<table>
+<tr><th>Rule</th><th>Detail</th></tr>
+<tr><td>URI points to</td><td class="mono">THE TARGET ITSELF — the exact object</td></tr>
+<tr><td>Payload</td><td><span class="badge b-ok">BARE ATTRIBUTES</span> — no wrapping (URI already identifies the object)</td></tr>
+<tr><td>If exists</td><td><span class="badge b-warn">REPLACES ENTIRELY</span> — unspecified fields reset to defaults!</td></tr>
+<tr><td>If doesn't exist</td><td><span class="badge b-ok">CREATES</span> it</td></tr>
+</table>
+
+<div class="code">PUT /restconf/data/.../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>
+                                              ↑
+                                     URI = THE OBJECT itself
+                                     payload = just attributes, NO wrapping
+
+payload:
+{
+  "fabEncap": "vlan-100",     ← bare attributes
+  "name": "MyVlan"            ← no "BD-list" wrapper needed
+}</div>
+
+<div class="rule rule-red"><strong>PUT replaces entirely.</strong> If eth1/2 has mtu=1500, accessVlan=vlan-100, speed=10G and you PUT with only <code>{"id":"eth1/2","mtu":9216}</code>, the result is: mtu=9216, accessVlan=DEFAULT, speed=DEFAULT. Everything not in the payload resets. Use PATCH if you only want to change one field.</div>
+
+<h3>Correct vs wrong payloads</h3>
+<div class="compare">
+<div class="compare-col">
+<h4>Correct — bare attributes</h4>
+<div class="code" style="margin:0"><span class="ok">{
+  "fabEncap": "vlan-100",
+  "name": "MyVlan"
+}</span></div>
+</div>
+<div class="compare-col">
+<h4>Wrong — wrapped with BD-list</h4>
+<div class="code" style="margin:0"><span class="err">{
+  "BD-list": [
+    {"fabEncap":"vlan-100"}
+  ]
+}</span>
+→ double path error</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="post">
+<h2>POST — create a new resource</h2>
+
+<div class="method-card border-green">
+<span class="method-tag tag-post">POST</span>
+<div class="method-title">"Create a new child under this parent"</div>
+<div class="method-subtitle">NETCONF equivalent: edit-config (operation="create")</div>
+
+<table>
+<tr><th>Rule</th><th>Detail</th></tr>
+<tr><td>URI points to</td><td class="mono">THE PARENT — one level above the target</td></tr>
+<tr><td>Payload</td><td><span class="badge b-warn">WRAPPED</span> — must include child list/container name</td></tr>
+<tr><td>If exists</td><td><span class="badge b-err">409 CONFLICT</span> — POST is strictly create-only</td></tr>
+<tr><td>If doesn't exist</td><td><span class="badge b-ok">CREATES</span> it</td></tr>
+<tr><td>Multi-resource?</td><td><span class="badge b-err">NO</span> — POST goes to ONE parent only</td></tr>
+</table>
+
+<div class="code">POST /restconf/data/.../bd-items/<span class="hl">bd-items</span>          ← URI = PARENT
+                                      ↑
+                             one level ABOVE the target
+
+payload:
+{
+  <span class="hl">"BD-list"</span>: [              ← WRAPPER tells server what to create
+    {
+      "fabEncap": "vlan-300",
+      "name": "MyVlan"
+    }
+  ]
+}</div>
+
+<div class="rule rule-red"><strong>POST = create-only.</strong> If the resource already exists → 409 Conflict. This is the #1 exam trap. Physical interfaces (eth1/X) ALWAYS exist on the switch — you can NEVER POST to create them. Use PATCH or PUT instead.</div>
+
+<h3>Why wrapping is mandatory for POST</h3>
+<p>The URI only says "go to bd-items" — it doesn't say WHAT to create. The wrapper (<code>"BD-list":[...]</code>) tells the server "create a BD-list entry with these attributes". Without it, the server has no idea what child type to create.</p>
+
+<h3>POST restrictions</h3>
+<div class="code"><span class="err">POST .../BD-list=vlan-300</span>    → ERROR: POST can't target the object itself
+<span class="err">POST .../System</span>              → ERROR: POST must go to the DIRECT parent
+                                not an ancestor (that's PATCH territory)
+<span class="ok">POST .../bd-items/bd-items</span>  → CORRECT: direct parent, wrapped payload</div>
+
+<h3>What can and can't be POSTed</h3>
+<table>
+<tr><th>Resource</th><th>POST works?</th><th>Why</th></tr>
+<tr><td class="mono">vlan-200 (doesn't exist)</td><td><span class="badge b-ok">Yes</span></td><td>VLANs are created/deleted dynamically</td></tr>
+<tr><td class="mono">loopback99 (doesn't exist)</td><td><span class="badge b-ok">Yes</span></td><td>Logical interfaces can be created</td></tr>
+<tr><td class="mono">eth1/12 (physical port)</td><td><span class="badge b-err">409</span></td><td>Physical ports always exist — can only modify</td></tr>
+<tr><td class="mono">vlan-400 (already exists)</td><td><span class="badge b-err">409</span></td><td>POST = create-only, resource exists</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="patch">
+<h2>PATCH — merge/update a resource</h2>
+
+<div class="method-card border-amber">
+<span class="method-tag tag-patch">PATCH</span>
+<div class="method-title">"Merge this data into whatever I point at"</div>
+<div class="method-subtitle">NETCONF equivalent: edit-config (operation="merge")</div>
+
+<table>
+<tr><th>Rule</th><th>Detail</th></tr>
+<tr><td>URI points to</td><td class="mono">ANY LEVEL — target, parent, grandparent, or root</td></tr>
+<tr><td>Payload</td><td><span class="badge b-warn">FILLS THE GAP</span> — from URI level down to the actual data</td></tr>
+<tr><td>If exists</td><td><span class="badge b-ok">MERGES</span> — only specified fields change, others untouched</td></tr>
+<tr><td>If doesn't exist</td><td><span class="badge b-ok">CREATES</span> it (NETCONF merge semantics)</td></tr>
+<tr><td>Multi-resource?</td><td><span class="badge b-ok">YES</span> — target a common ancestor, include all branches</td></tr>
+</table>
+
+<div class="rule rule-green"><strong>PATCH is the safest and most flexible method.</strong> It's the ONLY method that can: create what's missing, update what exists, and handle multiple resources in one request. This is NOT standard HTTP PATCH behaviour — it's RESTCONF-specific (RFC 8040 merge semantics).</div>
+
+<h3>PATCH at different URI levels — same result</h3>
+<div class="code"># Level 1: URI = target → payload = bare attributes
+PATCH .../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>
+{"fabEncap":"vlan-100","name":"MyVlan"}
+
+# Level 2: URI = parent → payload wraps with child name
+PATCH .../bd-items/<span class="hl">bd-items</span>
+{"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}
+
+# Level 3: URI = grandparent → payload wraps two levels
+PATCH .../<span class="hl">bd-items</span>
+{"bd-items":{"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}}
+
+# Level 4: URI = root → payload wraps full tree
+PATCH .../Cisco-NX-OS-device:<span class="hl">System</span>
+{"bd-items":{"bd-items":{"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}}}</div>
+
+<h3>PATCH vs standard HTTP PATCH</h3>
+<table>
+<tr><th></th><th>Standard HTTP PATCH</th><th>RESTCONF PATCH (RFC 8040)</th></tr>
+<tr><td>Resource exists</td><td>Update fields</td><td>Update fields</td></tr>
+<tr><td>Resource doesn't exist</td><td><span class="badge b-err">404 Not Found</span></td><td><span class="badge b-ok">Creates it</span></td></tr>
+<tr><td>NETCONF equivalent</td><td>—</td><td>edit-config with <strong>merge</strong></td></tr>
+</table>
+
+<h3>Multi-resource PATCH (unique to PATCH)</h3>
+<div class="code">PATCH /restconf/data/Cisco-NX-OS-device:System     ← common ancestor
+
+{
+  "bd-items": {                          ← branch 1: create VLAN
+    "bd-items": {
+      "BD-list": [{"fabEncap":"vlan-200","name":"MyVlan"}]
+    }
+  },
+  "intf-items": {                        ← branch 2: modify interface
+    "phys-items": {
+      "PhysIf-list": [
+        {"id":"eth1/3","accessVlan":"vlan-200"},
+        {"id":"eth1/4","mtu":9216}        ← branch 2b: another interface
+      ]
+    }
+  }
+}
+
+→ One request, three changes, no errors.
+→ POST can't do this (409 — bd-items exists).
+→ PUT can't do this (replaces entire system).
+→ DELETE can't do this (no payload).</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="wrapping">
+<h2>Wrapping rules — when and why</h2>
+
+<h3>The rule</h3>
+<div class="rule rule-blue"><strong>Whatever the URI doesn't cover, the payload must fill in.</strong> The deeper the URI goes, the less wrapping the payload needs.</div>
+
+<h3>Visual: same VLAN, different URI depths</h3>
+<div class="diagram">YANG tree:
+System / bd-items / bd-items / BD-list=vlan-100
+  L4       L3         L2          L1 (target)
+
+URI at L1 (target):    payload = bare attributes
+URI at L2 (parent):    payload = 1 level wrapping
+URI at L3 (grandpa):   payload = 2 levels wrapping
+URI at L4 (root):      payload = 3 levels wrapping (full tree)</div>
+
+<table>
+<tr><th>URI level</th><th>Method</th><th>Payload</th></tr>
+<tr><td class="mono">L1: BD-list=vlan-100</td><td>PUT / PATCH</td><td class="mono">{"fabEncap":"vlan-100","name":"X"}</td></tr>
+<tr><td class="mono">L2: bd-items (parent)</td><td>POST / PATCH</td><td class="mono">{"BD-list":[{"fabEncap":"vlan-100","name":"X"}]}</td></tr>
+<tr><td class="mono">L3: bd-items (grandpa)</td><td>PATCH only</td><td class="mono">{"bd-items":{"BD-list":[...]}}</td></tr>
+<tr><td class="mono">L4: System (root)</td><td>PATCH only</td><td class="mono">{"bd-items":{"bd-items":{"BD-list":[...]}}}</td></tr>
+</table>
+
+<h3>Method determines which levels are allowed</h3>
+<table>
+<tr><th>Method</th><th>Allowed URI level</th><th>Wrapping required?</th></tr>
+<tr><td><span class="badge b-info">GET</span></td><td>Target (L1)</td><td>No payload</td></tr>
+<tr><td><span class="badge b-err">DELETE</span></td><td>Target (L1)</td><td>No payload</td></tr>
+<tr><td><span class="badge" style="background:var(--purple-bg);color:var(--purple-text)">PUT</span></td><td>Target only (L1)</td><td><strong>Never</strong> — bare attributes</td></tr>
+<tr><td><span class="badge b-ok">POST</span></td><td>Direct parent only (L2)</td><td><strong>Always</strong> — one level wrapping</td></tr>
+<tr><td><span class="badge b-warn">PATCH</span></td><td>Any level (L1–L4)</td><td><strong>Depends</strong> — fills the gap from URI to target</td></tr>
+</table>
+
+<h3>Common wrapping mistakes</h3>
+<div class="code"><span class="err">PUT  .../BD-list=vlan-100  +  {"BD-list":[...]}</span>
+→ double path: URI says BD-list, payload says BD-list again
+
+<span class="err">POST .../bd-items  +  {"fabEncap":"vlan-100"}</span>
+→ no wrapper: server doesn't know which child to create
+
+<span class="err">PATCH .../PhysIf-list=eth1%2F11  +  {"PhysIf-list":[...]}</span>
+→ double path: URI already covers PhysIf-list
+
+<span class="err">POST .../System  +  {"bd-items":{"bd-items":{"BD-list":[...]}}}</span>
+→ POST must go to DIRECT parent, not an ancestor
+
+<span class="ok">PATCH .../System  +  {"bd-items":{"bd-items":{"BD-list":[...]}}}</span>
+→ correct: PATCH can target any ancestor with full tree wrapping</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="errors">
+<h2>HTTP error conditions</h2>
+
+<table>
+<tr><th>Error</th><th>When it happens</th><th>Example</th></tr>
+<tr>
+<td><span class="badge b-err">409 Conflict</span></td>
+<td>POST to create a resource that already exists</td>
+<td class="mono">POST .../bd-items → BD-list=vlan-400 (exists)</td>
+</tr>
+<tr>
+<td><span class="badge b-err">404 Not Found</span></td>
+<td>GET/DELETE a resource that doesn't exist, or slash not encoded in URI</td>
+<td class="mono">GET .../PhysIf-list=eth1/11 (should be eth1%2F11)</td>
+</tr>
+<tr>
+<td><span class="badge b-err">400 Bad Request</span></td>
+<td>Invalid content-type header or malformed JSON payload</td>
+<td class="mono">content-type: application/yang-data+json (dash instead of dot on NX-OS 9.3)</td>
+</tr>
+<tr>
+<td><span class="badge b-err">unknown-element</span></td>
+<td>Payload wrapping duplicates a level the URI already covers</td>
+<td class="mono">PATCH .../PhysIf-list=eth1%2F11 + {"PhysIf-list":[...]}</td>
+</tr>
+<tr>
+<td><span class="badge b-err">401 Unauthorized</span></td>
+<td>Missing or expired authentication. RESTCONF uses Basic Auth, not APIC-cookie</td>
+<td class="mono">Using Cookie: APIC-cookie=... on /restconf/ endpoint</td>
+</tr>
+<tr>
+<td><span class="badge b-err">405 Method Not Allowed</span></td>
+<td>Using a method the resource doesn't support</td>
+<td class="mono">POST to a non-list resource</td>
+</tr>
+<tr>
+<td><span class="badge b-ok">204 No Content</span></td>
+<td>Success — PATCH/PUT/DELETE completed, no body returned</td>
+<td class="mono">PATCH .../BD-list=vlan-100 → 204 (success)</td>
+</tr>
+<tr>
+<td><span class="badge b-ok">201 Created</span></td>
+<td>Success — POST created a new resource</td>
+<td class="mono">POST .../bd-items → 201 (created vlan-300)</td>
+</tr>
+<tr>
+<td><span class="badge b-ok">200 OK</span></td>
+<td>Success — GET returned data</td>
+<td class="mono">GET .../BD-list=vlan-100 → 200 + JSON body</td>
+</tr>
+</table>
+
+<h3>Error decision tree</h3>
+<div class="code">POST fails?
+├── Resource exists?           → <span class="err">409 Conflict</span>
+├── URI targets the object?    → <span class="err">Error</span> (must target parent)
+├── URI targets an ancestor?   → <span class="err">Error</span> (must target DIRECT parent)
+└── Payload not wrapped?       → <span class="err">Error</span> (server doesn't know what to create)
+
+PUT/PATCH fails?
+├── Payload wraps a level the URI covers?  → <span class="err">unknown-element</span>
+├── Slash not encoded in URI?              → <span class="err">404 Not Found</span>
+├── Wrong content-type?                    → <span class="err">400 Bad Request</span>
+└── Wrong auth method?                     → <span class="err">401 Unauthorized</span>
+
+DELETE fails?
+├── Payload included?          → <span class="err">Invalid</span> (DELETE has no body)
+├── Resource doesn't exist?    → <span class="err">404 Not Found</span>
+└── URI too broad?             → <span class="err">Deletes more than intended!</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="comparison">
+<h2>Method comparison — all five at a glance</h2>
+
+<table>
+<tr><th>Method</th><th>URI target</th><th>Payload</th><th>If exists</th><th>If doesn't exist</th><th>Multi-resource?</th></tr>
+<tr>
+<td><span class="badge b-info">GET</span></td>
+<td>Target</td><td>None</td>
+<td>Returns data</td><td>404</td>
+<td>Yes (ancestor returns subtree)</td>
+</tr>
+<tr>
+<td><span class="badge b-err">DELETE</span></td>
+<td>Target</td><td>None</td>
+<td>Removes it</td><td>404</td>
+<td>No — 1 per request</td>
+</tr>
+<tr>
+<td><span class="badge" style="background:var(--purple-bg);color:var(--purple-text)">PUT</span></td>
+<td>Target itself</td><td>Bare attributes</td>
+<td>Replaces entirely</td><td>Creates</td>
+<td>No — 1 per request</td>
+</tr>
+<tr>
+<td><span class="badge b-ok">POST</span></td>
+<td>Direct parent</td><td>Wrapped</td>
+<td><span class="badge b-err">409</span></td><td>Creates</td>
+<td>No — 1 parent per request</td>
+</tr>
+<tr>
+<td><span class="badge b-warn">PATCH</span></td>
+<td>Any level</td><td>Fills the gap</td>
+<td>Merges (partial update)</td><td>Creates (merge)</td>
+<td>Yes — common ancestor</td>
+</tr>
+</table>
+
+<h3>Same vlan-100 — all five methods</h3>
+<div class="code"># ─── No payload ──────────────────────────────────────────────────────
+
+GET     .../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>     → reads it
+DELETE  .../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>     → removes it
+
+# ─── URI = target, payload = bare ────────────────────────────────────
+
+PUT     .../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>
+        {"fabEncap":"vlan-100","name":"MyVlan"}
+
+# ─── URI = parent, payload = wrapped ─────────────────────────────────
+
+POST    .../bd-items/<span class="hl">bd-items</span>
+        {"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}
+
+# ─── URI = any level, payload = fills the gap ────────────────────────
+
+PATCH   .../bd-items/bd-items/<span class="hl">BD-list=vlan-100</span>     → bare
+        {"fabEncap":"vlan-100","name":"MyVlan"}
+
+PATCH   .../bd-items/<span class="hl">bd-items</span>                     → 1 level wrapping
+        {"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}
+
+PATCH   .../Cisco-NX-OS-device:<span class="hl">System</span>              → full tree wrapping
+        {"bd-items":{"bd-items":{"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}}}</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="netconf">
+<h2>NETCONF mapping — why RESTCONF methods behave differently</h2>
+
+<p>RESTCONF methods aren't standard HTTP — they map to NETCONF operations. This is why PATCH creates missing resources (merge), and POST fails on existing ones (create).</p>
+
+<table>
+<tr><th>RESTCONF</th><th>NETCONF operation</th><th>Behaviour</th></tr>
+<tr><td><span class="badge b-info">GET</span></td><td class="mono">&lt;get-config&gt; / &lt;get&gt;</td><td>Read configuration/operational data</td></tr>
+<tr><td><span class="badge b-ok">POST</span></td><td class="mono">edit-config (operation="create")</td><td>Create only — fails if exists</td></tr>
+<tr><td><span class="badge" style="background:var(--purple-bg);color:var(--purple-text)">PUT</span></td><td class="mono">edit-config (operation="create/replace")</td><td>Creates new or replaces entirely</td></tr>
+<tr><td><span class="badge b-warn">PATCH</span></td><td class="mono">edit-config (operation="merge")</td><td>Creates if missing, updates if exists</td></tr>
+<tr><td><span class="badge b-err">DELETE</span></td><td class="mono">edit-config (operation="delete")</td><td>Removes — fails if doesn't exist</td></tr>
+</table>
+
+<div class="rule rule-amber"><strong>For the exam:</strong> whenever you see RESTCONF, think NETCONF operations — not standard HTTP behaviour. PATCH = merge (creates + updates). POST = create (fails if exists). PUT = create/replace (overwrites everything).</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="section" id="gotchas">
+<h2>Exam gotchas — quick reference</h2>
+
+<div class="method-card">
+<h3>Spotting the wrong answer</h3>
+<table>
+<tr><th>Trap</th><th>Why it's wrong</th></tr>
+<tr><td>POST to the target URI</td><td>POST must go to the PARENT, never the object itself</td></tr>
+<tr><td>POST to System (ancestor)</td><td>POST must go to the DIRECT parent, not grandparent</td></tr>
+<tr><td>PUT with wrapped payload</td><td>PUT targets the object — URI already identifies it, no wrapper needed</td></tr>
+<tr><td>PATCH with PhysIf-list wrapper when URI has PhysIf-list=...</td><td>Double path — unknown-element error</td></tr>
+<tr><td>POST to modify an existing physical interface</td><td>Physical ports always exist → 409 Conflict</td></tr>
+<tr><td>DELETE with a payload body</td><td>DELETE never has a body — the URI IS the instruction</td></tr>
+<tr><td>GET with a payload body</td><td>GET never has a body</td></tr>
+<tr><td>eth1/11 without %2F encoding</td><td>Slash becomes a path separator → 404</td></tr>
+<tr><td>application/yang-data+json on NX-OS 9.3</td><td>NX-OS 9.3 uses dot (yang.data), not dash (yang-data)</td></tr>
+<tr><td>Using APIC-cookie for RESTCONF</td><td>RESTCONF uses Basic Auth, APIC-cookie is for DME (/api/) only</td></tr>
+<tr><td>"Not possible in one request"</td><td>Usually wrong — PATCH to common ancestor handles multi-resource</td></tr>
+<tr><td>"PATCH can't create resources"</td><td>Wrong — RESTCONF PATCH = NETCONF merge, creates if missing</td></tr>
+</table>
+</div>
+
+<div class="method-card">
+<h3>Decision flowchart</h3>
+<div class="code">What do you need?
+│
+├── Read?            → <span class="ok">GET</span>     → URI = target, no payload
+├── Remove?          → <span class="err">DELETE</span>  → URI = target, no payload
+├── Create new?      → <span class="ok">POST</span>    → URI = parent, payload wrapped
+├── Replace?         → PUT     → URI = target, payload bare
+├── Update fields?   → <span class="hl">PATCH</span>   → URI = target, payload bare
+└── Multi-resource?  → <span class="hl">PATCH</span>   → URI = ancestor, payload fills tree
+
+Resource already exists?
+├── POST             → <span class="err">409 Conflict</span>
+├── PUT              → Replaces entirely (dangerous!)
+├── PATCH            → <span class="ok">Merges safely</span> (best choice)
+└── GET/DELETE       → Works normally</div>
+</div>
+
+<div class="method-card">
+<h3>NX-OS 9.3 specifics</h3>
+<table>
+<tr><th>Topic</th><th>Correct</th><th>Wrong</th></tr>
+<tr><td>Content-type</td><td class="mono">application/yang.data+json</td><td class="mono">application/yang-data+json</td></tr>
+<tr><td>RESTCONF auth</td><td class="mono">-u expert:'1234QWer!'</td><td class="mono">-H "Cookie: APIC-cookie=..."</td></tr>
+<tr><td>Slash in interface ID</td><td class="mono">PhysIf-list=eth1%2F11</td><td class="mono">PhysIf-list=eth1/11</td></tr>
+<tr><td>RESTCONF feature</td><td class="mono">feature nxapi + feature restconf</td><td class="mono">feature restconf alone (needs nxapi for HTTP server)</td></tr>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+
+</details>
+
+<hr>
 
             <h2>🐍 Initial Code</h2>
             <details><summary>📄 Click to expand initial code (with #TODO placeholders)</summary>
@@ -1469,7 +2142,7 @@ vrf context challenge-A5
 
         <section id="quiz" class="section">
             <h1>Lab Practice — NX-OS API Fill-in-the-Gaps</h1>
-            <p class="intro-text">13 questions covering TODO tasks + DME/RESTCONF filtering. Drag the correct segments into the curl command blanks.</p>
+            <p class="intro-text">14 questions covering TODO tasks + DME/RESTCONF filtering. Drag the correct segments into the curl command blanks.</p>
             <div class="quiz-header"><div>
                 <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
                 <span class="score-display">Score: <span class="score-correct" id="correctCount">0</span> <span class="score-total">/ <span id="totalAnswered">0</span> answered</span></span>
@@ -1479,6 +2152,19 @@ vrf context challenge-A5
             </div></div>
             <div id="quizContainer"></div>
         </section>
+
+        <section id="quiz2" class="section">
+            <h1>Lab Practice-2 — RESTCONF CRUD Operations</h1>
+            <p class="intro-text">17 questions covering POST, PUT, PATCH, DELETE — URI targeting, payload wrapping, multi-resource operations.</p>
+            <div class="quiz-header"><div>
+                <div class="progress-bar"><div class="progress-fill" id="pb2" style="width:0%"></div></div>
+                <span class="score-display">Score: <span class="score-correct" id="sc2">0</span> <span class="score-total">/ <span id="ans2">0</span> answered</span></span>
+            </div><div class="quiz-controls">
+                <button class="btn btn-secondary" onclick="resetQ2()">🔄 Reset</button>
+            </div></div>
+            <div id="qs2"></div>
+        </section>
+
     </main>
     <script>
         const questions = [
@@ -1565,6 +2251,100 @@ vrf context challenge-A5
              answers:["Cisco-NX-OS-device:System","intf-items/phys-items","accept: application/yang.data+json","expert:'1234QWer!'",'select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000)'],
              pool:["Cisco-NX-OS-device:System","Cisco-NX-OS-device:system","intf-items/phys-items","intf-items/svi-items","accept: application/yang.data+json","accept: application/yang-data+json","expert:'1234QWer!'","Cookie: APIC-cookie=$token",'select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000)','select(.adminSt == \"Up\" and .operSt == \"Up\" and .mtu >= 9000)','select(.adminSt == \"up\" or .operSt == \"up\" and .mtu >= 9000)','select(adminSt == \"up\" and operSt == \"up\" and mtu >= 9000)'],
              explanation:"Correct answers (in order):\n\n[1] Cisco-NX-OS-device:System\n    RESTCONF root.\n\n[2] intf-items/phys-items\n    YANG path to physical interfaces.\n\n[3] accept: application/yang.data+json\n    NX-OS RESTCONF accept header (dot format).\n\n[4] expert:'1234QWer!'\n    Basic Auth credentials.\n\n[5] select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000)\n    jq client-side filter combining three conditions with 'and'.\n    \u2022 Leading dot required: .adminSt, .operSt, .mtu\n    \u2022 String comparison uses == with quotes: == \"up\"\n    \u2022 Numeric comparison: .mtu >= 9000 (no quotes around 9000 in jq)\n    \u2022 Case-sensitive: \"up\" not \"Up\"\n\n\u2705 Full correct command:\ncurl -sk \"https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System/intf-items/phys-items\" \\\n  -H 'accept: application/yang.data+json' \\\n  -u expert:'1234QWer!' \\\n  | jq '.\"phys-items\".\"PhysIf-list\"[] | select(.adminSt == \"up\" and .operSt == \"up\" and .mtu >= 9000) | {id, adminSt, operSt, mtu}'\n\nDistractors:\n  select(... == \"Up\") \u2192 case-sensitive; RESTCONF returns lowercase \"up\"\n  select(... or ...) \u2192 'or' matches if ANY condition true; need 'and' for ALL\n  select(adminSt == ...) \u2192 missing leading dots; jq requires .adminSt\n  Cisco-NX-OS-device:system \u2192 lowercase s fails\n\n\U0001f9ea How to test in real-time:\n  Option A: Browse https://192.168.89.73 \u2192 Method=RESTCONF (Yang), json\n  Option B: Use YangSuite with Cisco-NX-OS-device module"}
+        ,
+
+            // Q14: RESTCONF PATCH — correct payload structure
+            {id:14,type:"single",count:1,
+             question:"RESTCONF PATCH: Create VLAN 300 + Configure eth1/13\n\nGiven this YANG tree:",
+             tree:"Cisco-NX-OS-device:System          \u2190 URI points here\n\u2502\n\u251C\u2500\u2500 bd-items\n\u2502   \u2514\u2500\u2500 bd-items\n\u2502       \u2514\u2500\u2500 BD-list                \u2190 list (key: fabEncap)\n\u2502           \u251C\u2500\u2500 fabEncap\n\u2502           \u2514\u2500\u2500 name\n\u2502\n\u2514\u2500\u2500 intf-items\n    \u2514\u2500\u2500 phys-items\n        \u2514\u2500\u2500 PhysIf-list            \u2190 list (key: id)\n            \u251C\u2500\u2500 id\n            \u251C\u2500\u2500 adminSt\n            \u2514\u2500\u2500 mtu",
+             curl_cmd:"curl --request PATCH \\\n  --url https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System \\\n  --header 'accept: application/yang.data+json' \\\n  --header 'authorization: Basic ZXhwZXJ0OjEyMzRRV2VyIQ==' \\\n  --header 'content-type: application/yang.data+json' \\\n  --data '<PAYLOAD>'",
+             after_question:"Which payload correctly creates VLAN 300 and configures interface eth1/13 with accessVlan=vlan-300 and mtu=9216?",
+             options:[
+                 {text:`{
+  "bd-items": {
+    "BD-list": [
+      {
+        "fabEncap": "vlan-300",
+        "name": "TestVLAN-300"
+      }
+    ]
+  },
+  "intf-items": {
+    "phys-items": {
+      "PhysIf-list": [
+        {
+          "id": "eth1/13",
+          "accessVlan": "vlan-300",
+          "mtu": 9216
+        }
+      ]
+    }
+  }
+}`,correct:false},
+                 {text:`{
+  "bd-items": {
+    "bd-items": {
+      "BD-list": {
+        "fabEncap": "vlan-300",
+        "name": "TestVLAN-300"
+      }
+    }
+  },
+  "intf-items": {
+    "phys-items": {
+      "PhysIf-list": {
+        "id": "eth1/13",
+        "accessVlan": "vlan-300",
+        "mtu": 9216
+      }
+    }
+  }
+}`,correct:false},
+                 {text:`{
+  "bd-items": {
+    "bd-items": {
+      "BD-list": [
+        {
+          "fabEncap": "vlan-300",
+          "name": "TestVLAN-300"
+        }
+      ]
+    }
+  },
+  "intf-items": {
+    "phys-items": {
+      "PhysIf-list": [
+        {
+          "id": "eth1/13",
+          "accessVlan": "vlan-300",
+          "mtu": 9216
+        }
+      ]
+    }
+  }
+}`,correct:true},
+                 {text:`{
+  "bd-items": {
+    "bd-items": {
+      "BD-list": [
+        {
+          "fabEncap": "vlan-300",
+          "name": "TestVLAN-300"
+        }
+      ]
+    }
+  },
+  "phys-items": {
+    "PhysIf-list": [
+      {
+        "accessVlan": "vlan-300",
+        "mtu": 9216
+      }
+    ]
+  }
+}`,correct:false}
+             ],
+             explanation:"Correct answers:\n\n\u2705 Option C is correct.\n\nWhy C is correct:\n\u2022 Double bd-items nesting: bd-items \u2192 bd-items \u2192 BD-list\n  The YANG tree shows TWO levels of bd-items before BD-list. Both are required.\n\u2022 BD-list and PhysIf-list are JSON arrays [...]\n  YANG lists MUST be JSON arrays, even for a single entry. Objects {} are invalid.\n\u2022 List keys present: fabEncap (BD-list key) and id (PhysIf-list key) are mandatory.\n\u2022 intf-items wrapper: phys-items lives UNDER intf-items, not directly under System.\n\nWhy others are wrong:\n\n\u274C Option A \u2014 Missing inner bd-items\n  Goes bd-items \u2192 BD-list directly, skipping the second bd-items level.\n  YANG tree clearly shows: bd-items \u2192 bd-items \u2192 BD-list (two levels).\n\n\u274C Option B \u2014 YANG lists as objects {} instead of arrays []\n  BD-list: {} and PhysIf-list: {} are objects.\n  YANG lists MUST be JSON arrays: BD-list: [...] and PhysIf-list: [...]\n  Even with a single entry, the array wrapper is required.\n\n\u274C Option D \u2014 Two errors:\n  1. Missing intf-items wrapper: phys-items is placed directly under System.\n     YANG tree shows: System \u2192 intf-items \u2192 phys-items \u2192 PhysIf-list.\n  2. Missing id key in PhysIf-list. The list key (id=eth1/13) is mandatory.\n\n\u2705 Full correct curl command:\ncurl --request PATCH \\\n  --url https://192.168.89.73/restconf/data/Cisco-NX-OS-device:System \\\n  --header 'accept: application/yang.data+json' \\\n  --header 'authorization: Basic ZXhwZXJ0OjEyMzRRV2VyIQ==' \\\n  --header 'content-type: application/yang.data+json' \\\n  --data '{\"bd-items\":{\"bd-items\":{\"BD-list\":[{\"fabEncap\":\"vlan-300\",\"name\":\"TestVLAN-300\"}]}},\"intf-items\":{\"phys-items\":{\"PhysIf-list\":[{\"id\":\"eth1/13\",\"accessVlan\":\"vlan-300\",\"mtu\":9216}]}}}'\n\n\U0001f9ea How to test in real-time:\n  Option A: Browse https://192.168.89.73 \u2192 Method=RESTCONF (Yang), json, use PATCH\n  Option B: Use YangSuite \u2192 navigate Cisco-NX-OS-device:System \u2192 bd-items and intf-items"}
         ];
 
         let submitted={},score=0;
@@ -1575,13 +2355,22 @@ vrf context challenge-A5
         function initQuiz(){
             document.getElementById('quizContainer').innerHTML=questions.map((q,i)=>renderQ(q,i)).join('');
             questions.forEach(q=>{
-                slotState[q.id]={values:new Array(q.answers.length).fill(null)};
+                if(q.type!=='single'){slotState[q.id]={values:new Array(q.answers.length).fill(null)};}
             });
             updateProgress();
         }
 
         function renderQ(q,idx){
             var e=q.explanation.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+            var treeHtml=q.tree?'<pre style="margin:0.75rem 0;font-size:0.68rem;line-height:1.35;background:var(--code-bg);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;overflow-x:auto">'+q.tree.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>':'';
+            var curlHtml=q.curl_cmd?'<pre style="font-size:0.7rem;margin:0.75rem 0;line-height:1.6">'+q.curl_cmd.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>':'';
+            var afterQ=q.after_question?'<p style="font-weight:600;color:var(--text-primary);margin-top:0.75rem">'+q.after_question+'</p>':'';
+
+            if(q.type==='single'){
+                return '<div class="question-card" id="q'+q.id+'"><div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Choose 1</span></div><div class="question-text">'+q.question.replace(/\n/g,'<br>').replace(/ {2}/g,'&nbsp;&nbsp;')+treeHtml+curlHtml+afterQ+'</div><div class="options-list">'+q.options.map(function(o,i){var h=o.text.replace(/</g,'&lt;').replace(/>/g,'&gt;');if(o.text.indexOf('\n')>-1)h='<pre>'+h+'</pre>';return '<div class="option-item" data-qid="'+q.id+'" data-idx="'+i+'" onclick="selMCQ('+q.id+','+i+')"><div class="option-checkbox">'+String.fromCharCode(65+i)+'</div><div class="option-text">'+h+'</div></div>'}).join('')+'</div><button class="submit-btn" id="sub'+q.id+'" onclick="subMCQ('+q.id+')" disabled>Submit Answer</button><div class="explanation" id="exp'+q.id+'"><div class="explanation-title">\uD83D\uDCD6 Explanation</div><div class="explanation-text">'+e+'</div></div></div>';
+            }
+
+            // Block-fill type (default)
             // Step 1: Escape the template first
             var escaped=q.template.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
             // Step 2: Replace {{N}} markers with inline slot spans
@@ -1594,7 +2383,7 @@ vrf context challenge-A5
 
             return '<div class="question-card" id="q'+q.id+'">' +
                 '<div class="question-header"><span class="question-number">Q'+(idx+1)+'</span><span class="question-type">Fill the Gaps</span></div>' +
-                '<div class="question-text">'+q.question.replace(/\n/g,'<br>')+'</div>' +
+                '<div class="question-text">'+q.question.replace(/\n/g,'<br>')+treeHtml+'</div>' +
                 '<div class="cmd-block"><pre class="cmd-pre" id="cmd_'+q.id+'">'+cmdHtml+'</pre>' +
                 '<button class="copy-btn" id="copy_'+q.id+'" style="display:none" onclick="copyCmd('+q.id+')">📋 Copy Command</button></div>' +
                 '<div class="cmd-pool" id="pool'+q.id+'"><div class="cmd-pool-title">\uD83D\uDCE6 Drag segments into the blanks above</div>' +
@@ -1603,6 +2392,11 @@ vrf context challenge-A5
                 '<button class="submit-btn" id="sub'+q.id+'" onclick="subQ('+q.id+')" disabled>Submit Answer</button>' +
                 '<div class="explanation" id="exp'+q.id+'"><div class="explanation-title">\uD83D\uDCD6 Explanation</div><div class="explanation-text">'+e+'</div></div></div>';
         }
+
+        // MCQ functions
+        var mcqAnswers={};
+        function selMCQ(qid,idx){if(submitted[qid])return;mcqAnswers[qid]=[idx];document.querySelectorAll('.option-item[data-qid="'+qid+'"]').forEach(function(el,j){el.classList.toggle('selected',j===idx)});document.getElementById('sub'+qid).disabled=false;}
+        function subMCQ(qid){if(submitted[qid])return;submitted[qid]=true;var q=questions.find(function(x){return x.id===qid});var correct=q.options.map(function(o,i){return o.correct?i:-1}).filter(function(i){return i>-1});var user=mcqAnswers[qid]||[];var ok=user.length===1&&correct.includes(user[0]);if(ok)score++;document.querySelectorAll('.option-item[data-qid="'+qid+'"]').forEach(function(el,i){el.classList.add('disabled');el.classList.remove('selected');if(q.options[i].correct)el.classList.add('correct');else if(user.includes(i))el.classList.add('incorrect')});document.getElementById('q'+qid).classList.add(ok?'answered-correct':'answered-incorrect');var b=document.getElementById('sub'+qid);b.textContent=ok?'\u2713 Correct!':'\u2717 Incorrect';b.style.background=ok?'var(--accent-green)':'var(--accent-red)';b.disabled=true;document.getElementById('exp'+qid).classList.add('show');document.getElementById('correctCount').textContent=score;document.getElementById('totalAnswered').textContent=Object.keys(submitted).length;updateProgress();}
 
         function dragChip(e,el){e.dataTransfer.setData('text/plain',el.dataset.cmd);}
 
@@ -1742,7 +2536,7 @@ vrf context challenge-A5
         function updateProgress(){document.getElementById('progressBar').style.width=(Object.keys(submitted).length/questions.length*100)+'%';}
 
         function resetQuiz(){
-            submitted={};score=0;
+            submitted={};score=0;mcqAnswers={};
             Object.keys(slotState).forEach(k=>delete slotState[k]);
             document.getElementById('correctCount').textContent='0';
             document.getElementById('totalAnswered').textContent='0';
@@ -1752,14 +2546,122 @@ vrf context challenge-A5
         function showAllAnswers(){
             questions.forEach(q=>{
                 if(submitted[q.id])return;
-                if(!slotState[q.id])slotState[q.id]={values:new Array(q.answers.length).fill(null)};
-                q.answers.forEach((a,i)=>{slotState[q.id].values[i]=a;updateSlot(q.id,i);});
-                updateChips(q.id);
-                subQ(q.id);
+                if(q.type==='single'){
+                    mcqAnswers[q.id]=q.options.map(function(o,i){return o.correct?i:-1}).filter(function(i){return i>-1}).slice(0,1);
+                    subMCQ(q.id);
+                }else{
+                    if(!slotState[q.id])slotState[q.id]={values:new Array(q.answers.length).fill(null)};
+                    q.answers.forEach((a,i)=>{slotState[q.id].values[i]=a;updateSlot(q.id,i);});
+                    updateChips(q.id);
+                    subQ(q.id);
+                }
             });
         }
 
         initQuiz();
+    </script>
+
+    <script>
+    // ═══════════════════════════════════════════════════════════
+    // LAB PRACTICE-2: RESTCONF CRUD OPERATIONS (17 questions)
+    // ═══════════════════════════════════════════════════════════
+    const H2="192.168.89.73",U2="expert",P2="1234QWer!",B2=`https://${H2}/restconf/data/Cisco-NX-OS-device:System`;
+    const Q2=[
+{q:"You want to CREATE vlan-300 using POST. Which curl is correct?",s:"Method: POST\nTarget: create BD-list=vlan-300",t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items                  ← <span class="hl">POST URI = parent</span>\n        └── BD-list=vlan-300      ← <span class="hl">resource to create</span>\n            ├── fabEncap\n            └── name`,m:false,opts:[{l:"POST to the target object itself (bare payload)",c:`curl -sk -X POST "${B2}/bd-items/bd-items/BD-list=vlan-300" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"fabEncap":"vlan-300","name":"MyVlan"}'`},{l:"POST to parent, payload wrapped with child name",c:`curl -sk -X POST "${B2}/bd-items/bd-items" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{\n    "BD-list": [\n      {"fabEncap": "vlan-300", "name": "MyVlan"}\n    ]\n  }'`},{l:"POST to parent, no wrapper in payload",c:`curl -sk -X POST "${B2}/bd-items/bd-items" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"fabEncap":"vlan-300","name":"MyVlan"}'`},{l:"POST to System, payload wraps full tree",c:`curl -sk -X POST "${B2}" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{\n    "bd-items": {\n      "bd-items": {\n        "BD-list": [{"fabEncap":"vlan-300","name":"MyVlan"}]\n      }\n    }\n  }'`}],ans:[1],exp:`<strong>POST = "Create a new child under this parent"</strong><span class="exp-tree">/System/bd-items/bd-items/BD-list=vlan-300\n   ↑        ↑        ↑          ↑\n root    folder    folder    THE FILE\n                    ↑\n            POST URI here (parent)</span>URI → PARENT (one level up). Payload MUST wrap with child name.\nA targets the object itself — POST can't.\nC has no wrapper.\nD targets System — POST must go to the <em>direct</em> parent, not an ancestor.`},
+
+{q:"You want to REPLACE vlan-100 entirely using PUT. Which payload is correct?",s:"Method: PUT\nURI: .../bd-items/bd-items/BD-list=vlan-100",t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items\n        └── BD-list=vlan-100      ← <span class="hl">PUT URI = target itself</span>\n            ├── fabEncap\n            └── name`,m:false,opts:[{l:"PUT to target with BD-list array wrapper",c:`curl -sk -X PUT "${B2}/bd-items/bd-items/BD-list=vlan-100" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"BD-list":[{"fabEncap":"vlan-100","name":"Replaced"}]}'`},{l:"PUT to target with bare attributes (no wrapper)",c:`curl -sk -X PUT "${B2}/bd-items/bd-items/BD-list=vlan-100" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{\n    "fabEncap": "vlan-100",\n    "name": "Replaced"\n  }'`},{l:"PUT to parent bd-items with BD-list wrapper",c:`curl -sk -X PUT "${B2}/bd-items/bd-items" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"BD-list":[{"fabEncap":"vlan-100","name":"Replaced"}]}'`},{l:"PUT to target with bd-items wrapper around BD-list",c:`curl -sk -X PUT "${B2}/bd-items/bd-items/BD-list=vlan-100" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"bd-items":{"BD-list":[{"fabEncap":"vlan-100","name":"Replaced"}]}}'`}],ans:[1],exp:`<strong>PUT = "Place this thing exactly here"</strong><span class="exp-tree">/System/bd-items/bd-items/BD-list=vlan-100\n                              ↑\n                     PUT URI here (target)\n                     payload = just attributes</span>URI → THE OBJECT itself. Payload = just attributes, NO wrapping.\nA double-wraps. C targets parent — would replace ALL VLANs.\nD wraps with bd-items which the URI already covers.`},
+
+{q:"You PATCH eth1/11. Which curl succeeds?",s:"Method: PATCH to specific interface\nURI: .../PhysIf-list=eth1%2F11",t:`Cisco-NX-OS-device:System\n└── intf-items\n    └── phys-items\n        └── PhysIf-list=eth1/11   ← <span class="hl">PATCH URI = target</span>\n            ├── id\n            ├── accessVlan\n            └── mtu`,m:false,opts:[{l:"Bare attributes — URI already identifies target",c:`curl -sk -X PATCH "${B2}/intf-items/phys-items/PhysIf-list=eth1%2F11" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{\n    "id": "eth1/11",\n    "accessVlan": "vlan-100",\n    "mtu": 1500\n  }'`},{l:"Wrapped with PhysIf-list in payload",c:`curl -sk -X PATCH "${B2}/intf-items/phys-items/PhysIf-list=eth1%2F11" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"PhysIf-list":[{"id":"eth1/11","accessVlan":"vlan-100","mtu":1500}]}'`},{l:"Wrapped with phys-items → PhysIf-list",c:`curl -sk -X PATCH "${B2}/intf-items/phys-items/PhysIf-list=eth1%2F11" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"phys-items":{"PhysIf-list":[{"id":"eth1/11","mtu":1500}]}}'`},{l:"Correct payload but slash not encoded in URI",c:`curl -sk -X PATCH "${B2}/intf-items/phys-items/PhysIf-list=eth1/11" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{"id":"eth1/11","mtu":1500}'`}],ans:[0],exp:`<strong>PATCH to target = bare attributes.</strong>\nB wraps PhysIf-list → double path.\nC wraps two extra levels.\nD doesn't encode the slash — /11 becomes a separate URI path segment → 404.`},
+
+{q:"Which can CREATE vlan-200 AND assign to eth1/12 in ONE request? (select correct answers)",s:"Goal: single request for both VLAN creation + interface config",t:`Cisco-NX-OS-device:System          ← <span class="hl">common ancestor</span>\n├── bd-items\n│   └── bd-items\n│       └── BD-list=vlan-200         ← create this\n└── intf-items\n    └── phys-items\n        └── PhysIf-list=eth1/12      ← modify this`,m:true,opts:[{l:"POST to System with both branches",c:`curl -sk -X POST "${B2}" \\\n  -d '{"bd-items":{...},"intf-items":{...}}'`},{l:"PATCH to System with both branches",c:`curl -sk -X PATCH "${B2}" \\\n  -H 'content-type: application/yang.data+json' \\\n  -u ${U2}:'${P2}' \\\n  -d '{\n    "bd-items":{"bd-items":{"BD-list":[{"fabEncap":"vlan-200","name":"MyVlan"}]}},\n    "intf-items":{"phys-items":{"PhysIf-list":[{"id":"eth1/12","accessVlan":"vlan-200"}]}}\n  }'`},{l:"PUT to System with both branches",c:""},{l:"PATCH to bd-items with intf-items in same payload",c:`curl -sk -X PATCH "${B2}/bd-items" \\\n  -d '{"bd-items":{...},"intf-items":{...}}'`},{l:"Two separate POSTs (one per resource)",c:"# Request 1: POST .../bd-items/bd-items\n# Request 2: POST .../intf-items/phys-items"},{l:"Not possible in any single request",c:""}],ans:[1],exp:`<strong>Only PATCH to System works in one request.</strong>\nPOST → 409 (bd-items exists). PUT → replaces entire system.\nD targets bd-items — intf-items is a sibling, not a child.\nE works but is two requests.`},
+
+{q:"Which safely update ONLY the MTU on eth1/2 to 9216? (select correct answers)",s:"eth1/2 already exists with accessVlan, speed, etc.\nGoal: change mtu only, keep all other fields.",t:`Cisco-NX-OS-device:System\n└── intf-items\n    └── phys-items\n        └── PhysIf-list=eth1/2\n            ├── id\n            ├── mtu           ← <span class="hl">change to 9216</span>\n            ├── accessVlan    ← keep\n            ├── speed         ← keep\n            └── mode          ← keep`,m:true,opts:[{l:"PATCH directly to the interface",c:`curl -sk -X PATCH "${B2}/intf-items/phys-items/PhysIf-list=eth1%2F2" \\\n  -H 'content-type: application/yang.data+json' -u ${U2}:'${P2}' \\\n  -d '{"id":"eth1/2","mtu":9216}'`},{l:"PUT directly to the interface",c:`curl -sk -X PUT "${B2}/intf-items/phys-items/PhysIf-list=eth1%2F2" \\\n  -d '{"id":"eth1/2","mtu":9216}'`},{l:"PATCH to System with full tree path",c:`curl -sk -X PATCH "${B2}" \\\n  -H 'content-type: application/yang.data+json' -u ${U2}:'${P2}' \\\n  -d '{"intf-items":{"phys-items":{"PhysIf-list":[{"id":"eth1/2","mtu":9216}]}}}'`},{l:"POST to phys-items parent",c:`curl -sk -X POST "${B2}/intf-items/phys-items" \\\n  -d '{"PhysIf-list":[{"id":"eth1/2","mtu":9216}]}'`}],ans:[0,2],exp:`<strong>A and C — PATCH merges at any level, only specified fields change.</strong>\nB (PUT) replaces entire interface — only id+mtu survive, everything else resets.\nD (POST) → 409, eth1/2 already exists.`},
+
+{q:"DELETE vlan-100 and reset eth1/12. Minimum curl requests needed?",s:"Goal: remove both resources completely",t:`Cisco-NX-OS-device:System\n├── bd-items\n│   └── bd-items\n│       └── BD-list=vlan-100      ← <span class="hl">DELETE #1</span>\n└── intf-items\n    └── phys-items\n        └── PhysIf-list=eth1/12   ← <span class="hl">DELETE #2</span>\n\nDELETE = no payload, URI = what gets deleted`,m:false,opts:[{l:"1 — DELETE to System covers both",c:`curl -sk -X DELETE "${B2}" -u ${U2}:'${P2}'`},{l:"2 — DELETE each target separately",c:`# Request 1\ncurl -sk -X DELETE "${B2}/bd-items/bd-items/BD-list=vlan-100" -u ${U2}:'${P2}'\n\n# Request 2\ncurl -sk -X DELETE "${B2}/intf-items/phys-items/PhysIf-list=eth1%2F12" -u ${U2}:'${P2}'`},{l:"1 — DELETE to System with payload specifying targets",c:`curl -sk -X DELETE "${B2}" -u ${U2}:'${P2}' \\\n  -d '{"bd-items":{...},"intf-items":{...}}'`},{l:"1 — PATCH with empty arrays to clear both",c:`curl -sk -X PATCH "${B2}" -d '{"bd-items":{"bd-items":{"BD-list":[]}},...}'`},{l:"1 — DELETE to bd-items (removes VLAN and interface)",c:`curl -sk -X DELETE "${B2}/bd-items" -u ${U2}:'${P2}'`}],ans:[1],exp:`<strong>DELETE = no payload, URI = what gets deleted.</strong>\nA deletes ENTIRE system. C is invalid — DELETE doesn't accept a body.\nD merges empty arrays — doesn't truly delete.\nE deletes ALL VLANs and doesn't touch interfaces.`},
+
+{q:"PATCH creates vlan-500 even though it doesn't exist. Why no 404?",s:"vlan-500 does NOT exist.\nPATCH returns 204 No Content (success).",t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items                  ← <span class="hl">PATCH URI</span>\n        └── BD-list=vlan-500      ← doesn't exist yet!\n            ├── fabEncap               but PATCH creates it\n            └── name                   (NETCONF merge)`,m:false,opts:[{l:"Bug — PATCH shouldn't create. Use POST instead",c:""},{l:"RFC 8040: RESTCONF PATCH = NETCONF merge (creates if missing, updates if exists)",c:`curl -sk -X PATCH "${B2}/bd-items/bd-items" \\\n  -H 'content-type: application/yang.data+json' -u ${U2}:'${P2}' \\\n  -d '{"BD-list":[{"fabEncap":"vlan-500","name":"NewVlan"}]}'`},{l:"Works because wrapping with BD-list acts like POST",c:""},{l:"Works because PATCH at System level auto-creates all containers",c:""},{l:"PATCH silently converts to PUT when resource is missing",c:""},{l:"PATCH and POST are identical in RESTCONF",c:""}],ans:[1],exp:`<strong>RFC 8040: RESTCONF PATCH = NETCONF edit-config with merge.</strong>\nMerge creates missing resources AND updates existing ones.\nNot a bug (A). Not same as POST (C/F) — POST returns 409 if resource exists.\nNo conversion to PUT (E).`},
+
+{q:"PATCH to System for vlan-100. Which wrapping level is correct?",s:"PATCH /restconf/data/Cisco-NX-OS-device:System",t:`Cisco-NX-OS-device:System        ← <span class="hl">URI is here</span>\n└── bd-items                      ← payload must include\n    └── bd-items                  ← payload must include\n        └── BD-list=vlan-100      ← <span class="hl">target</span>\n            ├── fabEncap\n            └── name\n\nPayload fills the gap: System → bd-items → bd-items → BD-list`,m:false,opts:[{l:"Bare attributes — no wrapping",c:`-d '{"fabEncap":"vlan-100","name":"MyVlan"}'`},{l:"One level — BD-list only",c:`-d '{"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}'`},{l:"Two levels — bd-items → BD-list (skipping second bd-items)",c:`-d '{"bd-items":{"BD-list":[{"fabEncap":"vlan-100","name":"MyVlan"}]}}'`},{l:"Full tree — bd-items → bd-items → BD-list",c:`curl -sk -X PATCH "${B2}" \\\n  -H 'content-type: application/yang.data+json' -u ${U2}:'${P2}' \\\n  -d '{\n    "bd-items": {\n      "bd-items": {\n        "BD-list": [\n          {"fabEncap": "vlan-100", "name": "MyVlan"}\n        ]\n      }\n    }\n  }'`}],ans:[3],exp:`<strong>PATCH = "Merge this data into whatever I point at"</strong><span class="exp-tree">/System / bd-items / bd-items / BD-list=vlan-100\n   ↑         ↑          ↑           ↑\n  URI     payload    payload     payload\n          level 1    level 2     level 3</span>Payload fills the ENTIRE gap. A has no path. B skips both bd-items.\nC skips the nested bd-items — YANG has two nested bd-items containers.`},
+
+{q:"Which content-type headers work on NX-OS 9.3? (select correct answers)",s:"PATCH /restconf/data/Cisco-NX-OS-device:System\nContent-Type: ???",t:`NX-OS 9.3 RESTCONF content-type:\n\n  RFC 8040:      application/yang-data+json  (dash)  ← REJECTED\n  NX-OS 9.3:     application/yang.data+json  (dot)   ← <span class="hl">ACCEPTED</span>\n  NX-OS 9.3 XML: application/yang.data+xml   (dot)   ← <span class="hl">ACCEPTED</span>`,m:true,opts:[{l:"application/yang-data+json (dash: yang-data)",c:""},{l:"application/yang.data+json (dot: yang.data, JSON)",c:""},{l:"application/json",c:""},{l:"application/yang.data+xml (dot: yang.data, XML)",c:""},{l:"application/yang+json (no .data)",c:""},{l:"text/json",c:""}],ans:[1,3],exp:`NX-OS 9.3 uses the older <strong>DOT format</strong> (yang.data).\nRFC 8040 dash (yang-data) → 'Invalid content type'.\nC (application/json) is generic HTTP, not RESTCONF.\nE missing .data. F is not a RESTCONF media type.`},
+
+{q:"vlan-400 does NOT exist. Which curls create it successfully? (select correct answers)",s:"BD-list=vlan-400 does NOT exist on the switch.",t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items\n        ├── BD-list=vlan-100     ← exists\n        ├── BD-list=vlan-2110    ← exists\n        └── BD-list=vlan-400     ← <span class="hl">does NOT exist</span>`,m:true,opts:[{l:"POST to parent bd-items (wrapped)",c:`curl -sk -X POST "${B2}/bd-items/bd-items" \\\n  -d '{"BD-list":[{"fabEncap":"vlan-400","name":"Production"}]}'`},{l:"PUT to target BD-list=vlan-400 (bare)",c:`curl -sk -X PUT "${B2}/bd-items/bd-items/BD-list=vlan-400" \\\n  -d '{"fabEncap":"vlan-400","name":"Production"}'`},{l:"PATCH to target BD-list=vlan-400 (bare)",c:`curl -sk -X PATCH "${B2}/bd-items/bd-items/BD-list=vlan-400" \\\n  -d '{"fabEncap":"vlan-400","name":"Production"}'`},{l:"PATCH to System with full tree",c:`curl -sk -X PATCH "${B2}" \\\n  -d '{"bd-items":{"bd-items":{"BD-list":[{"fabEncap":"vlan-400","name":"Production"}]}}}'`},{l:"POST to target BD-list=vlan-400 (bare)",c:`curl -sk -X POST "${B2}/bd-items/bd-items/BD-list=vlan-400" \\\n  -d '{"fabEncap":"vlan-400","name":"Production"}'`},{l:"DELETE vlan-400 first, then POST",c:""}],ans:[0,1,2,3],exp:`<strong>A, B, C, D all work</strong> when resource doesn't exist.\nPOST creates (parent, wrapped). PUT creates/replaces (target, bare).\nPATCH merges=creates if missing.\nE fails — POST can't target the object itself.\nF unnecessary — doesn't exist, no need to delete.`},
+
+{q:'vlan-400 ALREADY EXISTS (name="OldName"). Which rename to "Production" without error? (select correct answers)',s:'Existing: BD-list=vlan-400, name="OldName"\nGoal: rename to "Production"',t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items\n        └── BD-list=vlan-400      ← <span class="hl">ALREADY EXISTS</span>\n            ├── fabEncap: "vlan-400"\n            └── name: "OldName"   ← change to "Production"\n\nPOST → 409 Conflict (create-only!)`,m:true,opts:[{l:"POST to parent bd-items (wrapped)",c:""},{l:"PUT to BD-list=vlan-400 (bare)",c:`curl -sk -X PUT "${B2}/bd-items/bd-items/BD-list=vlan-400" \\\n  -d '{"fabEncap":"vlan-400","name":"Production"}'`},{l:"PATCH to BD-list=vlan-400 (bare)",c:`curl -sk -X PATCH "${B2}/bd-items/bd-items/BD-list=vlan-400" \\\n  -d '{"fabEncap":"vlan-400","name":"Production"}'`},{l:"PATCH to System with full tree",c:`curl -sk -X PATCH "${B2}" \\\n  -d '{"bd-items":{"bd-items":{"BD-list":[{"fabEncap":"vlan-400","name":"Production"}]}}}'`},{l:"PATCH to parent bd-items (wrapped)",c:`curl -sk -X PATCH "${B2}/bd-items/bd-items" \\\n  -d '{"BD-list":[{"fabEncap":"vlan-400","name":"Production"}]}'`},{l:"POST to target BD-list=vlan-400 (bare)",c:""}],ans:[1,2,3,4],exp:`<strong>POST fails 409</strong> — resource exists, POST = create-only.\nA and F both fail.\nB (PUT) replaces entirely. C, D, E (all PATCH) merge safely.\nCompare with Q10 — same resource, different result!`},
+
+{q:"Create vlan-500, set eth1/3 access vlan-500, AND set eth1/4 mtu 9216 — all in ONE request. Which curl?",s:"3 changes in 1 request.\nvlan-500 doesn't exist. Both interfaces exist.",t:`Cisco-NX-OS-device:System              ← <span class="hl">PATCH URI</span>\n├── bd-items\n│   └── bd-items\n│       └── BD-list=vlan-500              ← <span class="hl">create</span>\n└── intf-items\n    └── phys-items\n        ├── PhysIf-list=eth1/3            ← <span class="hl">modify</span>\n        └── PhysIf-list=eth1/4            ← <span class="hl">modify</span>`,m:false,opts:[{l:"POST to System",c:""},{l:"PATCH to System with full payload",c:`curl -sk -X PATCH "${B2}" \\\n  -H 'content-type: application/yang.data+json' -u ${U2}:'${P2}' \\\n  -d '{\n    "bd-items":{"bd-items":{"BD-list":[{"fabEncap":"vlan-500","name":"NewVlan"}]}},\n    "intf-items":{"phys-items":{"PhysIf-list":[\n      {"id":"eth1/3","accessVlan":"vlan-500","mode":"access"},\n      {"id":"eth1/4","mtu":9216}\n    ]}}\n  }'`},{l:"Not possible — max 2 objects per PATCH",c:""},{l:"PUT to System",c:""},{l:"PATCH to intf-items only",c:""},{l:"Three separate PATCHes",c:""}],ans:[1],exp:`<strong>PATCH to System — one request, full tree.</strong>\nPOST → 409 (bd-items exists). No limit on objects in PATCH.\nPUT replaces entire system. E only modifies interfaces.\nF works but is 3 requests, not 1.`},
+
+{q:"Given this PATCH URI, which payloads are valid? (select correct answers)",s:"PATCH /restconf/data/.../intf-items/phys-items/PhysIf-list=eth1%2F3\nGoal: set accessVlan=vlan-200 and mtu=9216",t:`Cisco-NX-OS-device:System\n└── intf-items\n    └── phys-items\n        └── PhysIf-list=eth1/3    ← <span class="hl">URI points here (target)</span>\n            ├── id\n            ├── accessVlan        ← set to vlan-200\n            └── mtu               ← set to 9216\n\nPATCH to target = bare attributes, no wrapping`,m:true,opts:[{l:"Bare attributes",c:`{"id":"eth1/3","accessVlan":"vlan-200","mtu":9216}`},{l:"Wrapped with PhysIf-list",c:`{"PhysIf-list":[{"id":"eth1/3","accessVlan":"vlan-200","mtu":9216}]}`},{l:"Wrapped with phys-items → PhysIf-list",c:`{"phys-items":{"PhysIf-list":[...]}}`},{l:"Bare but missing the id key",c:`{"accessVlan":"vlan-200","mtu":9216}`},{l:"Wrapped with intf-items → phys-items → PhysIf-list",c:`{"intf-items":{"phys-items":{"PhysIf-list":[...]}}}`}],ans:[0],exp:`<strong>URI already points to PhysIf-list=eth1/3 — payload = just attributes.</strong><span class="exp-tree">URI covers:    .../phys-items/PhysIf-list=eth1/3\nPayload needs: just the attributes inside</span>B wraps PhysIf-list (double path). C wraps two extra levels.\nD missing the key field. E wraps three extra levels.`},
+
+{q:"Given this PUT URI, which payloads are valid? (select correct answers)",s:'PUT /restconf/data/.../bd-items/bd-items/BD-list=vlan-200\nGoal: create or replace vlan-200 with name="WebTier"',t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items\n        └── BD-list=vlan-200      ← <span class="hl">URI points here (target)</span>\n            ├── fabEncap\n            └── name\n\nPUT to target = bare attributes, no wrapping\nPUT creates if missing, REPLACES entirely if exists`,m:true,opts:[{l:"Bare attributes with fabEncap and name",c:`{"fabEncap":"vlan-200","name":"WebTier"}`},{l:"Wrapped with BD-list array",c:`{"BD-list":[{"fabEncap":"vlan-200","name":"WebTier"}]}`},{l:"Bare but only name (no fabEncap key)",c:`{"name":"WebTier"}`},{l:"Wrapped with bd-items → BD-list",c:`{"bd-items":{"BD-list":[...]}}`},{l:"Full tree from bd-items → bd-items → BD-list",c:`{"bd-items":{"bd-items":{"BD-list":[...]}}}`}],ans:[0],exp:`<strong>PUT = bare attributes. URI points to target.</strong><span class="exp-tree">URI:     .../BD-list=vlan-200  ← already says WHICH object\nPayload: just attributes       ← says WHAT goes inside</span>B wraps with BD-list (double path). C missing key field.\nD and E wrap with levels the URI already covers.`},
+
+{q:"Given this POST URI, which payloads are valid? (select correct answers)",s:'POST /restconf/data/.../bd-items/bd-items\nGoal: create vlan-300 with name="AppTier"',t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items                  ← <span class="hl">URI points here (parent)</span>\n        └── BD-list=vlan-300      ← resource to create\n            ├── fabEncap\n            └── name\n\nPOST to parent = payload MUST wrap with child name`,m:true,opts:[{l:"Wrapped with BD-list (correct child name)",c:`{"BD-list":[{"fabEncap":"vlan-300","name":"AppTier"}]}`},{l:"Bare attributes only",c:`{"fabEncap":"vlan-300","name":"AppTier"}`},{l:"Wrapped with bd-items → BD-list",c:`{"bd-items":{"BD-list":[...]}}`},{l:"Wrapped with l2BD (DME class name instead of YANG)",c:`{"l2BD":{"attributes":{"fabEncap":"vlan-300","name":"AppTier"}}}`},{l:"Wrapped with BD-list as object instead of array",c:`{"BD-list":{"fabEncap":"vlan-300","name":"AppTier"}}`}],ans:[0],exp:`<strong>POST = "Create child under parent" — payload MUST wrap with child name.</strong><span class="exp-tree">URI:     .../bd-items       ← PARENT\nPayload: {"BD-list":[...]}  ← tells server which CHILD to create</span>B no wrapper. C wraps with bd-items URI already covers.\nD uses DME class name — RESTCONF uses YANG names.\nE uses object {} instead of array [] — YANG lists must be arrays.`},
+
+{q:"Which are VALID method + URI + payload combinations for vlan-100? (select correct answers)",s:"Target: BD-list=vlan-100. vlan-100 exists.\nAll combinations must be syntactically correct.",t:`Cisco-NX-OS-device:System\n└── bd-items\n    └── bd-items                          ← parent\n        └── BD-list=vlan-100              ← <span class="hl">target</span>\n\nRules:\n  GET/DELETE → target, no payload\n  PUT        → target, bare payload\n  POST       → parent, wrapped payload\n  PATCH      → any level, payload fills the gap`,m:true,opts:[{l:'GET  .../BD-list=vlan-100 → no payload',c:""},{l:'DELETE  .../BD-list=vlan-100 → no payload',c:""},{l:'PUT  .../BD-list=vlan-100 → {"fabEncap":"vlan-100","name":"MyVlan"}',c:""},{l:'POST  .../bd-items → {"BD-list":[{"fabEncap":"vlan-100",...}]}',c:""},{l:'PATCH  .../BD-list=vlan-100 → {"fabEncap":"vlan-100",...}',c:""},{l:'PATCH  .../bd-items → {"BD-list":[{"fabEncap":"vlan-100",...}]}',c:""},{l:'PATCH  .../System → {"bd-items":{"bd-items":{"BD-list":[...]}}}',c:""},{l:'POST  .../BD-list=vlan-100 → bare payload',c:""},{l:'PUT  .../bd-items → {"BD-list":[...]}',c:""},{l:'GET  .../BD-list=vlan-100 → {"fabEncap":"vlan-100"}',c:""},{l:'DELETE  .../bd-items → no payload',c:""}],ans:[0,1,2,3,4,5,6],exp:`<strong>First 7 are all correct — each follows its method's rules:</strong><span class="exp-tree">GET/DELETE → target, no payload              ✓ A, B\nPUT        → target, bare attributes          ✓ C\nPOST       → parent, wrapped payload          ✓ D\nPATCH      → target (bare)                    ✓ E\nPATCH      → parent (wrapped)                 ✓ F\nPATCH      → System (full tree)               ✓ G</span>H fails — POST can't target the object.\nI fails — PUT must target the object.\nJ fails — GET has no payload.\nK deletes ALL VLANs, not just vlan-100.`},
+
+{q:"Which POST requests succeed without error? (select correct answers)",s:"Switch state:\n- vlan-200 does NOT exist\n- vlan-400 ALREADY exists\n- eth1/12, eth1/30 are physical ports (always exist)\n- loopback99 does NOT exist",t:`Cisco-NX-OS-device:System\n├── bd-items\n│   └── bd-items\n│       ├── BD-list=vlan-400      ← exists\n│       └── BD-list=vlan-200      ← <span class="hl">does NOT exist</span>\n├── intf-items\n│   ├── phys-items\n│   │   ├── PhysIf-list=eth1/12   ← exists\n│   │   └── PhysIf-list=eth1/30   ← exists\n│   └── lb-items\n│       └── LbRtdIf-list=lo99    ← <span class="hl">does NOT exist</span>\n\nPOST = create-only → 409 if resource exists`,m:true,opts:[{l:"POST .../bd-items/bd-items → create vlan-200",c:""},{l:"POST .../bd-items/bd-items → create vlan-400",c:""},{l:"POST .../phys-items → assign eth1/12",c:""},{l:"POST .../phys-items → set eth1/30 mtu",c:""},{l:"POST .../lb-items → create loopback99",c:""},{l:"POST .../BD-list=vlan-200 → bare payload",c:""},{l:"POST .../System → create vlan-200 with full tree",c:""}],ans:[0,4],exp:`<strong>POST = create-only. Resource must NOT exist, URI must be the PARENT.</strong><span class="exp-tree">A ✓ vlan-200 doesn't exist, URI=parent, wrapped     → creates\nB ✗ vlan-400 ALREADY exists                         → 409\nC ✗ eth1/12 is physical, ALREADY exists              → 409\nD ✗ eth1/30 is physical, ALREADY exists              → 409\nE ✓ loopback99 doesn't exist, URI=parent, wrapped   → creates\nF ✗ POST targets the object itself, not parent       → error\nG ✗ POST to System (grandparent), not direct parent  → error</span>Physical interfaces always exist — only PATCH/PUT them, never POST.`}
+];
+
+    let sc2=0,ans2c=0;
+    const tot2=Q2.length;
+    const ctn2=document.getElementById('qs2');
+    function esc2(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function mkC(raw,id){if(!raw)return '';return `<div class="q2-curl"><span id="${id}">${esc2(raw)}</span><button class="q2-copy" onclick="cpC('${id}',this)">copy</button></div>`;}
+    window.cpC=function(id,btn){const el=document.getElementById(id);navigator.clipboard.writeText(el.textContent).then(()=>{btn.textContent='copied!';setTimeout(()=>{btn.textContent='copy';},1500);});};
+    function upd2(){document.getElementById('sc2').textContent=sc2;document.getElementById('ans2').textContent=ans2c;document.getElementById('pb2').style.width=(ans2c/tot2*100)+'%';}
+
+    Q2.forEach((q,qi)=>{
+        const card=document.createElement('div');card.className='question-card';card.id='q2_'+qi;
+        const tag=q.m?'<span style="font-size:0.7rem;padding:2px 8px;border-radius:12px;background:rgba(163,113,247,0.2);color:var(--accent-purple)">select '+q.ans.length+'</span>':'<span style="font-size:0.7rem;padding:2px 8px;border-radius:12px;background:rgba(88,166,255,0.2);color:var(--accent-blue)">single answer</span>';
+        const rCls=q.m?' checkbox':'';
+        let oh=q.opts.map((o,oi)=>{const cid='q2c'+qi+'o'+oi;return `<div class="option-item" data-q2="${qi}" data-o="${oi}" style="cursor:pointer"><div class="option-checkbox${rCls}">${String.fromCharCode(65+oi)}</div><div class="option-text"><div style="font-size:0.85rem;margin-bottom:4px">${esc2(o.l)}</div>${mkC(o.c,cid)}</div></div>`;}).join('');
+        card.innerHTML=`<div class="question-header"><span class="question-number">Q${qi+1}</span>${tag}</div><div class="question-text">${q.q}</div><div class="q2-scenario">${esc2(q.s)}</div><div style="font-size:0.65rem;font-weight:600;color:var(--accent-purple);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">YANG tree</div><div class="q2-tree">${q.t}</div><div class="options-list" id="q2opts-${qi}">${oh}</div><div style="margin-top:1rem"><button class="submit-btn" id="q2sub-${qi}" onclick="subQ2(${qi})">Submit Answer</button></div><div class="q2-exp" id="q2exp-${qi}">${q.exp}</div>`;
+        ctn2.appendChild(card);
+    });
+
+    document.querySelectorAll('[data-q2]').forEach(el=>{el.addEventListener('click',function(){
+        const qi=parseInt(this.dataset.q2);const p=document.getElementById('q2opts-'+qi);
+        if(p.dataset.done)return;
+        if(Q2[qi].m){this.classList.toggle('selected');}
+        else{p.querySelectorAll('.option-item').forEach(o=>o.classList.remove('selected'));this.classList.add('selected');}
+    });});
+
+    window.subQ2=function(qi){
+        const p=document.getElementById('q2opts-'+qi);if(p.dataset.done)return;
+        const allO=p.querySelectorAll('.option-item');
+        const sel=[];allO.forEach((o,i)=>{if(o.classList.contains('selected'))sel.push(i);});
+        if(sel.length===0)return;
+        p.dataset.done='1';allO.forEach(o=>{o.classList.remove('selected');o.style.cursor='default';});
+        const cor=Q2[qi].ans;let perfect=true;
+        if(Q2[qi].m){
+            sel.forEach(s=>{if(cor.includes(s))allO[s].classList.add('correct');else{allO[s].classList.add('incorrect');perfect=false;}});
+            cor.forEach(c=>{if(!sel.includes(c)){allO[c].style.borderColor='var(--accent-green)';allO[c].style.opacity='0.6';perfect=false;}});
+        }else{
+            if(cor.includes(sel[0]))allO[sel[0]].classList.add('correct');
+            else{allO[sel[0]].classList.add('incorrect');allO[cor[0]].classList.add('correct');perfect=false;}
+        }
+        if(perfect)sc2++;ans2c++;upd2();
+        const card=document.getElementById('q2_'+qi);card.classList.add(perfect?'answered-correct':'answered-incorrect');
+        const b=document.getElementById('q2sub-'+qi);b.textContent=perfect?'✓ Correct!':'✗ Incorrect';b.style.background=perfect?'var(--accent-green)':'var(--accent-red)';b.disabled=true;
+        document.getElementById('q2exp-'+qi).style.display='block';
+    };
+
+    window.resetQ2=function(){sc2=0;ans2c=0;upd2();ctn2.innerHTML='';
+        Q2.forEach((q,qi)=>{
+            const card=document.createElement('div');card.className='question-card';card.id='q2_'+qi;
+            const tag=q.m?'<span style="font-size:0.7rem;padding:2px 8px;border-radius:12px;background:rgba(163,113,247,0.2);color:var(--accent-purple)">select '+q.ans.length+'</span>':'<span style="font-size:0.7rem;padding:2px 8px;border-radius:12px;background:rgba(88,166,255,0.2);color:var(--accent-blue)">single answer</span>';
+            const rCls=q.m?' checkbox':'';
+            let oh=q.opts.map((o,oi)=>{const cid='q2c'+qi+'o'+oi;return `<div class="option-item" data-q2="${qi}" data-o="${oi}" style="cursor:pointer"><div class="option-checkbox${rCls}">${String.fromCharCode(65+oi)}</div><div class="option-text"><div style="font-size:0.85rem;margin-bottom:4px">${esc2(o.l)}</div>${mkC(o.c,cid)}</div></div>`;}).join('');
+            card.innerHTML=`<div class="question-header"><span class="question-number">Q${qi+1}</span>${tag}</div><div class="question-text">${q.q}</div><div class="q2-scenario">${esc2(q.s)}</div><div style="font-size:0.65rem;font-weight:600;color:var(--accent-purple);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">YANG tree</div><div class="q2-tree">${q.t}</div><div class="options-list" id="q2opts-${qi}">${oh}</div><div style="margin-top:1rem"><button class="submit-btn" id="q2sub-${qi}" onclick="subQ2(${qi})">Submit Answer</button></div><div class="q2-exp" id="q2exp-${qi}">${q.exp}</div>`;
+            ctn2.appendChild(card);
+        });
+        document.querySelectorAll('[data-q2]').forEach(el=>{el.addEventListener('click',function(){
+            const qi=parseInt(this.dataset.q2);const p=document.getElementById('q2opts-'+qi);
+            if(p.dataset.done)return;
+            if(Q2[qi].m){this.classList.toggle('selected');}
+            else{p.querySelectorAll('.option-item').forEach(o=>o.classList.remove('selected'));this.classList.add('selected');}
+        });});
+    };
     </script>
 
 </body>

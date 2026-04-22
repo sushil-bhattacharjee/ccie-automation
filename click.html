@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Framework - CCIE DevNet Study Guide</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #16a34a;
+            --error: #dc2626;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --code-bg: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .header p { opacity: 0.9; font-size: 1.1rem; }
+
+        .nav {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active { background: var(--primary); color: white; }
+        .nav-btn:not(.active) { background: var(--bg); color: var(--text); }
+        .nav-btn:hover:not(.active) { background: var(--border); }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Table of Contents */
+        .toc {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .toc h2 { color: var(--primary); margin-bottom: 1rem; }
+
+        .toc-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .toc-item {
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .toc-item:hover { background: var(--primary); color: white; }
+
+        /* Chapter Styling */
+        .chapter {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .chapter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chapter-header h2 { color: var(--primary); font-size: 1.2rem; }
+
+        .chapter-toggle {
+            font-size: 1.5rem;
+            color: var(--primary);
+            transition: transform 0.3s;
+        }
+
+        .chapter.open .chapter-toggle { transform: rotate(180deg); }
+
+        .chapter-content { display: none; padding-top: 1rem; }
+        .chapter.open .chapter-content { display: block; }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            white-space: pre;
+        }
+
+        .code-block .keyword { color: #c792ea; }
+        .code-block .decorator { color: #82aaff; }
+        .code-block .string { color: #c3e88d; }
+        .code-block .param { color: #ffcb6b; }
+        .code-block .comment { color: #546e7a; }
+        .code-block .bool { color: #f78c6c; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { padding: 0.6rem; text-align: left; border: 1px solid var(--border); }
+        th { background: var(--bg); font-weight: 600; }
+
+        /* Highlight box */
+        .highlight-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .highlight-box.info { background: #dbeafe; border-color: var(--primary); }
+        .highlight-box.success { background: #dcfce7; border-color: var(--success); }
+
+        .highlight-box strong { color: var(--warning); }
+        .highlight-box.info strong { color: var(--primary); }
+        .highlight-box.success strong { color: var(--success); }
+
+        /* Inline code */
+        code {
+            background: #e2e8f0;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+        }
+
+        h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text); }
+        ul, ol { margin: 0.5rem 0; padding-left: 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+
+        /* ==================== PRACTICE SECTION ==================== */
+        .score-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .score-number { font-size: 3rem; font-weight: 700; }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .question-number {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .question-type {
+            background: var(--warning);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .question-type.fill { background: #8b5cf6; }
+
+        .question-text { font-size: 1.05rem; margin-bottom: 1rem; font-weight: 500; }
+
+        .expected-output {
+            background: #f0fdf4;
+            border-left: 4px solid var(--success);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .expected-output-title { font-weight: 600; color: var(--success); margin-bottom: 0.5rem; }
+
+        /* MCQ Options */
+        .mcq-options { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .mcq-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .mcq-option:hover { border-color: var(--primary); }
+        .mcq-option.selected { border-color: var(--primary); background: #eff6ff; }
+        .mcq-option.correct { border-color: var(--success); background: #f0fdf4; }
+        .mcq-option.incorrect { border-color: var(--error); background: #fef2f2; }
+
+        .mcq-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .mcq-option.selected .mcq-checkbox { background: var(--primary); border-color: var(--primary); }
+        .mcq-option.selected .mcq-checkbox::after { content: '✓'; color: white; font-size: 0.8rem; }
+
+        /* Fill in the Blanks */
+        .fill-blank-container { margin: 1rem 0; }
+
+        .code-with-blanks {
+            background: var(--code-bg);
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            line-height: 2.2;
+            white-space: pre-wrap;
+        }
+
+        .blank-slot {
+            display: inline-block;
+            min-width: 140px;
+            height: 28px;
+            background: #334155;
+            border: 2px dashed #64748b;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin: 0 4px;
+            padding: 0 8px;
+            line-height: 24px;
+            font-size: 0.85rem;
+        }
+
+        .blank-slot.filled { border-style: solid; border-color: var(--primary); background: #1e3a5f; }
+        .blank-slot.correct { border-color: var(--success); background: #14532d; }
+        .blank-slot.incorrect { border-color: var(--error); background: #7f1d1d; }
+
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 8px;
+        }
+
+        .word-pool-title { width: 100%; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-light); }
+
+        .word-chip {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            cursor: grab;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .word-chip:hover { border-color: var(--primary); background: #eff6ff; }
+        .word-chip.used { opacity: 0.4; cursor: not-allowed; }
+        .word-chip.dragging { opacity: 0.5; }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-reset { background: var(--text-light); color: white; }
+
+        .question-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+
+        .result-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .result-message.show { display: block; }
+        .result-message.correct { background: #f0fdf4; color: var(--success); border: 1px solid var(--success); }
+        .result-message.incorrect { background: #fef2f2; color: var(--error); border: 1px solid var(--error); }
+
+        .explanation {
+            background: #fefce8;
+            border-left: 4px solid var(--warning);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 8px 8px 0;
+            display: none;
+        }
+
+        .explanation.show { display: block; }
+        .explanation-title { font-weight: 600; color: #b45309; margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🖱️ Click Framework</h1>
+        <p>CCIE DevNet Expert - CLI Automation Study Guide</p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <button class="nav-btn active" onclick="showSection('theory')">📚 Theory</button>
+        <button class="nav-btn" onclick="showSection('practice')">✍️ Practice</button>
+    </div>
+
+    <div class="container">
+        <!-- ==================== THEORY SECTION ==================== -->
+        <div id="theory" class="section active">
+            
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h2>📑 Table of Contents</h2>
+                <ul class="toc-list">
+                    <li class="toc-item" onclick="openChapter(1)">1. @click.argument vs @click.option</li>
+                    <li class="toc-item" onclick="openChapter(2)">2. @click.option() Parameters</li>
+                    <li class="toc-item" onclick="openChapter(3)">3. Boolean Flag Pair vs is_flag</li>
+                    <li class="toc-item" onclick="openChapter(4)">4. click.Choice() Syntax</li>
+                    <li class="toc-item" onclick="openChapter(5)">5. Short vs Long Options</li>
+                    <li class="toc-item" onclick="openChapter(6)">6. @click.group() - Creating Groups</li>
+                    <li class="toc-item" onclick="openChapter(7)">7. @click.command() - Commands</li>
+                    <li class="toc-item" onclick="openChapter(8)">8. add_command() Method</li>
+                    <li class="toc-item" onclick="openChapter(9)">9. Context: pass_context & pass_obj</li>
+                    <li class="toc-item" onclick="openChapter(10)">10. Nested Subgroups</li>
+                </ul>
+            </div>
+
+            <!-- Chapter 1: argument vs option -->
+            <div class="chapter" id="chapter-1">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 1: @click.argument vs @click.option</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <table>
+                        <tr><th>Feature</th><th>@click.argument</th><th>@click.option</th></tr>
+                        <tr><td><strong>Required?</strong></td><td>Always required</td><td>Optional by default</td></tr>
+                        <tr><td><strong>Order?</strong></td><td>Position matters</td><td>Any order (uses flags)</td></tr>
+                        <tr><td><strong>Passed by</strong></td><td><code>script.py John</code></td><td><code>--name John</code></td></tr>
+                        <tr><td><strong>Default?</strong></td><td>With <code>default=</code> becomes optional</td><td>Supports <code>default=</code></td></tr>
+                        <tr><td><strong>Flags?</strong></td><td>❌ Not supported</td><td>✅ <code>is_flag=True</code></td></tr>
+                        <tr><td><strong>Good for</strong></td><td>Essential inputs (filenames)</td><td>Optional behavior (switches)</td></tr>
+                    </table>
+
+                    <h3>Example</h3>
+                    <div class="code-block"><span class="decorator">@click.command</span>()
+<span class="decorator">@click.argument</span>(<span class="string">'filename'</span>)                    <span class="comment"># Positional: script.py data.txt</span>
+<span class="decorator">@click.option</span>(<span class="string">'--verbose'</span>, <span class="param">is_flag</span>=<span class="bool">True</span>)    <span class="comment"># Named: --verbose</span>
+<span class="keyword">def</span> <span class="param">process</span>(filename, verbose):
+    <span class="keyword">pass</span></div>
+
+                    <div class="highlight-box info">
+                        <strong>💡 Key Rule:</strong> Arguments for essential inputs, options for optional/adjustable behavior.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter 2: Option Parameters -->
+            <div class="chapter" id="chapter-2">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 2: @click.option() Parameters</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <table>
+                        <tr><th>Parameter</th><th>Purpose</th><th>Example</th></tr>
+                        <tr><td><code>default=True</code></td><td>Default to True</td><td>Boolean options</td></tr>
+                        <tr><td><code>default="lines"</code></td><td>Default to string</td><td>Choice options</td></tr>
+                        <tr><td><code>is_flag=True</code></td><td>On/off flag</td><td><code>--verbose</code></td></tr>
+                        <tr><td><code>required=True</code></td><td>Make mandatory</td><td><code>--project</code></td></tr>
+                        <tr><td><code>type=int</code></td><td>Type conversion</td><td>Integer input</td></tr>
+                        <tr><td><code>show_default=True</code></td><td>Show default in help</td><td><code>[default: json]</code></td></tr>
+                        <tr><td><code>show_default="text"</code></td><td>Custom default text</td><td><code>[default: (text)]</code></td></tr>
+                        <tr><td><code>help="..."</code></td><td>Description text</td><td>Appears in --help</td></tr>
+                    </table>
+
+                    <h3>help vs show_default</h3>
+                    <div class="code-block"><span class="decorator">@click.option</span>(<span class="string">'--all/--project'</span>,
+              <span class="param">default</span>=<span class="bool">True</span>,
+              <span class="param">help</span>=<span class="string">"Show all projects or specific"</span>,      <span class="comment"># Description</span>
+              <span class="param">show_default</span>=<span class="string">"all: show all projects"</span>)     <span class="comment"># Default text</span></div>
+
+                    <div class="code-block"><span class="comment"># Help Output:</span>
+--all / --project  Show all projects or specific
+                   └──────────────────────────────┘
+                   From help=
+                   [default: (all: show all projects)]
+                   └──────────────────────────────────┘
+                   From show_default=</div>
+                </div>
+            </div>
+
+            <!-- Chapter 3: Boolean Flag Pair vs is_flag -->
+            <div class="chapter" id="chapter-3">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 3: Boolean Flag Pair vs is_flag</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <h3>Boolean Flag Pair: <code>--all/--project</code></h3>
+                    <p>The <code>/</code> creates two mutually exclusive flags.</p>
+                    <div class="code-block"><span class="decorator">@click.option</span>(<span class="string">'--all/--project'</span>, <span class="param">default</span>=<span class="bool">True</span>)
+<span class="keyword">def</span> <span class="param">cmd</span>(all):
+    <span class="keyword">if</span> all:   <span class="comment"># --all was used (or default)</span>
+    <span class="keyword">else</span>:     <span class="comment"># --project was used</span></div>
+
+                    <table>
+                        <tr><th>Command</th><th><code>all</code> value</th></tr>
+                        <tr><td><code>cmd</code></td><td><code>True</code> (default)</td></tr>
+                        <tr><td><code>cmd --all</code></td><td><code>True</code></td></tr>
+                        <tr><td><code>cmd --project</code></td><td><code>False</code></td></tr>
+                    </table>
+
+                    <h3>Simple Flag: <code>is_flag=True</code></h3>
+                    <p>On/off switch. Default is <strong>always False</strong> (implicit).</p>
+                    <div class="code-block"><span class="decorator">@click.option</span>(<span class="string">'--showgid'</span>, <span class="string">'-g'</span>, <span class="param">is_flag</span>=<span class="bool">True</span>)
+<span class="keyword">def</span> <span class="param">cmd</span>(showgid):
+    <span class="comment"># showgid=False when absent, True when present</span></div>
+
+                    <div class="highlight-box">
+                        <strong>⚠️ Key Difference:</strong><br>
+                        • Boolean pair: Use <code>default=True</code> or <code>default=False</code><br>
+                        • is_flag: Default is <strong>implicitly False</strong> (no need to write it)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter 4: click.Choice() -->
+            <div class="chapter" id="chapter-4">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 4: click.Choice() Syntax</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <p><code>click.Choice()</code> is a <strong>class</strong> that restricts input to specific values.</p>
+
+                    <div class="code-block"><span class="decorator">@click.option</span>(<span class="string">'--format'</span>, <span class="param">type</span>=click.Choice([<span class="string">'json'</span>, <span class="string">'xml'</span>]), <span class="param">default</span>=<span class="string">"json"</span>)</div>
+
+                    <h3>Valid vs Invalid Syntax</h3>
+                    <table>
+                        <tr><th>Syntax</th><th>Valid?</th><th>Why?</th></tr>
+                        <tr><td><code>click.Choice(['json', 'xml'])</code></td><td>✅ Yes</td><td>Passes a list</td></tr>
+                        <tr><td><code>click.Choice(('json', 'xml'))</code></td><td>✅ Yes</td><td>Passes a tuple</td></tr>
+                        <tr><td><code>click.Choice('json', 'xml')</code></td><td>❌ No</td><td>2 separate args</td></tr>
+                        <tr><td><code>click.Choice['json', 'xml']</code></td><td>❌ No</td><td>Wrong syntax</td></tr>
+                    </table>
+
+                    <div class="highlight-box">
+                        <strong>⚠️ Default Must Be String:</strong> Use <code>default="json"</code> NOT <code>default=True</code>
+                    </div>
+
+                    <h3>Why Outer Parentheses?</h3>
+                    <div class="code-block"><span class="param">type</span>=click.Choice([<span class="string">'json'</span>, <span class="string">'xml'</span>])
+     └──────────┘ └────────────────┘
+     Class call    List argument
+     ()            []</div>
+                </div>
+            </div>
+
+            <!-- Chapter 5: Short vs Long Options -->
+            <div class="chapter" id="chapter-5">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 5: Short vs Long Options</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <table>
+                        <tr><th>Type</th><th>Syntax</th><th>Example</th></tr>
+                        <tr><td>Long option</td><td>Two dashes <code>--</code></td><td><code>--outformat</code></td></tr>
+                        <tr><td>Short option</td><td>One dash <code>-</code></td><td><code>-o</code></td></tr>
+                    </table>
+
+                    <h3>Defining Both</h3>
+                    <div class="code-block"><span class="decorator">@click.option</span>(<span class="string">'--outformat'</span>, <span class="string">'-o'</span>, <span class="param">type</span>=click.Choice([<span class="string">'lines'</span>, <span class="string">'raw'</span>]))
+<span class="comment">#              Long          Short</span></div>
+
+                    <div class="highlight-box info">
+                        <strong>💡 Note:</strong> Click actually accepts <code>'--o'</code> (double dash with one letter) too, but convention is single dash for short options.
+                    </div>
+
+                    <h3>Usage</h3>
+                    <div class="code-block">$ python cli.py --outformat lines   <span class="comment"># Long form</span>
+$ python cli.py -o lines             <span class="comment"># Short form</span>
+$ python cli.py --o lines            <span class="comment"># Also works!</span></div>
+                </div>
+            </div>
+
+            <!-- Chapter 6: @click.group() -->
+            <div class="chapter" id="chapter-6">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 6: @click.group() - Creating Groups</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <p>A group is a <strong>container</strong> that holds multiple commands.</p>
+
+                    <div class="code-block"><span class="decorator">@click.group</span>()
+<span class="keyword">def</span> <span class="param">cli</span>():
+    <span class="string">"""Main CLI application"""</span>
+    <span class="keyword">pass</span>
+
+<span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:
+    cli()</div>
+
+                    <h3>Usage</h3>
+                    <div class="code-block">$ python cli.py --help
+Commands:
+  command1
+  command2</div>
+
+                    <div class="highlight-box success">
+                        <strong>✅ Remember:</strong> The entry point in <code>if __name__</code> is the <strong>group function</strong>, not a command.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter 7: @click.command() -->
+            <div class="chapter" id="chapter-7">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 7: @click.command() - Commands</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <h3>Two Ways to Register Commands</h3>
+
+                    <p><strong>Method 1:</strong> Using <code>@group.command()</code> decorator</p>
+                    <div class="code-block"><span class="decorator">@cli.command</span>()           <span class="comment"># Registers directly to 'cli' group</span>
+<span class="keyword">def</span> <span class="param">listprojects</span>():
+    <span class="keyword">pass</span></div>
+
+                    <p><strong>Method 2:</strong> Using <code>@click.command()</code> + <code>add_command()</code></p>
+                    <div class="code-block"><span class="decorator">@click.command</span>()          <span class="comment"># Standalone command</span>
+<span class="keyword">def</span> <span class="param">listprojects</span>():
+    <span class="keyword">pass</span>
+
+cli.add_command(listprojects)  <span class="comment"># Manually add to group</span></div>
+
+                    <div class="highlight-box">
+                        <strong>⚠️ Don't Mix!</strong> If you use <code>@group.command()</code>, don't also call <code>add_command()</code> - it would register twice!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter 8: add_command() -->
+            <div class="chapter" id="chapter-8">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 8: add_command() Method</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <p>Manually adds commands or subgroups to a group.</p>
+
+                    <h3>Syntax</h3>
+                    <div class="code-block">group.add_command(command)              <span class="comment"># Uses function name</span>
+group.add_command(command, <span class="param">name</span>=<span class="string">"alias"</span>)  <span class="comment"># Custom name</span></div>
+
+                    <h3>Example: Adding with Custom Name</h3>
+                    <div class="code-block"><span class="decorator">@click.command</span>()
+<span class="keyword">def</span> <span class="param">namespace</span>():       <span class="comment"># Function name: namespace</span>
+    <span class="keyword">pass</span>
+
+individual.add_command(namespace, <span class="param">name</span>=<span class="string">"path"</span>)  <span class="comment"># CLI name: path</span>
+
+<span class="comment"># Usage: cli individual path</span></div>
+
+                    <h3>What Can Be Added?</h3>
+                    <table>
+                        <tr><th>What You're Adding</th><th>Method</th></tr>
+                        <tr><td>Command to group</td><td><code>group.add_command(cmd)</code></td></tr>
+                        <tr><td>Subgroup to group</td><td><code>group.add_command(subgroup)</code></td></tr>
+                    </table>
+
+                    <div class="highlight-box info">
+                        <strong>💡 Note:</strong> There is NO <code>add_subcommand()</code> method. Everything uses <code>add_command()</code>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter 9: Context -->
+            <div class="chapter" id="chapter-9">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 9: Context: @click.pass_context & @click.pass_obj</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <p>Context allows sharing data between group and commands.</p>
+
+                    <h3>@click.pass_context</h3>
+                    <p>Used on the <strong>group</strong> to initialize shared data.</p>
+                    <div class="code-block"><span class="decorator">@click.group</span>()
+<span class="decorator">@click.pass_context</span>
+<span class="keyword">def</span> <span class="param">gitlab</span>(ctx):
+    ctx.ensure_object(<span class="keyword">dict</span>)
+    config = json.load(<span class="keyword">open</span>(<span class="string">"pat.json"</span>))
+    ctx.obj[<span class="string">"api"</span>] = GitlabAPI(config[<span class="string">"PAT"</span>])</div>
+
+                    <h3>@click.pass_obj</h3>
+                    <p>Used on <strong>commands</strong> to receive the shared data.</p>
+                    <div class="code-block"><span class="decorator">@gitlab.command</span>()
+<span class="decorator">@click.pass_obj</span>
+<span class="keyword">def</span> <span class="param">listprojects</span>(obj):            <span class="comment"># obj = ctx.obj</span>
+    projects = obj[<span class="string">"api"</span>].get(<span class="string">"projects"</span>)</div>
+
+                    <table>
+                        <tr><th>Decorator</th><th>Used On</th><th>Parameter</th></tr>
+                        <tr><td><code>@click.pass_context</code></td><td>Group</td><td><code>ctx</code> (full context)</td></tr>
+                        <tr><td><code>@click.pass_obj</code></td><td>Commands</td><td><code>obj</code> (ctx.obj only)</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Chapter 10: Nested Subgroups -->
+            <div class="chapter" id="chapter-10">
+                <div class="chapter-header" onclick="toggleChapter(this)">
+                    <h2>📖 Chapter 10: Nested Subgroups</h2>
+                    <span class="chapter-toggle">▼</span>
+                </div>
+                <div class="chapter-content">
+                    <p>Groups can contain other groups, creating nested CLI structures.</p>
+
+                    <div class="code-block"><span class="comment"># Main group</span>
+<span class="decorator">@click.group</span>()
+<span class="keyword">def</span> <span class="param">gitlab</span>():
+    <span class="keyword">pass</span>
+
+<span class="comment"># Sub-group</span>
+<span class="decorator">@click.group</span>()
+<span class="keyword">def</span> <span class="param">individual</span>():
+    <span class="keyword">pass</span>
+
+<span class="comment"># Commands for sub-group</span>
+<span class="decorator">@click.command</span>()
+<span class="keyword">def</span> <span class="param">namespace</span>():
+    <span class="keyword">pass</span>
+
+<span class="decorator">@click.command</span>()
+<span class="keyword">def</span> <span class="param">commitmessage</span>():
+    <span class="keyword">pass</span>
+
+<span class="comment"># Wire it all together</span>
+gitlab.add_command(individual)
+individual.add_command(namespace, <span class="param">name</span>=<span class="string">"path"</span>)
+individual.add_command(commitmessage, <span class="param">name</span>=<span class="string">"message"</span>)</div>
+
+                    <h3>Resulting Structure</h3>
+                    <div class="code-block">gitlab
+├── listprojects
+├── project
+├── projectpath
+└── individual          <span class="comment"># Sub-group</span>
+    ├── path            <span class="comment"># Renamed from 'namespace'</span>
+    └── message         <span class="comment"># Renamed from 'commitmessage'</span></div>
+
+                    <h3>Usage</h3>
+                    <div class="code-block">$ python cli.py individual --help
+$ python cli.py individual path --help
+$ python cli.py individual message</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== PRACTICE SECTION ==================== -->
+        <div id="practice" class="section">
+            
+            <div class="score-card">
+                <div class="score-number" id="score">0/10</div>
+                <p>Questions Answered Correctly</p>
+            </div>
+
+            <!-- MCQ Question 1 -->
+            <div class="question-card" data-question="1" data-type="mcq">
+                <span class="question-number">Question 1</span>
+                <span class="question-type">MCQ</span>
+                
+                <div class="question-text">What is the correct decorator for the following requirement?</div>
+                
+                <div class="expected-output">
+                    <div class="expected-output-title">📋 Expected Help Output:</div>
+                    <div class="code-block" style="margin: 0.5rem 0;">Options:
+  --all / --project  Show all projects or specific project
+                     [default: (all: show all projects)]</div>
+                    <p><em>Rule: <code>--all/--project</code> is a boolean pair, default is <code>--all</code></em></p>
+                </div>
+
+                <div class="mcq-options">
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--all/--project', default="all", show_default="all: show all projects")</code>
+                    </div>
+                    <div class="mcq-option" data-correct="true" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--all/--project', default=True, help="Show all projects or specific project", show_default="all: show all projects")</code>
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--all/--project', is_flag=True, default="all")</code>
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--all', '--project', default=True, help="Show all projects")</code>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkMCQ(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct:</strong> <code>@click.option('--all/--project', default=True, help="...", show_default="...")</code></p>
+                    <ul>
+                        <li>Boolean pairs use <code>/</code> between flags</li>
+                        <li><code>default=True</code> makes <code>--all</code> the default</li>
+                        <li><code>help=</code> provides description text</li>
+                        <li><code>show_default=</code> shows custom default text</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>default="all"</code> — Boolean pairs need <code>True/False</code>, NOT strings</li>
+                        <li><code>is_flag=True</code> — Not used with boolean pairs; <code>is_flag</code> is for simple on/off flags</li>
+                        <li><code>'--all', '--project'</code> — Comma creates two separate options, NOT a boolean pair. Must use <code>/</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MCQ Question 2 -->
+            <div class="question-card" data-question="2" data-type="mcq">
+                <span class="question-number">Question 2</span>
+                <span class="question-type">MCQ</span>
+                
+                <div class="question-text">Which is the correct way to define a Choice option with "lines" as the default?</div>
+                
+                <div class="expected-output">
+                    <div class="expected-output-title">📋 Expected Help Output:</div>
+                    <div class="code-block" style="margin: 0.5rem 0;">Options:
+  --outformat, -o [lines|raw]  [default: lines]</div>
+                </div>
+
+                <div class="mcq-options">
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--outformat', '-o', type=click.Choice('lines', 'raw'), default="lines")</code>
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--outformat', '-o', type=click.Choice['lines', 'raw'], default=True)</code>
+                    </div>
+                    <div class="mcq-option" data-correct="true" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--outformat', '-o', type=click.Choice(['lines', 'raw']), default="lines", show_default=True)</code>
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.option('--outformat', '-o', choices=['lines', 'raw'], default="lines")</code>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkMCQ(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct:</strong> <code>type=click.Choice(['lines', 'raw']), default="lines", show_default=True</code></p>
+                    <ul>
+                        <li><code>click.Choice()</code> requires a <strong>list</strong> as argument</li>
+                        <li><code>default="lines"</code> — Default must be a <strong>string</strong> matching a choice</li>
+                        <li><code>'-o'</code> — Short option uses single dash</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>click.Choice('lines', 'raw')</code> — Passes 2 separate arguments instead of 1 list → TypeError</li>
+                        <li><code>click.Choice['lines', 'raw']</code> — Square brackets are for indexing, not calling classes → TypeError</li>
+                        <li><code>choices=['lines', 'raw']</code> — No <code>choices=</code> parameter in Click; must use <code>type=click.Choice([...])</code></li>
+                        <li><code>default=True</code> — Choice options need string default, not boolean</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MCQ Question 3 -->
+            <div class="question-card" data-question="3" data-type="mcq">
+                <span class="question-number">Question 3</span>
+                <span class="question-type">MCQ</span>
+                
+                <div class="question-text">What decorator combination is needed for the main group to share data with commands?</div>
+
+                <div class="mcq-options">
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.group()</code> and <code>@click.pass_obj</code> on the group
+                    </div>
+                    <div class="mcq-option" data-correct="true" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.group()</code> + <code>@click.pass_context</code> on group, <code>@click.pass_obj</code> on commands
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.command()</code> + <code>@click.pass_context</code> on everything
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@click.share_data()</code> decorator
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkMCQ(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct:</strong> <code>@click.group()</code> + <code>@click.pass_context</code> on group, <code>@click.pass_obj</code> on commands</p>
+                    <ul>
+                        <li>Group uses <code>@click.pass_context</code> to access <code>ctx</code> and initialize <code>ctx.obj</code></li>
+                        <li>Commands use <code>@click.pass_obj</code> to receive <code>ctx.obj</code> as <code>obj</code> parameter</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>@click.pass_obj</code> on group — <code>pass_obj</code> receives data, it doesn't create/initialize it</li>
+                        <li><code>@click.command()</code> on everything — Groups need <code>@click.group()</code>, not <code>@click.command()</code></li>
+                        <li><code>@click.share_data()</code> — This decorator doesn't exist in Click</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MCQ Question 4 -->
+            <div class="question-card" data-question="4" data-type="mcq">
+                <span class="question-number">Question 4</span>
+                <span class="question-type">MCQ</span>
+                
+                <div class="question-text">How do you add a subgroup called "individual" to the main "gitlab" group?</div>
+
+                <div class="mcq-options">
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>gitlab.add_subgroup(individual)</code>
+                    </div>
+                    <div class="mcq-option" data-correct="true" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>gitlab.add_command(individual)</code>
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>@gitlab.group() def individual():</code>
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>gitlab.add_subcommand(individual)</code>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkMCQ(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct:</strong> <code>gitlab.add_command(individual)</code></p>
+                    <ul>
+                        <li><code>add_command()</code> works for both commands AND subgroups</li>
+                        <li>Click uses the same method for all registration</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>gitlab.add_subgroup(individual)</code> — No such method exists in Click</li>
+                        <li><code>gitlab.add_subcommand(individual)</code> — No such method exists in Click</li>
+                        <li><code>@gitlab.group()</code> — This decorator doesn't exist; use <code>@click.group()</code> + <code>add_command()</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MCQ Question 5 -->
+            <div class="question-card" data-question="5" data-type="mcq">
+                <span class="question-number">Question 5</span>
+                <span class="question-type">MCQ</span>
+                
+                <div class="question-text">What is the default value of <code>is_flag=True</code> when the flag is NOT used?</div>
+
+                <div class="mcq-options">
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>None</code>
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>True</code>
+                    </div>
+                    <div class="mcq-option" data-correct="true" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>False</code> (implicit, no need to write it)
+                    </div>
+                    <div class="mcq-option" data-correct="false" onclick="selectMCQ(this)">
+                        <div class="mcq-checkbox"></div>
+                        <code>""</code> (empty string)
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkMCQ(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct:</strong> <code>False</code> (implicit, no need to write it)</p>
+                    <ul>
+                        <li>When <code>is_flag=True</code>, default is <strong>always <code>False</code></strong></li>
+                        <li>Flag absent → <code>False</code></li>
+                        <li>Flag present → <code>True</code></li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>None</code> — Flags are boolean, never <code>None</code></li>
+                        <li><code>True</code> — Would be inverted logic (rare, requires explicit <code>default=True</code>)</li>
+                        <li><code>""</code> — Flags are boolean, never strings</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Fill in Blank Question 6 -->
+            <div class="question-card" data-question="6" data-type="fill">
+                <span class="question-number">Question 6</span>
+                <span class="question-type fill">Fill in the Blanks</span>
+                
+                <div class="question-text">Complete the decorator for a simple boolean flag <code>--showgid</code> with short form <code>-g</code>.</div>
+                
+                <div class="expected-output">
+                    <div class="expected-output-title">📋 Expected Help Output:</div>
+                    <div class="code-block" style="margin: 0.5rem 0;">Options:
+  --showgid, -g  Show GID of tasks</div>
+                </div>
+
+                <div class="fill-blank-container">
+                    <div class="code-with-blanks">@click.option(<span class="blank-slot" data-answer="'--showgid'"></span>, <span class="blank-slot" data-answer="'-g'"></span>, <span class="blank-slot" data-answer="is_flag=True"></span>, help="Show GID of tasks")</div>
+
+                    <div class="word-pool">
+                        <div class="word-pool-title">🎯 Word Pool (click to select, then click a blank):</div>
+                        <div class="word-chip" draggable="true" data-word="'--showgid'">'--showgid'</div>
+                        <div class="word-chip" draggable="true" data-word="'-g'">'-g'</div>
+                        <div class="word-chip" draggable="true" data-word="is_flag=True">is_flag=True</div>
+                        <div class="word-chip" draggable="true" data-word="'--g'">'--g'</div>
+                        <div class="word-chip" draggable="true" data-word="default=False">default=False</div>
+                        <div class="word-chip" draggable="true" data-word="required=True">required=True</div>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkFillBlanks(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct answers:</strong> <code>'--showgid'</code>, <code>'-g'</code>, <code>is_flag=True</code></p>
+                    <ul>
+                        <li><code>'--showgid'</code> — Long option with double dash</li>
+                        <li><code>'-g'</code> — Short option with <strong>single dash</strong></li>
+                        <li><code>is_flag=True</code> — Makes it a boolean flag (no value needed)</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>'--g'</code> — Short options use single dash <code>-</code>, not double dash <code>--</code></li>
+                        <li><code>default=False</code> — Implicit for flags, no need to write it</li>
+                        <li><code>required=True</code> — Flags are never "required"; they're optional by nature</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Fill in Blank Question 7 -->
+            <div class="question-card" data-question="7" data-type="fill">
+                <span class="question-number">Question 7</span>
+                <span class="question-type fill">Fill in the Blanks</span>
+                
+                <div class="question-text">Complete the decorator for <code>--show/--not-show</code> where default is <code>--not-show</code>.</div>
+                
+                <div class="expected-output">
+                    <div class="expected-output-title">📋 Expected Help Output:</div>
+                    <div class="code-block" style="margin: 0.5rem 0;">Options:
+  --show / --not-show  [default: not-show]</div>
+                </div>
+
+                <div class="fill-blank-container">
+                    <div class="code-with-blanks">@click.option(<span class="blank-slot" data-answer="'--show/--not-show'"></span>, <span class="blank-slot" data-answer="default=False"></span>, <span class="blank-slot" data-answer="show_default=True"></span>)</div>
+
+                    <div class="word-pool">
+                        <div class="word-pool-title">🎯 Word Pool:</div>
+                        <div class="word-chip" draggable="true" data-word="'--show/--not-show'">'--show/--not-show'</div>
+                        <div class="word-chip" draggable="true" data-word="default=False">default=False</div>
+                        <div class="word-chip" draggable="true" data-word="show_default=True">show_default=True</div>
+                        <div class="word-chip" draggable="true" data-word="default=True">default=True</div>
+                        <div class="word-chip" draggable="true" data-word="'--show', '--not-show'">'--show', '--not-show'</div>
+                        <div class="word-chip" draggable="true" data-word="is_flag=True">is_flag=True</div>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkFillBlanks(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct answers:</strong> <code>'--show/--not-show'</code>, <code>default=False</code>, <code>show_default=True</code></p>
+                    <ul>
+                        <li><code>'--show/--not-show'</code> — Boolean pair with <code>/</code> separator</li>
+                        <li><code>default=False</code> — First flag (<code>--show</code>) = True, second (<code>--not-show</code>) = False. Since default is <code>--not-show</code>, use <code>False</code></li>
+                        <li><code>show_default=True</code> — Shows <code>[default: not-show]</code> in help</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>default=True</code> — Would make <code>--show</code> the default, not <code>--not-show</code></li>
+                        <li><code>'--show', '--not-show'</code> — Comma creates two separate options, not a boolean pair</li>
+                        <li><code>is_flag=True</code> — Not used with boolean pairs; pairs handle True/False automatically</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Fill in Blank Question 8 -->
+            <div class="question-card" data-question="8" data-type="fill">
+                <span class="question-number">Question 8</span>
+                <span class="question-type fill">Fill in the Blanks</span>
+                
+                <div class="question-text">Complete the group decorator with context passing.</div>
+                
+                <div class="expected-output">
+                    <div class="expected-output-title">📋 Requirement:</div>
+                    <p>Create a group that initializes shared data in <code>ctx.obj</code></p>
+                </div>
+
+                <div class="fill-blank-container">
+                    <div class="code-with-blanks"><span class="blank-slot" data-answer="@click.group()"></span>
+<span class="blank-slot" data-answer="@click.pass_context"></span>
+def gitlab(ctx):
+    ctx.ensure_object(dict)
+    ctx.obj["api"] = GitlabAPI(token)</div>
+
+                    <div class="word-pool">
+                        <div class="word-pool-title">🎯 Word Pool:</div>
+                        <div class="word-chip" draggable="true" data-word="@click.group()">@click.group()</div>
+                        <div class="word-chip" draggable="true" data-word="@click.pass_context">@click.pass_context</div>
+                        <div class="word-chip" draggable="true" data-word="@click.command()">@click.command()</div>
+                        <div class="word-chip" draggable="true" data-word="@click.pass_obj">@click.pass_obj</div>
+                        <div class="word-chip" draggable="true" data-word="@click.context()">@click.context()</div>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkFillBlanks(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct answers:</strong> <code>@click.group()</code>, <code>@click.pass_context</code></p>
+                    <ul>
+                        <li><code>@click.group()</code> — Creates a group (container for commands)</li>
+                        <li><code>@click.pass_context</code> — Provides access to <code>ctx</code> to initialize shared data in <code>ctx.obj</code></li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>@click.command()</code> — Creates a command, not a group</li>
+                        <li><code>@click.pass_obj</code> — Receives <code>ctx.obj</code>, doesn't create/initialize it</li>
+                        <li><code>@click.context()</code> — This decorator doesn't exist</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Fill in Blank Question 9 -->
+            <div class="question-card" data-question="9" data-type="fill">
+                <span class="question-number">Question 9</span>
+                <span class="question-type fill">Fill in the Blanks</span>
+                
+                <div class="question-text">Complete the command decorator to receive shared data from the group.</div>
+
+                <div class="fill-blank-container">
+                    <div class="code-with-blanks"><span class="blank-slot" data-answer="@gitlab.command()"></span>
+<span class="blank-slot" data-answer="@click.pass_obj"></span>
+def listprojects(obj):
+    projects = obj["api"].get("projects")</div>
+
+                    <div class="word-pool">
+                        <div class="word-pool-title">🎯 Word Pool:</div>
+                        <div class="word-chip" draggable="true" data-word="@gitlab.command()">@gitlab.command()</div>
+                        <div class="word-chip" draggable="true" data-word="@click.pass_obj">@click.pass_obj</div>
+                        <div class="word-chip" draggable="true" data-word="@click.command()">@click.command()</div>
+                        <div class="word-chip" draggable="true" data-word="@click.pass_context">@click.pass_context</div>
+                        <div class="word-chip" draggable="true" data-word="@gitlab.group()">@gitlab.group()</div>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkFillBlanks(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct answers:</strong> <code>@gitlab.command()</code>, <code>@click.pass_obj</code></p>
+                    <ul>
+                        <li><code>@gitlab.command()</code> — Registers command directly under the <code>gitlab</code> group</li>
+                        <li><code>@click.pass_obj</code> — Passes <code>ctx.obj</code> as the <code>obj</code> parameter to the function</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>@click.command()</code> — Creates standalone command; needs <code>add_command()</code> to register</li>
+                        <li><code>@click.pass_context</code> — Passes full <code>ctx</code>, not just <code>ctx.obj</code>; parameter would be <code>ctx</code> not <code>obj</code></li>
+                        <li><code>@gitlab.group()</code> — Would create a subgroup, not a command</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Fill in Blank Question 10 -->
+            <div class="question-card" data-question="10" data-type="fill">
+                <span class="question-number">Question 10</span>
+                <span class="question-type fill">Fill in the Blanks</span>
+                
+                <div class="question-text">Wire the subgroup and commands together.</div>
+                
+                <div class="expected-output">
+                    <div class="expected-output-title">📋 Required Structure:</div>
+                    <div class="code-block" style="margin: 0.5rem 0;">gitlab
+└── individual
+    ├── path     (from namespace function)
+    └── message  (from commitmessage function)</div>
+                </div>
+
+                <div class="fill-blank-container">
+                    <div class="code-with-blanks"><span class="blank-slot" data-answer="gitlab.add_command(individual)"></span>
+<span class="blank-slot" data-answer='individual.add_command(namespace, name="path")'></span>
+<span class="blank-slot" data-answer='individual.add_command(commitmessage, name="message")'></span></div>
+
+                    <div class="word-pool">
+                        <div class="word-pool-title">🎯 Word Pool:</div>
+                        <div class="word-chip" draggable="true" data-word="gitlab.add_command(individual)">gitlab.add_command(individual)</div>
+                        <div class="word-chip" draggable="true" data-word='individual.add_command(namespace, name="path")'>individual.add_command(namespace, name="path")</div>
+                        <div class="word-chip" draggable="true" data-word='individual.add_command(commitmessage, name="message")'>individual.add_command(commitmessage, name="message")</div>
+                        <div class="word-chip" draggable="true" data-word="gitlab.add_subgroup(individual)">gitlab.add_subgroup(individual)</div>
+                        <div class="word-chip" draggable="true" data-word="individual.add_subcommand(namespace)">individual.add_subcommand(namespace)</div>
+                    </div>
+                </div>
+
+                <div class="question-actions">
+                    <button class="btn btn-primary" onclick="checkFillBlanks(this)">Check Answer</button>
+                    <button class="btn btn-reset" onclick="resetQuestion(this)">Reset</button>
+                </div>
+
+                <div class="result-message"></div>
+                <div class="explanation">
+                    <div class="explanation-title">💡 Explanation</div>
+                    <p><strong>✅ Correct answers:</strong></p>
+                    <ul>
+                        <li><code>gitlab.add_command(individual)</code> — Adds subgroup to main group</li>
+                        <li><code>individual.add_command(namespace, name="path")</code> — Adds command with custom CLI name</li>
+                        <li><code>individual.add_command(commitmessage, name="message")</code> — Adds command with custom CLI name</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>❌ Why others are wrong:</strong></p>
+                    <ul>
+                        <li><code>gitlab.add_subgroup(individual)</code> — No such method; use <code>add_command()</code> for everything</li>
+                        <li><code>individual.add_subcommand(namespace)</code> — No such method; use <code>add_command()</code> for everything</li>
+                    </ul>
+                    <p style="margin-top: 0.5rem;"><strong>💡 Key Point:</strong> The <code>name=</code> parameter lets you use a different CLI name than the function name.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let correctAnswers = 0;
+        let totalQuestions = 10;
+        let answeredQuestions = new Set();
+        let draggedChip = null;
+        let selectedChip = null;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleChapter(header) {
+            header.parentElement.classList.toggle('open');
+        }
+
+        function openChapter(num) {
+            document.querySelectorAll('.chapter').forEach(c => c.classList.remove('open'));
+            const chapter = document.getElementById('chapter-' + num);
+            if (chapter) {
+                chapter.classList.add('open');
+                chapter.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function selectMCQ(option) {
+            const card = option.closest('.question-card');
+            if (card.classList.contains('answered')) return;
+            option.classList.toggle('selected');
+        }
+
+        function checkMCQ(btn) {
+            const card = btn.closest('.question-card');
+            if (card.classList.contains('answered')) return;
+            
+            const options = card.querySelectorAll('.mcq-option');
+            const resultMsg = card.querySelector('.result-message');
+            const explanation = card.querySelector('.explanation');
+            
+            let allCorrect = true;
+            let hasSelection = false;
+
+            options.forEach(opt => {
+                const isCorrect = opt.dataset.correct === 'true';
+                const isSelected = opt.classList.contains('selected');
+                if (isSelected) hasSelection = true;
+                
+                if (isCorrect && isSelected) {
+                    opt.classList.add('correct');
+                } else if (!isCorrect && isSelected) {
+                    opt.classList.add('incorrect');
+                    allCorrect = false;
+                } else if (isCorrect && !isSelected) {
+                    opt.classList.add('correct');
+                    allCorrect = false;
+                }
+            });
+
+            if (!hasSelection) {
+                resultMsg.textContent = '⚠️ Please select an answer first!';
+                resultMsg.className = 'result-message show incorrect';
+                return;
+            }
+
+            card.classList.add('answered');
+            const questionNum = card.dataset.question;
+            
+            if (!answeredQuestions.has(questionNum)) {
+                answeredQuestions.add(questionNum);
+                if (allCorrect) {
+                    correctAnswers++;
+                    resultMsg.textContent = '✅ Correct! Well done!';
+                    resultMsg.className = 'result-message show correct';
+                } else {
+                    resultMsg.textContent = '❌ Incorrect. See the correct answer highlighted in green.';
+                    resultMsg.className = 'result-message show incorrect';
+                }
+                updateScore();
+            }
+            explanation.classList.add('show');
+        }
+
+        // Drag and Drop
+        function initDragAndDrop() {
+            document.querySelectorAll('.word-chip').forEach(chip => {
+                chip.addEventListener('dragstart', function(e) {
+                    if (this.classList.contains('used')) { e.preventDefault(); return; }
+                    draggedChip = this;
+                    this.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', this.dataset.word);
+                });
+                chip.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                    draggedChip = null;
+                });
+            });
+
+            document.querySelectorAll('.blank-slot').forEach(slot => {
+                slot.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.background = '#1e3a5f';
+                });
+                slot.addEventListener('dragleave', function() {
+                    if (!this.classList.contains('filled')) {
+                        this.style.borderColor = '#64748b';
+                        this.style.background = '#334155';
+                    }
+                });
+                slot.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    const card = this.closest('.question-card');
+                    if (card.classList.contains('answered')) return;
+                    const word = e.dataTransfer.getData('text/plain');
+                    
+                    if (this.textContent) {
+                        const pool = card.querySelector('.word-pool');
+                        pool.querySelectorAll('.word-chip').forEach(c => {
+                            if (c.dataset.word === this.textContent) c.classList.remove('used');
+                        });
+                    }
+                    this.textContent = word;
+                    this.classList.add('filled');
+                    this.style.borderColor = 'var(--primary)';
+                    this.style.background = '#1e3a5f';
+                    if (draggedChip) draggedChip.classList.add('used');
+                });
+            });
+        }
+
+        // Click to Place
+        function initClickToPlace() {
+            document.querySelectorAll('.word-chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    if (this.classList.contains('used')) return;
+                    if (selectedChip === this) {
+                        selectedChip.style.outline = 'none';
+                        selectedChip = null;
+                    } else {
+                        if (selectedChip) selectedChip.style.outline = 'none';
+                        selectedChip = this;
+                        selectedChip.style.outline = '3px solid var(--primary)';
+                        selectedChip.style.outlineOffset = '2px';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.blank-slot').forEach(slot => {
+                slot.addEventListener('click', function() {
+                    const card = this.closest('.question-card');
+                    if (card.classList.contains('answered')) return;
+                    
+                    if (selectedChip && !selectedChip.classList.contains('used')) {
+                        if (this.textContent) {
+                            const pool = card.querySelector('.word-pool');
+                            pool.querySelectorAll('.word-chip').forEach(c => {
+                                if (c.dataset.word === this.textContent) c.classList.remove('used');
+                            });
+                        }
+                        this.textContent = selectedChip.dataset.word;
+                        this.classList.add('filled');
+                        selectedChip.classList.add('used');
+                        selectedChip.style.outline = 'none';
+                        selectedChip = null;
+                    } else if (this.textContent) {
+                        const pool = card.querySelector('.word-pool');
+                        pool.querySelectorAll('.word-chip').forEach(c => {
+                            if (c.dataset.word === this.textContent) c.classList.remove('used');
+                        });
+                        this.textContent = '';
+                        this.classList.remove('filled');
+                        this.style.borderColor = '#64748b';
+                        this.style.background = '#334155';
+                    }
+                });
+            });
+        }
+
+        initDragAndDrop();
+        initClickToPlace();
+
+        function checkFillBlanks(btn) {
+            const card = btn.closest('.question-card');
+            if (card.classList.contains('answered')) return;
+            
+            const slots = card.querySelectorAll('.blank-slot');
+            const resultMsg = card.querySelector('.result-message');
+            const explanation = card.querySelector('.explanation');
+            
+            let allCorrect = true;
+            let allFilled = true;
+
+            slots.forEach(slot => {
+                if (!slot.textContent) { allFilled = false; return; }
+                if (slot.textContent === slot.dataset.answer) {
+                    slot.classList.add('correct');
+                } else {
+                    slot.classList.add('incorrect');
+                    allCorrect = false;
+                }
+            });
+
+            if (!allFilled) {
+                resultMsg.textContent = '⚠️ Please fill in all blanks first!';
+                resultMsg.className = 'result-message show incorrect';
+                return;
+            }
+
+            card.classList.add('answered');
+            const questionNum = card.dataset.question;
+            
+            if (!answeredQuestions.has(questionNum)) {
+                answeredQuestions.add(questionNum);
+                if (allCorrect) {
+                    correctAnswers++;
+                    resultMsg.textContent = '✅ Correct! Well done!';
+                    resultMsg.className = 'result-message show correct';
+                } else {
+                    resultMsg.innerHTML = '❌ Incorrect. Correct answers:<br>' + 
+                        Array.from(slots).map(s => '<code>' + s.dataset.answer + '</code>').join('<br>');
+                    resultMsg.className = 'result-message show incorrect';
+                }
+                updateScore();
+            }
+            explanation.classList.add('show');
+        }
+
+        function resetQuestion(btn) {
+            const card = btn.closest('.question-card');
+            card.querySelectorAll('.mcq-option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            card.querySelectorAll('.blank-slot').forEach(slot => {
+                slot.textContent = '';
+                slot.classList.remove('filled', 'correct', 'incorrect');
+                slot.style.borderColor = '#64748b';
+                slot.style.background = '#334155';
+            });
+            card.querySelectorAll('.word-chip').forEach(chip => {
+                chip.classList.remove('used');
+                chip.style.outline = 'none';
+            });
+            selectedChip = null;
+            
+            const resultMsg = card.querySelector('.result-message');
+            const explanation = card.querySelector('.explanation');
+            resultMsg.className = 'result-message';
+            explanation.classList.remove('show');
+            
+            const questionNum = card.dataset.question;
+            if (answeredQuestions.has(questionNum)) {
+                answeredQuestions.delete(questionNum);
+            }
+            card.classList.remove('answered');
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = correctAnswers + '/' + totalQuestions;
+        }
+    </script>
+</body>
+</html>

@@ -799,6 +799,25 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Chapter 12: Click | Typer -->
+                        <div class="nav-chapter">
+                            <div class="chapter-header" onclick="toggleChapter(this)">
+                                <span class="chapter-icon">
+                                    <svg viewBox="0 0 16 16">
+                                        <path d="M6 12L10 8 6 4z" />
+                                    </svg>
+                                </span>
+                                <span class="chapter-title">Chapter 12, Click | Typer</span>
+                            </div>
+                            <div class="chapter-items">
+                                <div class="nav-item" onclick="loadContent('click.html', this)">
+                                    <span class="nav-item-icon">📄</span>
+                                    <span class="nav-item-text">Click Framework</span>
+                                    <span class="nav-item-badge badge-ready">Ready</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -811,7 +830,7 @@
                             </svg>
                         </span>
                         <span class="chapter-title">Quiz Bank</span>
-                        <span class="chapter-badge" style="background: #f85149; color: #fff;">9</span>
+                        <span class="chapter-badge" style="background: #f85149; color: #fff;">10</span>
                         <!-- Need to update after adding every MCQ -->
                     </div>
                     <div class="chapter-items">
@@ -854,6 +873,10 @@
                         <div class="nav-item" onclick="loadContent('nx-os-api.html', this)">
                             <span class="nav-item-icon">💬</span>
                             <span class="nav-item-text">NXOS API (9 MCQ)</span>
+                        </div>
+                        <div class="nav-item" onclick="loadContent('click.html', this)">
+                            <span class="nav-item-icon">💬</span>
+                            <span class="nav-item-text">Click Framework (5 MCQ)</span>
                         </div>
                     </div>
                 </div>
@@ -974,6 +997,18 @@
                             <div class="guide-card-meta">
                                 <span class="meta-tag">9 MCQ</span>
                                 <span class="meta-tag">Drag & Drop</span>
+                            </div>
+                        </div>
+
+                        <div class="guide-card" onclick="loadContentFromCard('click.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🖱️</div>
+                                <div class="guide-card-title">Click Framework</div>
+                            </div>
+                            <div class="guide-card-desc">Python Click CLI framework — decorators, arguments, options, groups, and Typer comparison.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">5 MCQ</span>
+                                <span class="meta-tag">Practice</span>
                             </div>
                         </div>
 

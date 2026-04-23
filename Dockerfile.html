@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docker Compose — Exam Study Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface-2: #232736;
+    --surface-3: #2c3044;
+    --border: #353a50;
+    --text: #e4e6f0;
+    --text-dim: #8b90a8;
+    --accent: #60a5fa;
+    --accent-glow: rgba(96, 165, 250, 0.15);
+    --green: #34d399;
+    --green-bg: rgba(52, 211, 153, 0.1);
+    --red: #f87171;
+    --red-bg: rgba(248, 113, 113, 0.1);
+    --orange: #fbbf24;
+    --orange-bg: rgba(251, 191, 36, 0.1);
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+    --mono: 'JetBrains Mono', monospace;
+    --body: 'DM Sans', sans-serif;
+    --display: 'Playfair Display', serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* === HEADER === */
+  .header {
+    padding: 3rem 2rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(96,165,250,0.06) 0%, transparent 100%);
+  }
+  .header h1 {
+    font-family: var(--display);
+    font-size: 2.4rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.4rem;
+  }
+  .header p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  /* === TAB BAR === */
+  .tab-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 1.2rem 2rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.8rem 2.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.25s;
+    letter-spacing: 0.03em;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* === CONTENT === */
+  .tab-content { display: none; padding: 2rem; max-width: 960px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  /* === QUESTION CARDS === */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .q-header {
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .q-number {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 0.8rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .q-type {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .q-type.mcq { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .q-type.matrix { background: rgba(34,211,238,0.15); color: var(--cyan); }
+  .q-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .q-body { padding: 1.5rem; }
+  .q-body p { margin-bottom: 1rem; color: var(--text-dim); font-size: 0.9rem; }
+
+  /* === MCQ OPTIONS === */
+  .mcq-options { list-style: none; margin: 1rem 0; }
+  .mcq-options li {
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 0.9rem;
+    cursor: default;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    transition: all 0.2s;
+  }
+  .mcq-options li .letter {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.8rem;
+    background: var(--surface-3);
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--text-dim);
+  }
+
+  /* === MATRIX TABLE === */
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+  }
+  .matrix-table th {
+    text-align: center;
+    padding: 0.8rem 0.5rem;
+    font-weight: 600;
+    color: var(--accent);
+    border-bottom: 2px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .matrix-table th:first-child {
+    text-align: left;
+    width: 55%;
+    color: var(--text-dim);
+    font-weight: 500;
+  }
+  .matrix-table td {
+    padding: 0.7rem 0.5rem;
+    border-bottom: 1px solid rgba(53,58,80,0.5);
+    text-align: center;
+  }
+  .matrix-table td:first-child {
+    text-align: left;
+    color: var(--text);
+  }
+  .matrix-table .check {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    font-size: 0.75rem;
+  }
+
+  /* === REVEAL BUTTON === */
+  .reveal-btn {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 0.5rem 1.2rem;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+  }
+  .reveal-btn:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* === EXPLANATION === */
+  .explanation {
+    display: none;
+    margin-top: 1.2rem;
+    padding: 1.2rem;
+    background: var(--surface-2);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    font-size: 0.88rem;
+  }
+  .explanation.show { display: block; animation: fadeIn 0.3s ease; }
+  .explanation h4 {
+    font-size: 0.82rem;
+    font-family: var(--mono);
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .explanation .correct {
+    color: var(--green);
+    background: var(--green-bg);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .explanation .wrong {
+    color: var(--red);
+    background: var(--red-bg);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .explanation .note {
+    color: var(--orange);
+    background: var(--orange-bg);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .explanation p { color: var(--text-dim); margin-bottom: 0.6rem; }
+
+  /* matrix answer highlights */
+  .matrix-table tr.revealed-correct td:first-child { color: var(--green); font-weight: 600; }
+  .check.is-correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+  .check.is-wrong { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+
+  /* === THEORY === */
+  .theory-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .theory-header {
+    padding: 1rem 1.5rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .theory-header:hover { background: var(--surface-3); }
+  .theory-header .chapter-num {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--cyan);
+    background: rgba(34,211,238,0.1);
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .theory-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .theory-header .toggle-icon {
+    margin-left: auto;
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    transition: transform 0.3s;
+  }
+  .theory-header.open .toggle-icon { transform: rotate(45deg); }
+  .theory-body {
+    display: none;
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+  .theory-body.open { display: block; animation: fadeIn 0.3s ease; }
+  .theory-body h4 {
+    color: var(--accent);
+    font-size: 0.9rem;
+    margin: 1.2rem 0 0.6rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .theory-body h4:first-child { margin-top: 0; }
+  .theory-body p { color: var(--text-dim); margin-bottom: 0.8rem; }
+
+  .t-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.8rem 0 1.2rem;
+    font-size: 0.85rem;
+  }
+  .t-table th {
+    background: var(--surface-3);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--accent);
+    border-bottom: 2px solid var(--border);
+  }
+  .t-table td {
+    padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid rgba(53,58,80,0.5);
+    color: var(--text-dim);
+  }
+  .t-table tr:hover td { background: rgba(96,165,250,0.04); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    background: var(--surface-3);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    color: var(--cyan);
+  }
+  pre {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    margin: 0.8rem 0 1.2rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .emoji { font-size: 1.1rem; }
+  .highlight { color: var(--accent); font-weight: 600; }
+  .warn { color: var(--orange); }
+  .ok { color: var(--green); }
+  .no { color: var(--red); }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* === SCORE BAR === */
+  .score-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+  .score-bar .score-label { color: var(--text-dim); }
+  .score-bar .score-val { font-family: var(--mono); color: var(--accent); font-weight: 600; }
+  .score-bar button {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .score-bar button:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🐳 Docker Compose</h1>
+  <p>Nginx · Flask RESTX · MongoDB — Exam Study Guide</p>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn" onclick="switchTab('theory')">Theory</button>
+  <button class="tab-btn active" onclick="switchTab('practice')">Practice</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- PRACTICE TAB                                                  -->
+<!-- ============================================================ -->
+<div id="practice" class="tab-content active">
+
+  <div class="score-bar">
+    <span class="score-label">Questions revealed: <span class="score-val" id="score-count">0</span>/10</span>
+    <button onclick="revealAll()">Reveal All</button>
+  </div>
+
+  <!-- ===== Q1 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">1</span>
+      <span class="q-title">In a production Nginx → Flask → MongoDB stack, which TWO services should have <code>ports:</code> mapping in docker-compose.yml?</span>
+      <span class="q-type mcq">MCQ</span>
+    </div>
+    <div class="q-body">
+      <p>Select <strong>2</strong> correct answers:</p>
+      <ul class="mcq-options">
+        <li><span class="letter">A</span> Nginx with <code>"8080:80"</code></li>
+        <li><span class="letter">B</span> Flask with <code>"5000:5000"</code></li>
+        <li><span class="letter">C</span> MongoDB with <code>"27017:27017"</code></li>
+        <li><span class="letter">D</span> None — all services communicate internally</li>
+        <li><span class="letter">E</span> Only Nginx — it is the single entry point</li>
+      </ul>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ A — Nginx needs ports mapped as the reverse proxy entry point</div>
+        <div class="correct">✅ E — Only Nginx should be exposed to host in production</div>
+        <div class="wrong">❌ B — Flask should only be reachable via Nginx internally</div>
+        <div class="wrong">❌ C — MongoDB should only be reachable via Flask on backend network</div>
+        <div class="wrong">❌ D — At least Nginx needs host mapping, otherwise nothing is accessible</div>
+        <p>In production, only the entry-point service (Nginx) gets <code>ports:</code>. Flask and MongoDB communicate on internal Docker networks. Exposing them bypasses security controls like rate limiting, SSL termination, and auth headers.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q2 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">2</span>
+      <span class="q-title">Match each statement to the correct service(s)</span>
+      <span class="q-type matrix">MATRIX</span>
+    </div>
+    <div class="q-body">
+      <p>Check all that apply for each row:</p>
+      <table class="matrix-table" id="matrix-q2">
+        <thead>
+          <tr><th>Statement</th><th>Flask</th><th>MongoDB</th><th>Nginx</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Sits on BOTH frontend and backend networks</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Only service with <code>ports:</code> in production</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Uses <code>volumes:</code> for data persistence</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Connection string is configured in application code</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Reverse proxy configured in its own config file</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="revealMatrix('matrix-q2', [[true,false,false],[false,false,true],[false,true,false],[true,false,false],[false,false,true]], this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ Flask sits on BOTH networks — it bridges frontend (Nginx) and backend (MongoDB)</div>
+        <div class="correct">✅ Only Nginx gets <code>ports:</code> — single entry point to host</div>
+        <div class="correct">✅ MongoDB uses <code>volumes: mongo-data:/data/db</code> for persistence</div>
+        <div class="correct">✅ Flask's <code>app.py</code> contains <code>MongoClient("mongodb://mongodb:27017/")</code></div>
+        <div class="correct">✅ Nginx uses <code>nginx.conf</code> with <code>proxy_pass http://flask-app:5000</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q3 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">3</span>
+      <span class="q-title">What is the difference between <code>EXPOSE</code> in Dockerfile and <code>ports:</code> in docker-compose.yml? Select TWO correct statements.</span>
+      <span class="q-type mcq">MCQ</span>
+    </div>
+    <div class="q-body">
+      <p>Select <strong>2</strong> correct answers:</p>
+      <ul class="mcq-options">
+        <li><span class="letter">A</span> <code>EXPOSE</code> publishes the port to the host machine</li>
+        <li><span class="letter">B</span> <code>EXPOSE</code> is documentation only — it does NOT publish the port to the host</li>
+        <li><span class="letter">C</span> <code>ports:</code> in docker-compose maps host ↔ container ports (real exposure)</li>
+        <li><span class="letter">D</span> <code>ports:</code> is documentation only, same as <code>EXPOSE</code></li>
+        <li><span class="letter">E</span> <code>EXPOSE</code> and <code>ports:</code> are interchangeable</li>
+      </ul>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ B — <code>EXPOSE</code> in Dockerfile is metadata/documentation; it tells others what port the container listens on but does nothing to publish it</div>
+        <div class="correct">✅ C — <code>ports:</code> in docker-compose actually creates the host ↔ container port mapping</div>
+        <div class="wrong">❌ A — EXPOSE does NOT publish; only <code>ports:</code> or <code>-p</code> flag does</div>
+        <div class="wrong">❌ D — <code>ports:</code> has real effect, it's not documentation</div>
+        <div class="wrong">❌ E — They serve completely different purposes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q4 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">4</span>
+      <span class="q-title">Which service(s) can communicate with which? (Production, explicit networks)</span>
+      <span class="q-type matrix">MATRIX</span>
+    </div>
+    <div class="q-body">
+      <p>Can the row service reach the column service?</p>
+      <table class="matrix-table" id="matrix-q4">
+        <thead>
+          <tr><th>From ↓ &nbsp;To →</th><th>Flask</th><th>MongoDB</th><th>Nginx</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Nginx</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Flask</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>MongoDB</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Host machine</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="revealMatrix('matrix-q4', [[true,false,false],[false,true,true],[true,false,false],[false,false,true]], this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ Nginx → Flask — both on <code>frontend</code> network</div>
+        <div class="wrong">❌ Nginx → MongoDB — different networks, DNS can't resolve</div>
+        <div class="correct">✅ Flask → MongoDB — both on <code>backend</code> network</div>
+        <div class="correct">✅ Flask → Nginx — both on <code>frontend</code> network</div>
+        <div class="correct">✅ MongoDB → Flask — both on <code>backend</code> network</div>
+        <div class="wrong">❌ MongoDB → Nginx — different networks</div>
+        <div class="correct">✅ Host → Nginx — via <code>ports: "8080:80"</code></div>
+        <div class="wrong">❌ Host → Flask/MongoDB — no <code>ports:</code> mapped in production</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q5 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">5</span>
+      <span class="q-title">What happens to MongoDB data when you run <code>docker-compose down</code> WITHOUT volumes configured? Select TWO correct statements.</span>
+      <span class="q-type mcq">MCQ</span>
+    </div>
+    <div class="q-body">
+      <p>Select <strong>2</strong> correct answers:</p>
+      <ul class="mcq-options">
+        <li><span class="letter">A</span> All database data is permanently lost</li>
+        <li><span class="letter">B</span> Data is preserved in the container's writable layer</li>
+        <li><span class="letter">C</span> Named volumes (<code>mongo-data:/data/db</code>) survive <code>docker-compose down</code></li>
+        <li><span class="letter">D</span> <code>docker-compose down -v</code> removes named volumes and data</li>
+        <li><span class="letter">E</span> <code>EXPOSE 27017</code> in Dockerfile ensures data persistence</li>
+      </ul>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ A — Without volumes, the writable layer is destroyed with the container — all data is gone</div>
+        <div class="correct">✅ D — <code>docker-compose down -v</code> explicitly removes named volumes, deleting persistent data</div>
+        <div class="wrong">❌ B — The writable layer is ephemeral; it's removed when the container is destroyed</div>
+        <div class="wrong">❌ C — This is true when volumes ARE configured, but the question says "WITHOUT volumes"</div>
+        <div class="wrong">❌ E — <code>EXPOSE</code> is about ports, not data persistence</div>
+        <p><strong>Key takeaway:</strong> Always use <code>volumes: mongo-data:/data/db</code> in production. Without it, <code>docker-compose down</code> destroys all data.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q6 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">6</span>
+      <span class="q-title">How should <code>env_file:</code> paths be specified in docker-compose.yml?</span>
+      <span class="q-type mcq">MCQ</span>
+    </div>
+    <div class="q-body">
+      <p>Select <strong>2</strong> correct answers:</p>
+      <ul class="mcq-options">
+        <li><span class="letter">A</span> <code>env_file: /home/user/project/db/.env</code> — absolute path</li>
+        <li><span class="letter">B</span> <code>env_file: ./db/some_env_file.env</code> — explicit relative path</li>
+        <li><span class="letter">C</span> <code>env_file: db/some_env_file.env</code> — implicit relative path</li>
+        <li><span class="letter">D</span> <code>env_file:</code> paths resolve relative to the user's home directory</li>
+        <li><span class="letter">E</span> <code>env_file:</code> paths resolve relative to the docker-compose.yml location</li>
+      </ul>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ B — Explicit relative path with <code>./</code> prefix, resolves from docker-compose.yml location</div>
+        <div class="correct">✅ E — All <code>env_file:</code> paths resolve relative to where docker-compose.yml is located</div>
+        <div class="wrong">❌ A — Absolute paths break portability; fails when cloned to another machine</div>
+        <div class="wrong">❌ C — This works but B is the preferred explicit form (C is also acceptable in practice)</div>
+        <div class="wrong">❌ D — Not the home directory; it's relative to docker-compose.yml</div>
+        <div class="note">⚠️ Note: C also works in practice. The exam emphasis is on "never use absolute paths" and understanding the resolution base.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q7 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">7</span>
+      <span class="q-title">Match each statement to the correct <code>.env</code> usage method</span>
+      <span class="q-type matrix">MATRIX</span>
+    </div>
+    <div class="q-body">
+      <p>Check the correct method for each statement:</p>
+      <table class="matrix-table" id="matrix-q7">
+        <thead>
+          <tr><th>Statement</th><th><code>env_file:</code></th><th><code>${VAR}</code></th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Injects variables into the container at runtime</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Resolves variables inside docker-compose.yml itself</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Flask reads credentials via <code>os.getenv()</code></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Used for <code>ports: "${PORT}:80"</code></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Must be listed in <code>.gitignore</code></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="revealMatrix('matrix-q7', [[true,false],[false,true],[true,false],[false,true],[true,true]], this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ <code>env_file:</code> injects all vars into the container's environment — Flask reads them with <code>os.getenv()</code></div>
+        <div class="correct">✅ <code>${VAR}</code> substitution resolves inside the compose file at parse time — used for port mappings, image tags, etc.</div>
+        <div class="correct">✅ Both methods typically source from <code>.env</code> files that contain secrets — both must be in <code>.gitignore</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q8 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">8</span>
+      <span class="q-title">Why can't Nginx reach MongoDB directly in the production configuration? Select TWO correct reasons.</span>
+      <span class="q-type mcq">MCQ</span>
+    </div>
+    <div class="q-body">
+      <p>Select <strong>2</strong> correct answers:</p>
+      <ul class="mcq-options">
+        <li><span class="letter">A</span> MongoDB's port 27017 is blocked by a firewall rule</li>
+        <li><span class="letter">B</span> Nginx is on <code>frontend</code> network only; MongoDB is on <code>backend</code> network only</li>
+        <li><span class="letter">C</span> Docker DNS only resolves service names within the same network</li>
+        <li><span class="letter">D</span> MongoDB has <code>EXPOSE 27017</code> which blocks external access</li>
+        <li><span class="letter">E</span> Nginx's <code>nginx.conf</code> explicitly blocks MongoDB connections</li>
+      </ul>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ B — They are on separate bridge networks with no overlap; true network isolation</div>
+        <div class="correct">✅ C — Docker embedded DNS only resolves service names for services sharing the same network. Nginx cannot resolve "mongodb" because they don't share a network.</div>
+        <div class="wrong">❌ A — There's no firewall rule; it's network segmentation via Docker bridge networks</div>
+        <div class="wrong">❌ D — <code>EXPOSE</code> is documentation only and doesn't block anything</div>
+        <div class="wrong">❌ E — The block happens at the Docker network layer, not in nginx.conf</div>
+        <p><strong>Security benefit:</strong> Even if Nginx is compromised, the attacker cannot directly reach MongoDB.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q9 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">9</span>
+      <span class="q-title">Where is each connection configured?</span>
+      <span class="q-type matrix">MATRIX</span>
+    </div>
+    <div class="q-body">
+      <p>Match each connection to where it is configured:</p>
+      <table class="matrix-table" id="matrix-q9">
+        <thead>
+          <tr><th>Connection</th><th>docker-compose.yml</th><th>nginx.conf</th><th>app.py</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Host → Nginx (<code>8080:80</code>)</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Nginx → Flask (<code>proxy_pass</code>)</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Flask → MongoDB (<code>MongoClient</code>)</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>Network segmentation (frontend/backend)</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+          <tr><td>MongoDB credentials (<code>MONGO_INITDB_*</code>)</td><td><span class="check">☐</span></td><td><span class="check">☐</span></td><td><span class="check">☐</span></td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="revealMatrix('matrix-q9', [[true,false,false],[false,true,false],[false,false,true],[true,false,false],[true,false,true]], this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ Host → Nginx: <code>ports: "8080:80"</code> in docker-compose.yml</div>
+        <div class="correct">✅ Nginx → Flask: <code>proxy_pass http://flask-app:5000</code> in nginx.conf</div>
+        <div class="correct">✅ Flask → MongoDB: <code>MongoClient("mongodb://mongodb:27017/")</code> in app.py</div>
+        <div class="correct">✅ Network segmentation: <code>networks:</code> section in docker-compose.yml</div>
+        <div class="correct">✅ MongoDB credentials: defined in docker-compose.yml via <code>environment:</code>/<code>.env</code>, AND read in app.py via <code>os.getenv()</code></div>
+        <p><strong>Key insight:</strong> Docker provides network segmentation and DNS. The actual connections are configured in application config files.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Q10 ===== -->
+  <div class="q-card">
+    <div class="q-header">
+      <span class="q-number">10</span>
+      <span class="q-title">In development, all ports are exposed. What are the security risks? Select THREE correct statements.</span>
+      <span class="q-type mcq">MCQ</span>
+    </div>
+    <div class="q-body">
+      <p>Select <strong>3</strong> correct answers:</p>
+      <ul class="mcq-options">
+        <li><span class="letter">A</span> Attackers can bypass Nginx and hit Flask directly at <code>localhost:5000</code></li>
+        <li><span class="letter">B</span> MongoDB is accessible directly at <code>localhost:27017</code> — skipping all auth layers</li>
+        <li><span class="letter">C</span> SSL termination, rate limiting, and auth headers configured in Nginx are bypassed</li>
+        <li><span class="letter">D</span> Docker DNS resolution stops working when ports are exposed</li>
+        <li><span class="letter">E</span> The frontend/backend network segmentation is completely removed</li>
+      </ul>
+      <button class="reveal-btn" onclick="reveal(this)">Show Answer</button>
+      <div class="explanation">
+        <h4>Explanation</h4>
+        <div class="correct">✅ A — With <code>ports: "5000:5000"</code>, Flask is directly reachable from the host, bypassing the reverse proxy</div>
+        <div class="correct">✅ B — With <code>ports: "27017:27017"</code>, anyone on the host can connect directly to MongoDB</div>
+        <div class="correct">✅ C — All Nginx-level protections (SSL, rate limits, auth headers, logging) are bypassed when services are accessed directly</div>
+        <div class="wrong">❌ D — DNS resolution works regardless of port exposure; it's a Docker network feature</div>
+        <div class="wrong">❌ E — Network segmentation remains intact; <code>ports:</code> adds host access but doesn't change internal network topology</div>
+        <p><strong>Key distinction:</strong> Exposing ports adds <em>additional</em> host access paths but doesn't change the internal Docker networking. Nginx still can't reach MongoDB directly.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- THEORY TAB                                                    -->
+<!-- ============================================================ -->
+<div id="theory" class="tab-content">
+
+  <!-- Chapter 1 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.1</span>
+      <h3>Architecture Overview — Three-Tier Stack</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+      <h4>The Stack</h4>
+      <p>The standard exam architecture is a three-tier web application using Docker Compose:</p>
+      <table class="t-table">
+        <tr><th>Service</th><th>Role</th><th>Image</th><th>Internal Port</th></tr>
+        <tr><td><span class="ok">Nginx</span></td><td>Reverse proxy — single entry point</td><td><code>nginx:alpine</code></td><td>80</td></tr>
+        <tr><td><span class="warn">Flask RESTX</span></td><td>API server — business logic</td><td>Custom (<code>python:3.9-slim</code>)</td><td>5000</td></tr>
+        <tr><td><span class="highlight">MongoDB</span></td><td>Database — persistent storage</td><td><code>mongo:6.0</code></td><td>27017</td></tr>
+      </table>
+      <h4>Traffic Flow</h4>
+<pre>User Browser → Host:8080 → Nginx:80 → Flask:5000 → MongoDB:27017
+                  ↑                ↑                ↑
+            docker-compose     nginx.conf       app.py
+              ports:          proxy_pass      MongoClient()</pre>
+      <p>Each hop is configured in a <strong>different file</strong>. Docker provides the network and DNS; the applications configure the connections.</p>
+    </div>
+  </div>
+
+  <!-- Chapter 2 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.2</span>
+      <h3>Ports — EXPOSE vs ports:</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+      <h4>Key Distinction</h4>
+      <table class="t-table">
+        <tr><th>Concept</th><th>Where</th><th>Effect</th></tr>
+        <tr><td><code>EXPOSE 80</code></td><td>Dockerfile</td><td>Documentation only — does NOT publish port to host</td></tr>
+        <tr><td><code>expose: ["5000"]</code></td><td>docker-compose.yml</td><td>Documentation only — same as EXPOSE</td></tr>
+        <tr><td><code>ports: "8080:80"</code></td><td>docker-compose.yml</td><td><strong>Actually maps</strong> host port 8080 → container port 80</td></tr>
+      </table>
+      <h4>Production vs Development</h4>
+      <table class="t-table">
+        <tr><th>Service</th><th>Production <code>ports:</code></th><th>Development <code>ports:</code></th></tr>
+        <tr><td>Nginx</td><td><code>"8080:80"</code> ✅</td><td><code>"8080:80"</code> ✅</td></tr>
+        <tr><td>Flask</td><td>❌ None</td><td><code>"5000:5000"</code></td></tr>
+        <tr><td>MongoDB</td><td>❌ None</td><td><code>"27017:27017"</code></td></tr>
+      </table>
+      <p><span class="warn">⚠️ Rule of thumb:</span> Only the entry-point service (Nginx) needs <code>ports:</code> in production. <code>EXPOSE</code> and <code>networks:</code> stay the same in both modes.</p>
+    </div>
+  </div>
+
+  <!-- Chapter 3 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.3</span>
+      <h3>Network Segmentation — Frontend & Backend</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+      <h4>Default vs Explicit Networks</h4>
+      <table class="t-table">
+        <tr><th>Approach</th><th>Result</th></tr>
+        <tr><td>No <code>networks:</code> defined</td><td>Docker creates ONE default network — all services can talk to each other</td></tr>
+        <tr><td>Explicit <code>networks:</code></td><td>You control which services can see each other — true segmentation</td></tr>
+      </table>
+      <h4>The Two-Network Pattern</h4>
+<pre>frontend (bridge)          backend (bridge)
+├── nginx       ✅         ├── flask-app    ✅
+└── flask-app   ✅         └── mongodb      ✅
+
+Nginx → MongoDB = ❌ BLOCKED (different networks)</pre>
+      <h4>Communication Matrix</h4>
+      <table class="t-table">
+        <tr><th>From → To</th><th>Flask</th><th>MongoDB</th><th>Nginx</th></tr>
+        <tr><td>Nginx</td><td><span class="ok">✅</span></td><td><span class="no">❌</span></td><td>—</td></tr>
+        <tr><td>Flask</td><td>—</td><td><span class="ok">✅</span></td><td><span class="ok">✅</span></td></tr>
+        <tr><td>MongoDB</td><td><span class="ok">✅</span></td><td>—</td><td><span class="no">❌</span></td></tr>
+      </table>
+      <h4>DNS Resolution</h4>
+      <p>Docker's embedded DNS only resolves service names <strong>within the same network</strong>. Nginx cannot resolve the hostname <code>mongodb</code> because they don't share a network. Flask can resolve both <code>nginx</code> and <code>mongodb</code> because it sits on both networks.</p>
+      <p><span class="ok">Security benefit:</span> Even if Nginx is compromised, the attacker cannot directly reach MongoDB.</p>
+    </div>
+  </div>
+
+  <!-- Chapter 4 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.4</span>
+      <h3>Environment Variables & .env Files</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+      <h4>Two Methods — Different Scopes</h4>
+      <table class="t-table">
+        <tr><th>Method</th><th>Syntax</th><th>Scope</th></tr>
+        <tr><td><code>env_file:</code></td><td><code>env_file: ./db/creds.env</code></td><td>Injects vars <strong>into the container</strong> at runtime</td></tr>
+        <tr><td><code>${VAR}</code> substitution</td><td><code>ports: "${PORT}:80"</code></td><td>Resolves <strong>inside docker-compose.yml</strong> at parse time</td></tr>
+      </table>
+      <h4>Path Rules</h4>
+      <p><code>env_file:</code> paths resolve <strong>relative to docker-compose.yml</strong> location. Never use absolute paths — they break portability.</p>
+<pre># ✅ Correct — relative path
+env_file:
+  - ./db/some_env_file.env
+
+# ❌ Wrong — absolute path, breaks on other machines
+env_file:
+  - /home/user/project/db/some_env_file.env</pre>
+      <h4>Example .env File</h4>
+<pre>MONGO_INITDB_ROOT_USERNAME=admin
+MONGO_INITDB_ROOT_PASSWORD=secretpass123
+MONGO_DB_NAME=myappdb
+NGINX_HOST_PORT=8080</pre>
+      <p><span class="warn">⚠️ Critical:</span> <code>.env</code> files must be in <code>.gitignore</code> — they contain secrets.</p>
+      <h4>How Flask Reads Credentials</h4>
+<pre>import os
+mongo_uri = "mongodb://{}:{}@{}:{}/".format(
+    os.getenv('MONGO_USER'),
+    os.getenv('MONGO_PASS'),
+    os.getenv('MONGO_HOST', 'mongodb'),
+    os.getenv('MONGO_PORT', '27017')
+)</pre>
+    </div>
+  </div>
+
+  <!-- Chapter 5 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.5</span>
+      <h3>Volumes & Data Persistence</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+      <h4>The Problem</h4>
+      <p>Containers are <strong>ephemeral</strong>. When a container is destroyed, its writable layer (and all data) is lost. For MongoDB, this means all database records disappear on <code>docker-compose down</code>.</p>
+      <h4>The Solution — Named Volumes</h4>
+<pre>services:
+  mongodb:
+    image: mongo:6.0
+    volumes:
+      - mongo-data:/data/db         # Database files
+      - mongo-config:/data/configdb # MongoDB configuration
+
+volumes:
+  mongo-data:
+  mongo-config:</pre>
+      <h4>Volume Lifecycle</h4>
+      <table class="t-table">
+        <tr><th>Command</th><th>Containers</th><th>Named Volumes</th></tr>
+        <tr><td><code>docker-compose down</code></td><td><span class="no">Destroyed</span></td><td><span class="ok">Preserved ✅</span></td></tr>
+        <tr><td><code>docker-compose down -v</code></td><td><span class="no">Destroyed</span></td><td><span class="no">Destroyed ❌</span></td></tr>
+        <tr><td><code>docker-compose stop</code></td><td><span class="ok">Stopped (kept)</span></td><td><span class="ok">Preserved ✅</span></td></tr>
+        <tr><td><code>docker-compose restart</code></td><td><span class="ok">Restarted</span></td><td><span class="ok">Preserved ✅</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Chapter 6 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.6</span>
+      <h3>Connection Configuration — Who Configures What</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+      <h4>Each Hop Is Configured in a Different Place</h4>
+      <table class="t-table">
+        <tr><th>Connection</th><th>Configured In</th><th>Network</th><th>How</th></tr>
+        <tr><td>Host → Nginx</td><td><code>docker-compose.yml</code></td><td>Host → frontend</td><td><code>ports: "8080:80"</code></td></tr>
+        <tr><td>Nginx → Flask</td><td><code>nginx.conf</code></td><td>frontend</td><td><code>proxy_pass http://flask-app:5000</code></td></tr>
+        <tr><td>Flask → MongoDB</td><td><code>app.py</code></td><td>backend</td><td><code>MongoClient("mongodb://mongodb:27017/")</code></td></tr>
+        <tr><td>Nginx → MongoDB</td><td>❌ BLOCKED</td><td>Not on same network</td><td>Cannot resolve hostname</td></tr>
+      </table>
+      <h4>Service Name = Hostname</h4>
+      <p>Docker Compose automatically creates DNS entries for each service. The <strong>service name</strong> in docker-compose.yml becomes the hostname on the Docker network:</p>
+<pre># docker-compose.yml service name → DNS hostname
+flask-app  → resolves to flask-app's container IP
+mongodb    → resolves to mongodb's container IP</pre>
+      <p>This is why <code>proxy_pass http://flask-app:5000</code> works — Docker DNS resolves <code>flask-app</code> to the correct container IP on the shared <code>frontend</code> network.</p>
+    </div>
+  </div>
+
+  <!-- Chapter 7 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.7</span>
+      <h3>Complete docker-compose.yml Reference</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+      <h4>Production Configuration</h4>
+<pre>version: '3.8'
+
+services:
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "${NGINX_HOST_PORT:-8080}:80"   # Only entry point
+    networks:
+      - frontend
+    depends_on:
+      - flask-app
+
+  flask-app:
+    build: ./flask-app
+    env_file:
+      - ./db/some_env_file.env          # Relative path, never absolute
+    environment:
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_DB: ${MONGO_DB_NAME}
+    expose:
+      - "5000"                          # Documentation only
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:6.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+    expose:
+      - "27017"                         # Documentation only
+    networks:
+      - backend
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  mongo-config:</pre>
+    </div>
+  </div>
+
+  <!-- Chapter 8 -->
+  <div class="theory-section">
+    <div class="theory-header" onclick="toggleTheory(this)">
+      <span class="chapter-num">CH.8</span>
+      <h3>Exam Quick-Recall Cheat Sheet</h3>
+      <span class="toggle-icon">+</span>
+    </div>
+    <div class="theory-body">
+<pre>EXPOSE             → documentation only, not real port mapping
+ports:             → actual host ↔ container mapping
+Only Nginx         → gets ports: in production
+frontend net       → Nginx ↔ Flask
+backend net        → Flask ↔ MongoDB
+Nginx → MongoDB    → BLOCKED (different networks)
+Flask              → bridges BOTH networks
+DNS resolution     → only within same network
+.env file          → secrets outside of code
+env_file:          → injects into container runtime
+env_file: path     → MUST be relative to docker-compose.yml
+${VAR}             → substitutes in compose file itself
+volumes:           → persist DB data across restarts
+down               → destroys containers, keeps volumes
+down -v            → destroys containers AND volumes
+.gitignore         → must include .env files
+Service name       → becomes DNS hostname on Docker network
+proxy_pass         → configured in nginx.conf
+MongoClient()      → configured in app.py
+Network isolation  → even if Nginx compromised, can't reach MongoDB</pre>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // === Tab switching ===
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+  }
+
+  // === MCQ reveal ===
+  let revealedCount = 0;
+  function reveal(btn) {
+    const expl = btn.nextElementSibling;
+    if (!expl.classList.contains('show')) {
+      expl.classList.add('show');
+      btn.textContent = 'Hide Answer';
+      revealedCount++;
+    } else {
+      expl.classList.remove('show');
+      btn.textContent = 'Show Answer';
+      revealedCount--;
+    }
+    document.getElementById('score-count').textContent = revealedCount;
+  }
+
+  // === Matrix reveal ===
+  function revealMatrix(tableId, answers, btn) {
+    const table = document.getElementById(tableId);
+    const expl = btn.nextElementSibling;
+    const rows = table.querySelectorAll('tbody tr');
+
+    if (!expl.classList.contains('show')) {
+      rows.forEach((row, ri) => {
+        const checks = row.querySelectorAll('.check');
+        checks.forEach((chk, ci) => {
+          if (answers[ri][ci]) {
+            chk.classList.add('is-correct');
+            chk.textContent = '✓';
+          } else {
+            chk.classList.add('is-wrong');
+            chk.textContent = '✗';
+          }
+        });
+      });
+      expl.classList.add('show');
+      btn.textContent = 'Hide Answer';
+      revealedCount++;
+    } else {
+      rows.forEach(row => {
+        row.querySelectorAll('.check').forEach(chk => {
+          chk.classList.remove('is-correct', 'is-wrong');
+          chk.textContent = '☐';
+        });
+      });
+      expl.classList.remove('show');
+      btn.textContent = 'Show Answer';
+      revealedCount--;
+    }
+    document.getElementById('score-count').textContent = revealedCount;
+  }
+
+  // === Reveal all ===
+  function revealAll() {
+    document.querySelectorAll('.reveal-btn').forEach(btn => {
+      const expl = btn.nextElementSibling;
+      if (!expl.classList.contains('show')) btn.click();
+    });
+  }
+
+  // === Theory accordion ===
+  function toggleTheory(header) {
+    const body = header.nextElementSibling;
+    const isOpen = body.classList.contains('open');
+    header.classList.toggle('open');
+    body.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>

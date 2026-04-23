@@ -618,10 +618,10 @@
                                     <span class="nav-item-text">Must Statement</span>
                                     <span class="nav-item-badge badge-soon">Soon</span>
                                 </div>
-                                <div class="nav-item disabled">
+                                <div class="nav-item" onclick="loadContent('when_statement.html', this)">
                                     <span class="nav-item-icon">📄</span>
                                     <span class="nav-item-text">When Statement</span>
-                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                    <span class="nav-item-badge badge-ready">Ready</span>
                                 </div>
                                 <div class="nav-item" onclick="loadContent('yang-when-must.html', this)">
                                     <span class="nav-item-icon">📐</span>
@@ -773,10 +773,10 @@
                                 <span class="chapter-title">Chapter 10, Docker</span>
                             </div>
                             <div class="chapter-items">
-                                <div class="nav-item disabled">
+                                <div class="nav-item" onclick="loadContent('Dockerfile.html', this)">
                                     <span class="nav-item-icon">📄</span>
                                     <span class="nav-item-text">Dockerfile</span>
-                                    <span class="nav-item-badge badge-soon">Soon</span>
+                                    <span class="nav-item-badge badge-ready">Ready</span>
                                 </div>
                             </div>
                         </div>
@@ -821,65 +821,6 @@
                     </div>
                 </div>
 
-                <!-- Quiz Section -->
-                <div class="nav-chapter">
-                    <div class="chapter-header" onclick="toggleChapter(this)">
-                        <span class="chapter-icon">
-                            <svg viewBox="0 0 16 16">
-                                <path d="M6 12L10 8 6 4z" />
-                            </svg>
-                        </span>
-                        <span class="chapter-title">Quiz Bank</span>
-                        <span class="chapter-badge" style="background: #f85149; color: #fff;">10</span>
-                        <!-- Need to update after adding every MCQ -->
-                    </div>
-                    <div class="chapter-items">
-                        <div class="nav-item" onclick="loadContent('git-workflows.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">Git Workflows (30 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('git-ops.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">Git Operations (20 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('git-cherry-pick.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">Cherry-Pick (20 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('git-merge-strategies.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">Merge Strategies (20 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('git-stash-sync-merge.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">Git-stash (20 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('yang-when-must.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">YANG when/must (20 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('netconf-operation.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">NETCONF Operations (17 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('xpath-operation.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">xPath Operations (13 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('restconf-operation.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">RESTCONF Operations (26 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('nx-os-api.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">NXOS API (9 MCQ)</span>
-                        </div>
-                        <div class="nav-item" onclick="loadContent('click.html', this)">
-                            <span class="nav-item-icon">💬</span>
-                            <span class="nav-item-text">Click Framework (5 MCQ)</span>
-                        </div>
-                    </div>
-                </div>
             </nav>
         </aside>
 
@@ -976,6 +917,18 @@
                                 <span class="meta-tag">Drag & Drop</span>
                             </div>
                         </div>
+                        <div class="guide-card" onclick="loadContentFromCard('when_statement.html')">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">📋</div>
+                                <div class="guide-card-title">YANG When Statement</div>
+                            </div>
+                            <div class="guide-card-desc">YANG when statement — conditional node visibility, XPath expressions, dependency chains.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">MCQ</span>
+                                <span class="meta-tag">Practice</span>
+                            </div>
+                        </div>
+
                         <div class="guide-card" onclick="loadContentFromCard('restconf-operation.html')">
                             <div class="guide-card-header">
                                 <div class="guide-card-icon">🌐</div>

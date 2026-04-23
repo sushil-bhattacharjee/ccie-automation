@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCIE Automation — YANG when Statement</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117; --surface: #161b22; --surface2: #1c2333; --border: #2a3142;
+    --text: #e0e4eb; --text-dim: #8b93a5; --accent: #58a6ff; --green: #3fb950;
+    --red: #f85149; --orange: #d29922; --yang-kw: #ff7b72; --yang-str: #a5d6ff;
+    --yang-type: #d2a8ff; --yang-comment: #6e7681;
+    --correct-bg: #122117; --correct-border: #238636;
+    --wrong-bg: #1c1214; --wrong-border: #da3633;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; line-height:1.65; padding:1.5rem 1rem; }
+  .container { max-width:980px; margin:0 auto; }
+
+  header { text-align:center; margin-bottom:1.5rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border); }
+  header h1 { font-size:1.5rem; font-weight:700; letter-spacing:-0.02em; margin-bottom:0.35rem; }
+  header .tag { display:inline-block; background:var(--surface2); border:1px solid var(--border); color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.65rem; border-radius:3px; margin-top:0.4rem; }
+
+  /* ---- TOP LEVEL TABS ---- */
+  .top-tabs { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:0; }
+  .top-tab { padding:0.7rem 1.5rem; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; color:var(--text-dim); background:transparent; border:none; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.15s; }
+  .top-tab:hover { color:var(--text); }
+  .top-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .tab-content { display:none; padding-top:2rem; }
+  .tab-content.active { display:block; }
+
+  /* ---- ACCORDION ---- */
+  .accordion-item { margin-bottom:0.75rem; }
+  .accordion-btn {
+    width:100%; text-align:left; background:var(--surface); border:1px solid var(--border);
+    border-radius:6px; padding:1rem 1.25rem; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:1rem; font-weight:600; cursor:pointer; display:flex; align-items:center;
+    justify-content:space-between; transition:all 0.15s;
+  }
+  .accordion-btn:hover { border-color:var(--accent); }
+  .accordion-btn.open { border-color:var(--accent); border-radius:6px 6px 0 0; }
+  .accordion-btn .arrow { transition:transform 0.2s; font-size:0.75rem; color:var(--accent); }
+  .accordion-btn.open .arrow { transform:rotate(180deg); }
+  .accordion-body {
+    display:none; background:var(--surface); border:1px solid var(--border); border-top:none;
+    border-radius:0 0 6px 6px; padding:1.75rem 2rem; overflow:hidden;
+  }
+  .accordion-body.open { display:block; }
+
+  /* ---- YANG BLOCK ---- */
+  .yang-block { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:1.25rem; margin-bottom:1.5rem; overflow-x:auto; position:relative; }
+  .yang-block .label, .payload-block .label { position:absolute; top:0; right:0; background:var(--surface2); border-left:1px solid var(--border); border-bottom:1px solid var(--border); border-radius:0 5px 0 4px; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--text-dim); padding:0.2rem 0.6rem; text-transform:uppercase; letter-spacing:0.05em; }
+  .yang-block pre { font-family:'JetBrains Mono',monospace; font-size:0.78rem; line-height:1.6; color:var(--text); white-space:pre; }
+  .kw { color:var(--yang-kw); font-weight:600; } .str { color:var(--yang-str); } .tp { color:var(--yang-type); } .cm { color:var(--yang-comment); font-style:italic; } .num { color:var(--orange); }
+
+  /* ---- PAYLOAD BLOCK ---- */
+  .payload-block { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:1.25rem; margin-bottom:1.25rem; overflow-x:auto; position:relative; }
+  .payload-block pre { font-family:'JetBrains Mono',monospace; font-size:0.76rem; line-height:1.55; color:var(--text); }
+  .jk { color:var(--accent); } .jv { color:var(--green); } .jn { color:var(--orange); }
+
+  /* ---- CLICKABLE PAYLOAD OPTIONS (Q1) ---- */
+  .payload-option { transition:all 0.15s; border:2px solid var(--border); cursor:pointer; }
+  .payload-option:hover:not(.locked) { border-color:var(--accent); }
+  .payload-option.selected { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent),0 0 20px rgba(88,166,255,0.1); }
+  .payload-option.selected .label { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+  .payload-option.correct-reveal { border-color:var(--correct-border); box-shadow:0 0 0 1px var(--correct-border); }
+  .payload-option.correct-reveal .label { background:var(--green); color:var(--bg); border-color:var(--green); }
+  .payload-option.wrong-reveal { border-color:var(--wrong-border); box-shadow:0 0 0 1px var(--wrong-border); }
+  .payload-option.wrong-reveal .label { background:var(--red); color:var(--bg); border-color:var(--red); }
+  .payload-option.locked { cursor:default !important; }
+
+  /* ---- MCQ OPTION BUTTONS (Q2) ---- */
+  .options-grid { display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1.5rem; }
+  .option-btn { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:1rem 1.25rem; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.88rem; cursor:pointer; text-align:left; transition:all 0.15s; display:flex; align-items:flex-start; gap:0.75rem; }
+  .option-btn:hover:not(.locked) { border-color:var(--accent); background:var(--surface2); }
+  .option-btn .letter { font-family:'JetBrains Mono',monospace; font-weight:600; font-size:0.8rem; min-width:22px; height:22px; border-radius:3px; display:flex; align-items:center; justify-content:center; background:var(--surface2); border:1px solid var(--border); flex-shrink:0; margin-top:1px; }
+  .option-btn.selected { border-color:var(--accent); background:rgba(88,166,255,0.08); }
+  .option-btn.selected .letter { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+  .option-btn.correct-reveal { border-color:var(--correct-border); background:var(--correct-bg); }
+  .option-btn.correct-reveal .letter { background:var(--green); color:var(--bg); border-color:var(--green); }
+  .option-btn.wrong-reveal { border-color:var(--wrong-border); background:var(--wrong-bg); }
+  .option-btn.wrong-reveal .letter { background:var(--red); color:var(--bg); border-color:var(--red); }
+  .option-btn.locked { cursor:default; }
+
+  /* ---- BUTTONS ---- */
+  .btn-row { display:flex; gap:0.75rem; flex-wrap:wrap; }
+  .submit-btn,.reset-btn { font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:600; padding:0.6rem 1.5rem; border-radius:5px; cursor:pointer; border:none; transition:all 0.15s; }
+  .submit-btn { background:var(--accent); color:var(--bg); }
+  .submit-btn:hover { opacity:0.85; }
+  .submit-btn:disabled { opacity:0.35; cursor:not-allowed; }
+  .reset-btn { background:transparent; color:var(--text-dim); border:1px solid var(--border); }
+  .reset-btn:hover { border-color:var(--text-dim); color:var(--text); }
+
+  .result-banner { margin-top:1.25rem; padding:0.85rem 1.25rem; border-radius:6px; font-weight:600; font-size:0.9rem; display:none; }
+  .result-banner.correct { background:var(--correct-bg); border:1px solid var(--correct-border); color:var(--green); display:block; }
+  .result-banner.wrong { background:var(--wrong-bg); border:1px solid var(--wrong-border); color:var(--red); display:block; }
+
+  .explanation { display:none; margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.5rem; }
+  .explanation.show { display:block; }
+  .explanation h3 { font-size:0.95rem; margin-bottom:1rem; color:var(--accent); }
+
+  .eval-table { width:100%; border-collapse:collapse; font-size:0.8rem; margin-bottom:1.25rem; }
+  .eval-table th { background:var(--bg); text-align:left; padding:0.5rem 0.75rem; border:1px solid var(--border); color:var(--text-dim); font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+  .eval-table td { padding:0.5rem 0.75rem; border:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+  .eval-table tr:nth-child(even) { background:rgba(255,255,255,0.02); }
+  .pass { color:var(--green); } .fail { color:var(--red); }
+
+  .explanation p { font-size:0.88rem; color:var(--text-dim); margin-bottom:0.75rem; line-height:1.6; }
+  .explanation p strong { color:var(--text); }
+  .exp-option { margin-bottom:1rem; padding:0.85rem 1rem; background:var(--bg); border:1px solid var(--border); border-radius:5px; }
+  .exp-option .exp-label { font-family:'JetBrains Mono',monospace; font-size:0.78rem; font-weight:600; margin-bottom:0.3rem; }
+  .exp-option .exp-label.is-correct { color:var(--green); }
+  .exp-option .exp-label.is-wrong { color:var(--red); }
+  .exp-option p { margin-bottom:0; font-size:0.82rem; }
+
+  .question-block { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:2rem; margin-bottom:2.5rem; }
+  .q-header { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; }
+  .q-number { background:var(--accent); color:var(--bg); font-weight:700; font-size:0.8rem; width:28px; height:28px; border-radius:4px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .q-title { font-size:1.05rem; font-weight:600; }
+  .q-instruction { color:var(--text-dim); font-size:0.88rem; margin-bottom:1.25rem; padding-left:0.5rem; border-left:2px solid var(--border); }
+
+  /* ---- THEORY STYLES ---- */
+  .theory-section { margin-bottom:1.5rem; }
+  .theory-section h3 { font-size:0.95rem; font-weight:700; margin:1.5rem 0 0.75rem; color:var(--text); }
+  .theory-section p { font-size:0.88rem; color:var(--text-dim); margin-bottom:0.75rem; line-height:1.7; }
+  .theory-section p strong { color:var(--text); }
+  .theory-section code { font-family:'JetBrains Mono',monospace; font-size:0.82rem; background:var(--bg); padding:0.15rem 0.4rem; border-radius:3px; color:var(--yang-kw); }
+  .theory-section ul { list-style:none; padding:0; margin-bottom:1rem; }
+  .theory-section ul li { font-size:0.85rem; color:var(--text-dim); padding:0.3rem 0 0.3rem 1.25rem; position:relative; }
+  .theory-section ul li::before { content:'→'; position:absolute; left:0; color:var(--accent); }
+
+  .verdict-card { padding:1rem 1.25rem; border-radius:6px; margin-bottom:1rem; border-left:3px solid; }
+  .verdict-card.correct-card { background:var(--correct-bg); border-left-color:var(--green); }
+  .verdict-card.wrong-card { background:var(--wrong-bg); border-left-color:var(--red); }
+  .verdict-card .verdict-title { font-family:'JetBrains Mono',monospace; font-size:0.82rem; font-weight:600; margin-bottom:0.35rem; }
+  .verdict-card.correct-card .verdict-title { color:var(--green); }
+  .verdict-card.wrong-card .verdict-title { color:var(--red); }
+  .verdict-card p { font-size:0.84rem; color:var(--text-dim); margin:0; line-height:1.6; }
+
+  .matrix-table { width:100%; border-collapse:collapse; font-size:0.8rem; margin:1rem 0 1.5rem; }
+  .matrix-table th { background:var(--surface2); text-align:center; padding:0.5rem; border:1px solid var(--border); color:var(--text-dim); font-family:'JetBrains Mono',monospace; font-size:0.72rem; }
+  .matrix-table th:first-child { text-align:left; }
+  .matrix-table td { text-align:center; padding:0.5rem; border:1px solid var(--border); font-family:'JetBrains Mono',monospace; font-size:0.8rem; }
+  .matrix-table td:first-child { text-align:left; color:var(--text); }
+
+  .strategy-box { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:1.25rem; margin-top:1rem; }
+  .strategy-box ol { padding-left:1.5rem; margin:0; }
+  .strategy-box ol li { font-size:0.85rem; color:var(--text-dim); padding:0.35rem 0; line-height:1.6; }
+  .strategy-box ol li strong { color:var(--text); }
+
+  .section-divider { border:none; border-top:1px solid var(--border); margin:2rem 0; }
+
+  @media (max-width:640px) { body{padding:1rem 0.5rem;} .question-block{padding:1.25rem;} .accordion-body{padding:1.25rem;} .yang-block pre,.payload-block pre{font-size:0.68rem;} .top-tab{padding:0.6rem 0.8rem;font-size:0.82rem;} }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>YANG <code style="color:var(--yang-kw)">when</code> Statement</h1>
+  <div class="tag">CCIE Automation / DevNet Expert</div>
+</header>
+
+<!-- ======== TOP LEVEL TABS ======== -->
+<div class="top-tabs">
+  <button class="top-tab active" data-tab="theory" onclick="switchTab(this)">Theory</button>
+  <button class="top-tab" data-tab="lab" onclick="switchTab(this)">Lab-Practice</button>
+</div>
+
+<!-- ================================================================ -->
+<!-- THEORY TAB -->
+<!-- ================================================================ -->
+<div class="tab-content active" id="tab-theory">
+
+  <!-- ACCORDION: BGP-NSO-SP -->
+  <div class="accordion-item">
+    <button class="accordion-btn" onclick="toggleAccordion(this)">
+      <span>BGP-NSO-SP</span>
+      <span class="arrow">▼</span>
+    </button>
+    <div class="accordion-body">
+
+      <div class="theory-section">
+        <h3>YANG Model</h3>
+        <div class="yang-block"><span class="label">bgp-peering.yang</span>
+<pre><span class="kw">module</span> bgp-peering {
+  <span class="kw">namespace</span> <span class="str">"http://example.com/bgp-peering"</span>;  <span class="kw">prefix</span> bp;
+  <span class="kw">import</span> ietf-inet-types { <span class="kw">prefix</span> inet; }
+
+  <span class="kw">list</span> bgp-peering {
+    <span class="kw">key</span> <span class="str">"name"</span>;
+    <span class="kw">leaf</span> name        { <span class="kw">type</span> <span class="tp">string</span>; }
+    <span class="kw">leaf</span> local-as    { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> remote-as   { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> neighbor-ip { <span class="kw">type</span> <span class="tp">inet:ipv4-address</span>; }
+
+    <span class="kw">leaf</span> peer-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> direct    { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> untrusted { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> transit   { <span class="kw">value</span> <span class="num">3</span>; }
+    } }
+
+    <span class="kw">leaf</span> as-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> customer { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> provider { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> peer     { <span class="kw">value</span> <span class="num">3</span>; }
+    } }
+
+    <span class="kw">leaf-list</span> allowed-ip-prefixes {
+      <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted'"</span>;              <span class="cm">// untrusted only</span>
+    }
+    <span class="kw">container</span> static-routes {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'direct' or ../peer-type = 'untrusted'"</span>;
+      <span class="kw">leaf-list</span> route { <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>; }
+    }
+    <span class="kw">container</span> static-filter {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted' and ../as-type = 'customer'"</span>;
+      <span class="kw">leaf-list</span> allowed-vlans { <span class="kw">type</span> <span class="tp">uint16</span>; }
+      <span class="kw">leaf</span> strict-rpf { <span class="kw">type</span> <span class="tp">boolean</span>; <span class="kw">default</span> true; }
+    }
+    <span class="kw">leaf</span> max-prefix {
+      <span class="kw">type</span> <span class="tp">uint32</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type != 'direct'"</span>;                <span class="cm">// NOT direct</span>
+    }
+    <span class="kw">leaf</span> import-policy {
+      <span class="kw">type</span> <span class="tp">string</span>;
+      <span class="kw">when</span> <span class="str">"../as-type = 'customer' or ../as-type = 'peer'"</span>;
+    }
+  }
+}</pre>
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="theory-section">
+        <h3>Q1 — Which payload is valid? (Answer + Explanation)</h3>
+
+        <p><strong>✅ Option A — untrusted + customer — CORRECT</strong></p>
+        <table class="eval-table">
+          <tr><th>Node</th><th>when condition</th><th>Eval</th><th>In Payload?</th><th>Verdict</th></tr>
+          <tr><td>allowed-ip-prefixes</td><td>peer-type = 'untrusted'</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>static-filter</td><td>untrusted AND customer</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>max-prefix</td><td>peer-type != 'direct'</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>import-policy</td><td>customer or peer</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+        </table>
+        <div class="verdict-card correct-card"><div class="verdict-title">✅ All five when conditions pass. No extra leaves. Payload is valid.</div></div>
+
+        <div class="verdict-card wrong-card"><div class="verdict-title">❌ Option B — Contains "negotiated-hold-time": 180</div><p>This leaf <strong>does not exist</strong> in the YANG model. Any unknown leaf in a RESTCONF payload is rejected. One unknown leaf = entire payload fails.</p><p><strong>Lesson:</strong> Always check if every key in the JSON exists in the YANG schema — not just the <code>when</code> conditions.</p></div>
+
+        <p><strong>❌ Option C — peer-type=direct</strong></p>
+        <table class="eval-table">
+          <tr><th>Node</th><th>when condition</th><th>Eval for direct+customer</th><th>In Payload?</th><th>Verdict</th></tr>
+          <tr><td>allowed-ip-prefixes</td><td>peer-type = 'untrusted'</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+          <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>static-filter</td><td>untrusted AND customer</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+          <tr><td>max-prefix</td><td>peer-type != 'direct'</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+          <tr><td>import-policy</td><td>customer or peer</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+        </table>
+        <div class="verdict-card wrong-card"><div class="verdict-title">❌ Three violations</div><p><code>direct</code> is the most restrictive peer-type. Only <code>static-routes</code> and <code>import-policy</code> (if customer/peer) survive.</p></div>
+
+        <p><strong>❌ Option D — as-type=provider</strong></p>
+        <table class="eval-table">
+          <tr><th>Node</th><th>when condition</th><th>Eval for untrusted+provider</th><th>In Payload?</th><th>Verdict</th></tr>
+          <tr><td>allowed-ip-prefixes</td><td>peer-type = 'untrusted'</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>static-filter</td><td>untrusted AND customer</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+          <tr><td>max-prefix</td><td>peer-type != 'direct'</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>import-policy</td><td>customer or peer</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+        </table>
+        <div class="verdict-card wrong-card"><div class="verdict-title">❌ Two violations</div><p><code>provider</code> kills both <code>static-filter</code> and <code>import-policy</code>.</p></div>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="theory-section">
+        <h3>Q2 — Fix the broken payload (Answer + Explanation)</h3>
+        <p>Payload uses <strong>peer-type=direct</strong> + <strong>as-type=customer</strong> but includes nodes that need <code>untrusted</code>.</p>
+
+        <table class="eval-table">
+          <tr><th>Node</th><th>when condition</th><th>Eval</th><th>In Payload?</th><th>Verdict</th></tr>
+          <tr><td>allowed-ip-prefixes</td><td>peer-type = 'untrusted'</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+          <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+          <tr><td>static-filter</td><td>untrusted AND customer</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+          <tr><td>max-prefix</td><td>peer-type != 'direct'</td><td class="fail">❌ FALSE</td><td>NO</td><td class="pass">✅ OK (absent)</td></tr>
+          <tr><td>import-policy</td><td>customer or peer</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+        </table>
+        <p><strong>Two violations:</strong> <code>allowed-ip-prefixes</code> and <code>static-filter</code> present but <code>when</code>=FALSE.</p>
+        <p><strong>Note:</strong> <code>max-prefix</code> also has <code>when</code>=FALSE but it's <strong>absent</strong> — correctly not a violation.</p>
+
+        <div class="verdict-card correct-card"><div class="verdict-title">✅ A — Remove allowed-ip-prefixes and static-filter</div><p>Directly removes both offending nodes. Remaining nodes valid for direct+customer.</p></div>
+        <div class="verdict-card wrong-card"><div class="verdict-title">❌ B — Remove static-routes</div><p>Already valid for <code>direct</code>. Removing a valid node doesn't fix actual violations.</p></div>
+        <div class="verdict-card correct-card"><div class="verdict-title">✅ C — Change peer-type to untrusted</div><p>All <code>when</code> conditions become TRUE for untrusted+customer. <code>max-prefix</code> absent is fine — <code>when=TRUE</code> means <strong>can</strong> exist, not <strong>must</strong>.</p></div>
+        <div class="verdict-card wrong-card"><div class="verdict-title">❌ D — Change as-type to provider</div><p>Makes it <strong>worse</strong> — 2 violations → 3. <code>import-policy</code> now also breaks.</p></div>
+        <div class="verdict-card wrong-card"><div class="verdict-title">❌ E — Remove import-policy</div><p>Already valid for <code>customer</code>. Doesn't fix anything.</p></div>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="theory-section">
+        <h3>Decision Matrix — What exists for each combo</h3>
+        <table class="matrix-table">
+          <tr><th>Node</th><th>direct+customer</th><th>direct+provider</th><th>untrusted+customer</th><th>untrusted+provider</th><th>transit+peer</th></tr>
+          <tr><td>allowed-ip-prefixes</td><td class="fail">✗</td><td class="fail">✗</td><td class="pass">✓</td><td class="pass">✓</td><td class="fail">✗</td></tr>
+          <tr><td>static-routes</td><td class="pass">✓</td><td class="pass">✓</td><td class="pass">✓</td><td class="pass">✓</td><td class="fail">✗</td></tr>
+          <tr><td>static-filter</td><td class="fail">✗</td><td class="fail">✗</td><td class="pass">✓</td><td class="fail">✗</td><td class="fail">✗</td></tr>
+          <tr><td>max-prefix</td><td class="fail">✗</td><td class="fail">✗</td><td class="pass">✓</td><td class="pass">✓</td><td class="pass">✓</td></tr>
+          <tr><td>import-policy</td><td class="pass">✓</td><td class="fail">✗</td><td class="pass">✓</td><td class="fail">✗</td><td class="pass">✓</td></tr>
+        </table>
+        <ul>
+          <li><code>static-filter</code> is the most restrictive — needs BOTH <code>untrusted</code> AND <code>customer</code></li>
+          <li><code>provider</code> kills both <code>static-filter</code> and <code>import-policy</code></li>
+          <li><code>direct</code> kills <code>allowed-ip-prefixes</code>, <code>static-filter</code>, and <code>max-prefix</code></li>
+          <li><code>untrusted+customer</code> is the most permissive — all five nodes allowed</li>
+          <li><code>transit</code> kills <code>allowed-ip-prefixes</code>, <code>static-routes</code>, and <code>static-filter</code></li>
+        </ul>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="theory-section">
+        <h3>Exam Strategy</h3>
+        <div class="strategy-box"><ol>
+          <li><strong>Read peer-type and as-type first</strong> — before looking at any nodes</li>
+          <li><strong>Walk every when statement</strong> — evaluate TRUE/FALSE for that specific combo</li>
+          <li><strong>Check presence vs absence</strong> — node present + when=FALSE = violation. Node absent + when=FALSE = OK.</li>
+          <li><strong>Watch for unknown leaves</strong> — any key not in the YANG model = instant fail (Option B trap)</li>
+          <li><strong>For "fix" questions</strong> — verify the fix doesn't break something else (Option D makes it worse)</li>
+        </ol></div>
+      </div>
+
+    </div><!-- /accordion-body -->
+  </div><!-- /accordion-item BGP-NSO-SP -->
+
+  <!-- future accordion items go here -->
+
+</div><!-- /tab-theory -->
+
+<!-- ================================================================ -->
+<!-- LAB-PRACTICE TAB (original MCQ — untouched) -->
+<!-- ================================================================ -->
+<div class="tab-content" id="tab-lab">
+
+<!-- QUESTION 1 -->
+<div class="question-block" id="q1-block">
+  <div class="q-header">
+    <div class="q-number">1</div>
+    <div class="q-title">Which JSON payload is a valid RESTCONF PATCH request?</div>
+  </div>
+  <p class="q-instruction">Given the NSO SP BGP peering YANG model below, examine the <code>when</code> conditions on each node. Only one payload has all conditional nodes correctly present or absent. Choose one.</p>
+
+  <div class="yang-block">
+    <span class="label">bgp-peering.yang</span>
+<pre><span class="kw">module</span> bgp-peering {
+  <span class="kw">namespace</span> <span class="str">"http://example.com/bgp-peering"</span>;
+  <span class="kw">prefix</span> bp;
+  <span class="kw">import</span> ietf-inet-types { <span class="kw">prefix</span> inet; }
+
+  <span class="kw">list</span> bgp-peering {
+    <span class="kw">key</span> <span class="str">"name"</span>;
+
+    <span class="kw">leaf</span> name        { <span class="kw">type</span> <span class="tp">string</span>; }
+    <span class="kw">leaf</span> local-as    { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> remote-as   { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> neighbor-ip { <span class="kw">type</span> <span class="tp">inet:ipv4-address</span>; }
+
+    <span class="kw">leaf</span> peer-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> direct    { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> untrusted { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> transit   { <span class="kw">value</span> <span class="num">3</span>; }
+      }
+    }
+
+    <span class="kw">leaf</span> as-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> customer { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> provider { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> peer     { <span class="kw">value</span> <span class="num">3</span>; }
+      }
+    }
+
+    <span class="kw">leaf-list</span> allowed-ip-prefixes {
+      <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted'"</span>;              <span class="cm">// untrusted only</span>
+    }
+
+    <span class="kw">container</span> static-routes {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'direct' or ../peer-type = 'untrusted'"</span>;
+
+      <span class="kw">leaf-list</span> route { <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>; }
+    }
+
+    <span class="kw">container</span> static-filter {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted' and ../as-type = 'customer'"</span>;
+
+      <span class="kw">leaf-list</span> allowed-vlans { <span class="kw">type</span> <span class="tp">uint16</span>; }
+      <span class="kw">leaf</span> strict-rpf { <span class="kw">type</span> <span class="tp">boolean</span>; <span class="kw">default</span> true; }
+    }
+
+    <span class="kw">leaf</span> max-prefix {
+      <span class="kw">type</span> <span class="tp">uint32</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type != 'direct'"</span>;                <span class="cm">// NOT direct</span>
+    }
+
+    <span class="kw">leaf</span> import-policy {
+      <span class="kw">type</span> <span class="tp">string</span>;
+      <span class="kw">when</span> <span class="str">"../as-type = 'customer' or ../as-type = 'peer'"</span>;
+    }
+  }
+}</pre>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:1rem;" id="q1-options">
+    <!-- Option A -->
+    <div class="payload-block payload-option" data-val="A" onclick="selectQ1(this)" style="flex:1; min-width:420px;">
+      <span class="label">Option A</span>
+<pre>{
+  <span class="jk">"bgp-peering:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"CE-WEST-01"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65101</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.1.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"untrusted"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"customer"</span>,
+    <span class="jk">"allowed-ip-prefixes"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>],
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>]
+    },
+    <span class="jk">"static-filter"</span>: {
+      <span class="jk">"allowed-vlans"</span>: [<span class="jn">100</span>,<span class="jn">200</span>,<span class="jn">300</span>],
+      <span class="jk">"strict-rpf"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"max-prefix"</span>: <span class="jn">1000</span>,
+    <span class="jk">"import-policy"</span>: <span class="jv">"CUST-IMPORT"</span>
+  }]
+}</pre>
+    </div>
+
+    <!-- Option B -->
+    <div class="payload-block payload-option" data-val="B" onclick="selectQ1(this)" style="flex:1; min-width:420px;">
+      <span class="label">Option B</span>
+<pre>{
+  <span class="jk">"bgp-peering:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"CE-WEST-01"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65101</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.1.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"untrusted"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"customer"</span>,
+    <span class="jk">"allowed-ip-prefixes"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>],
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>]
+    },
+    <span class="jk">"static-filter"</span>: {
+      <span class="jk">"allowed-vlans"</span>: [<span class="jn">100</span>,<span class="jn">200</span>,<span class="jn">300</span>],
+      <span class="jk">"strict-rpf"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"max-prefix"</span>: <span class="jn">1000</span>,
+    <span class="jk">"import-policy"</span>: <span class="jv">"CUST-IMPORT"</span>,
+    <span class="jk">"negotiated-hold-time"</span>: <span class="jn">180</span>
+  }]
+}</pre>
+    </div>
+
+    <!-- Option C -->
+    <div class="payload-block payload-option" data-val="C" onclick="selectQ1(this)" style="flex:1; min-width:420px;">
+      <span class="label">Option C</span>
+<pre>{
+  <span class="jk">"bgp-peering:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"CE-WEST-01"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65101</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.1.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"direct"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"customer"</span>,
+    <span class="jk">"allowed-ip-prefixes"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>],
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>]
+    },
+    <span class="jk">"static-filter"</span>: {
+      <span class="jk">"allowed-vlans"</span>: [<span class="jn">100</span>,<span class="jn">200</span>,<span class="jn">300</span>],
+      <span class="jk">"strict-rpf"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"max-prefix"</span>: <span class="jn">1000</span>,
+    <span class="jk">"import-policy"</span>: <span class="jv">"CUST-IMPORT"</span>
+  }]
+}</pre>
+    </div>
+
+    <!-- Option D -->
+    <div class="payload-block payload-option" data-val="D" onclick="selectQ1(this)" style="flex:1; min-width:420px;">
+      <span class="label">Option D</span>
+<pre>{
+  <span class="jk">"bgp-peering:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"CE-WEST-01"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65101</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.1.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"untrusted"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"provider"</span>,
+    <span class="jk">"allowed-ip-prefixes"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>],
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"10.10.0.0/16"</span>,<span class="jv">"10.20.0.0/16"</span>]
+    },
+    <span class="jk">"static-filter"</span>: {
+      <span class="jk">"allowed-vlans"</span>: [<span class="jn">100</span>,<span class="jn">200</span>,<span class="jn">300</span>],
+      <span class="jk">"strict-rpf"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"max-prefix"</span>: <span class="jn">1000</span>,
+    <span class="jk">"import-policy"</span>: <span class="jv">"CUST-IMPORT"</span>
+  }]
+}</pre>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="submit-btn" id="q1-submit" disabled onclick="submitQ1()">Check Answer</button>
+    <button class="reset-btn" onclick="resetQ1()">Reset</button>
+  </div>
+
+  <div class="result-banner" id="q1-result"></div>
+
+  <div class="explanation" id="q1-explanation">
+    <h3>Explanation</h3>
+    <p>Evaluate every <code>when</code> for <strong>each option's peer-type + as-type</strong>:</p>
+    <table class="eval-table">
+      <tr><th>Node</th><th>when condition</th><th>A: untrusted+customer</th><th>C: direct+customer</th><th>D: untrusted+provider</th></tr>
+      <tr><td>allowed-ip-prefixes</td><td>peer-type = 'untrusted'</td><td class="pass">✅ TRUE</td><td class="fail">❌ FALSE</td><td class="pass">✅ TRUE</td></tr>
+      <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅ TRUE</td><td class="pass">✅ TRUE</td><td class="pass">✅ TRUE</td></tr>
+      <tr><td>static-filter</td><td>untrusted AND customer</td><td class="pass">✅ TRUE</td><td class="fail">❌ FALSE</td><td class="fail">❌ FALSE</td></tr>
+      <tr><td>max-prefix</td><td>!= direct</td><td class="pass">✅ TRUE</td><td class="fail">❌ FALSE</td><td class="pass">✅ TRUE</td></tr>
+      <tr><td>import-policy</td><td>customer or peer</td><td class="pass">✅ TRUE</td><td class="pass">✅ TRUE</td><td class="fail">❌ FALSE</td></tr>
+    </table>
+    <div class="exp-option"><div class="exp-label is-correct">✅ A — All when conditions TRUE. No extra leaves.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ B — negotiated-hold-time does not exist in the YANG model</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ C — 3 violations for peer-type=direct</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ D — 2 violations for as-type=provider</div></div>
+  </div>
+</div>
+
+<!-- QUESTION 2 -->
+<div class="question-block" id="q2-block">
+  <div class="q-header">
+    <div class="q-number">2</div>
+    <div class="q-title">Fix the invalid payload — Choose TWO</div>
+  </div>
+  <p class="q-instruction">The following JSON payload returns an error when sent as a RESTCONF PATCH using the NSO SP BGP peering YANG model below. Choose <strong>two</strong> options that would <strong>independently</strong> fix the payload.</p>
+
+  <div class="yang-block">
+    <span class="label">bgp-peering.yang</span>
+<pre><span class="kw">module</span> bgp-peering {
+  <span class="kw">namespace</span> <span class="str">"http://example.com/bgp-peering"</span>;
+  <span class="kw">prefix</span> bp;
+  <span class="kw">import</span> ietf-inet-types { <span class="kw">prefix</span> inet; }
+
+  <span class="kw">list</span> bgp-peering {
+    <span class="kw">key</span> <span class="str">"name"</span>;
+
+    <span class="kw">leaf</span> name        { <span class="kw">type</span> <span class="tp">string</span>; }
+    <span class="kw">leaf</span> local-as    { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> remote-as   { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> neighbor-ip { <span class="kw">type</span> <span class="tp">inet:ipv4-address</span>; }
+
+    <span class="kw">leaf</span> peer-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> direct    { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> untrusted { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> transit   { <span class="kw">value</span> <span class="num">3</span>; }
+      }
+    }
+
+    <span class="kw">leaf</span> as-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> customer { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> provider { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> peer     { <span class="kw">value</span> <span class="num">3</span>; }
+      }
+    }
+
+    <span class="kw">leaf-list</span> allowed-ip-prefixes {
+      <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted'"</span>;
+    }
+
+    <span class="kw">container</span> static-routes {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'direct' or ../peer-type = 'untrusted'"</span>;
+
+      <span class="kw">leaf-list</span> route { <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>; }
+    }
+
+    <span class="kw">container</span> static-filter {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted' and ../as-type = 'customer'"</span>;
+
+      <span class="kw">leaf-list</span> allowed-vlans { <span class="kw">type</span> <span class="tp">uint16</span>; }
+      <span class="kw">leaf</span> strict-rpf { <span class="kw">type</span> <span class="tp">boolean</span>; <span class="kw">default</span> true; }
+    }
+
+    <span class="kw">leaf</span> max-prefix {
+      <span class="kw">type</span> <span class="tp">uint32</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type != 'direct'"</span>;
+    }
+
+    <span class="kw">leaf</span> import-policy {
+      <span class="kw">type</span> <span class="tp">string</span>;
+      <span class="kw">when</span> <span class="str">"../as-type = 'customer' or ../as-type = 'peer'"</span>;
+    }
+  }
+}</pre>
+  </div>
+
+  <div class="payload-block">
+    <span class="label">Invalid Payload</span>
+<pre>{
+  <span class="jk">"bgp-peering:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"CE-EAST-02"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65202</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.2.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"direct"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"customer"</span>,
+    <span class="jk">"allowed-ip-prefixes"</span>: [<span class="jv">"172.16.0.0/16"</span>,<span class="jv">"172.17.0.0/16"</span>],
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"172.16.0.0/16"</span>,<span class="jv">"172.17.0.0/16"</span>]
+    },
+    <span class="jk">"static-filter"</span>: {
+      <span class="jk">"allowed-vlans"</span>: [<span class="jn">100</span>,<span class="jn">200</span>],
+      <span class="jk">"strict-rpf"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"import-policy"</span>: <span class="jv">"CUST-IMPORT-V2"</span>
+  }]
+}</pre>
+  </div>
+
+  <div class="options-grid" id="q2-options">
+    <button class="option-btn" data-q="2" data-val="A" onclick="selectQ2(this)">
+      <span class="letter">A</span>
+      <span>Remove <code>allowed-ip-prefixes</code> and <code>static-filter</code> from the payload</span>
+    </button>
+    <button class="option-btn" data-q="2" data-val="B" onclick="selectQ2(this)">
+      <span class="letter">B</span>
+      <span>Remove <code>static-routes</code> from the payload</span>
+    </button>
+    <button class="option-btn" data-q="2" data-val="C" onclick="selectQ2(this)">
+      <span class="letter">C</span>
+      <span>Change <code>peer-type</code> from <code>direct</code> to <code>untrusted</code></span>
+    </button>
+    <button class="option-btn" data-q="2" data-val="D" onclick="selectQ2(this)">
+      <span class="letter">D</span>
+      <span>Change <code>as-type</code> from <code>customer</code> to <code>provider</code></span>
+    </button>
+    <button class="option-btn" data-q="2" data-val="E" onclick="selectQ2(this)">
+      <span class="letter">E</span>
+      <span>Remove <code>import-policy</code> from the payload</span>
+    </button>
+  </div>
+
+  <div class="btn-row">
+    <button class="submit-btn" id="q2-submit" disabled onclick="submitQ2()">Check Answer</button>
+    <button class="reset-btn" onclick="resetQ2()">Reset</button>
+  </div>
+
+  <div class="result-banner" id="q2-result"></div>
+
+  <div class="explanation" id="q2-explanation">
+    <h3>Explanation</h3>
+    <p>Current payload: <strong>peer-type=direct + as-type=customer</strong></p>
+    <table class="eval-table">
+      <tr><th>Node</th><th>when condition</th><th>Eval</th><th>In Payload?</th><th>Verdict</th></tr>
+      <tr><td>allowed-ip-prefixes</td><td>peer-type = 'untrusted'</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+      <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+      <tr><td>static-filter</td><td>untrusted AND customer</td><td class="fail">❌ FALSE</td><td>YES</td><td class="fail">⛔ INVALID</td></tr>
+      <tr><td>max-prefix</td><td>peer-type != 'direct'</td><td class="fail">❌ FALSE</td><td>NO</td><td class="pass">✅ OK (correctly absent)</td></tr>
+      <tr><td>import-policy</td><td>customer or peer</td><td class="pass">✅ TRUE</td><td>YES</td><td class="pass">✅ OK</td></tr>
+    </table>
+    <p><strong>Two violations:</strong> <code>allowed-ip-prefixes</code> and <code>static-filter</code> are present but their <code>when</code> is FALSE for <code>peer-type=direct</code>.</p>
+    <div class="exp-option"><div class="exp-label is-correct">✅ A — Removes both offending nodes. Remaining nodes valid for direct+customer.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ B — static-routes is already valid for direct. Doesn't fix anything.</div></div>
+    <div class="exp-option"><div class="exp-label is-correct">✅ C — Changing to untrusted makes all when conditions TRUE.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ D — Makes it worse: 2 violations → 3. import-policy also breaks.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ E — import-policy is already valid for customer. Doesn't fix anything.</div></div>
+  </div>
+</div>
+
+</div><!-- /tab-lab -->
+
+</div><!-- /container -->
+
+<script>
+// ---- TOP TABS ----
+function switchTab(btn) {
+  document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+}
+
+// ---- ACCORDION ----
+function toggleAccordion(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+
+// ---- Q1: Single select (payload cards) ----
+let q1Selected = null;
+let q1Locked = false;
+
+function selectQ1(el) {
+  if (q1Locked) return;
+  document.querySelectorAll('#q1-options .payload-option').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  q1Selected = el.dataset.val;
+  document.getElementById('q1-submit').disabled = false;
+}
+
+function submitQ1() {
+  if (q1Locked || !q1Selected) return;
+  q1Locked = true;
+
+  const correct = 'A';
+  const result = document.getElementById('q1-result');
+  const cards = document.querySelectorAll('#q1-options .payload-option');
+
+  cards.forEach(c => {
+    c.classList.add('locked');
+    if (c.dataset.val === correct) {
+      c.classList.add('correct-reveal');
+    } else if (c.classList.contains('selected')) {
+      c.classList.add('wrong-reveal');
+    }
+  });
+
+  if (q1Selected === correct) {
+    result.textContent = '✅ Correct!';
+    result.className = 'result-banner correct';
+  } else {
+    result.textContent = '❌ Wrong — Correct answer is A';
+    result.className = 'result-banner wrong';
+  }
+
+  document.getElementById('q1-explanation').classList.add('show');
+  document.getElementById('q1-submit').disabled = true;
+}
+
+function resetQ1() {
+  q1Selected = null;
+  q1Locked = false;
+  document.querySelectorAll('#q1-options .payload-option').forEach(c => {
+    c.classList.remove('selected', 'correct-reveal', 'wrong-reveal', 'locked');
+  });
+  document.getElementById('q1-result').className = 'result-banner';
+  document.getElementById('q1-result').textContent = '';
+  document.getElementById('q1-explanation').classList.remove('show');
+  document.getElementById('q1-submit').disabled = true;
+}
+
+// ---- Q2: Multi-select (exactly 2) ----
+let q2Selected = new Set();
+let q2Locked = false;
+
+function selectQ2(btn) {
+  if (q2Locked) return;
+  const val = btn.dataset.val;
+  if (q2Selected.has(val)) {
+    q2Selected.delete(val);
+    btn.classList.remove('selected');
+  } else {
+    if (q2Selected.size >= 2) {
+      const oldest = q2Selected.values().next().value;
+      q2Selected.delete(oldest);
+      document.querySelector(`#q2-options .option-btn[data-val="${oldest}"]`).classList.remove('selected');
+    }
+    q2Selected.add(val);
+    btn.classList.add('selected');
+  }
+  document.getElementById('q2-submit').disabled = q2Selected.size !== 2;
+}
+
+function submitQ2() {
+  if (q2Locked || q2Selected.size !== 2) return;
+  q2Locked = true;
+
+  const correctSet = new Set(['A', 'C']);
+  const result = document.getElementById('q2-result');
+  const btns = document.querySelectorAll('#q2-options .option-btn');
+
+  btns.forEach(b => {
+    b.classList.add('locked');
+    if (correctSet.has(b.dataset.val)) {
+      b.classList.add('correct-reveal');
+    } else if (b.classList.contains('selected')) {
+      b.classList.add('wrong-reveal');
+    }
+  });
+
+  const isCorrect = q2Selected.size === 2 && [...q2Selected].every(v => correctSet.has(v));
+  if (isCorrect) {
+    result.textContent = '✅ Correct! Both answers right.';
+    result.className = 'result-banner correct';
+  } else {
+    result.textContent = '❌ Wrong — Correct answers are A and C';
+    result.className = 'result-banner wrong';
+  }
+
+  document.getElementById('q2-explanation').classList.add('show');
+  document.getElementById('q2-submit').disabled = true;
+}
+
+function resetQ2() {
+  q2Selected = new Set();
+  q2Locked = false;
+  document.querySelectorAll('#q2-options .option-btn').forEach(b => {
+    b.classList.remove('selected', 'correct-reveal', 'wrong-reveal', 'locked');
+  });
+  document.getElementById('q2-result').className = 'result-banner';
+  document.getElementById('q2-result').textContent = '';
+  document.getElementById('q2-explanation').classList.remove('show');
+  document.getElementById('q2-submit').disabled = true;
+}
+</script>
+</body>
+</html>

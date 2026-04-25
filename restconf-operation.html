@@ -1,991 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RESTCONF Operations & ACL CRUD - DevNet Expert Study Guide</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0d1117; --bg-secondary: #161b22; --bg-tertiary: #21262d;
-            --text-primary: #e6edf3; --text-secondary: #8b949e;
-            --accent-blue: #58a6ff; --accent-green: #3fb950; --accent-red: #f85149;
-            --accent-orange: #d29922; --accent-purple: #a371f7; --accent-cyan: #39c5cf;
-            --accent-yellow: #f0e68c; --border-color: #30363d; --code-bg: #0d1117;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.7; }
-        .nav-container { position: fixed; top: 0; left: 0; right: 0; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); z-index: 1000; padding: 1rem 2rem; }
-        .nav-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .nav-title { font-size: 1.2rem; font-weight: 700; color: var(--accent-green); }
-        .nav-tabs { display: flex; gap: 0.5rem; align-items: center; }
-        .nav-tab { padding: 0.6rem 1.5rem; border: none; background: transparent; color: var(--text-secondary); font-family: inherit; font-size: 0.95rem; font-weight: 500; cursor: pointer; border-radius: 8px; transition: all 0.2s ease; text-decoration: none; }
-        .nav-tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-        .nav-tab.active { background: var(--accent-green); color: var(--bg-primary); }
-        .main-content { max-width: 1200px; margin: 0 auto; padding: 6rem 2rem 3rem; }
-        .section { display: none; } .section.active { display: block; }
-        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
-        h2 { font-size: 1.75rem; font-weight: 600; margin: 2.5rem 0 1rem; color: var(--accent-blue); padding-bottom: 0.5rem; border-bottom: 2px solid var(--border-color); }
-        h3 { font-size: 1.25rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--accent-purple); }
-        h4 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--accent-cyan); }
-        p { margin-bottom: 1rem; color: var(--text-secondary); }
-        .intro-text { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
-        pre { background: var(--code-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; overflow-x: auto; margin: 1rem 0; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; line-height: 1.5; white-space: pre; }
-        code { font-family: 'JetBrains Mono', monospace; background: var(--bg-tertiary); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
-        pre code { background: none; padding: 0; }
-        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
-        th, td { padding: 0.6rem 0.8rem; text-align: left; border: 1px solid var(--border-color); }
-        th { background: var(--bg-tertiary); font-weight: 600; color: var(--text-primary); }
-        td { background: var(--bg-secondary); color: var(--text-secondary); }
-        tr:hover td { background: var(--bg-tertiary); }
-        .tip-box { background: rgba(88,166,255,0.1); border: 1px solid var(--accent-blue); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-        .tip-box strong { color: var(--accent-blue); }
-        .warning-box { background: rgba(248,81,73,0.1); border: 1px solid var(--accent-red); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-        .warning-box strong { color: var(--accent-red); }
-        .golden-box { background: rgba(210,153,34,0.15); border: 2px solid var(--accent-orange); border-radius: 8px; padding: 1.25rem; margin: 1.5rem 0; }
-        .golden-box strong { color: var(--accent-orange); }
-        .success-box { background: rgba(63,185,80,0.1); border: 2px solid var(--accent-green); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-        .success-box strong { color: var(--accent-green); }
-        .fail-box { background: rgba(248,81,73,0.1); border: 2px solid var(--accent-red); border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-        .fail-box strong { color: var(--accent-red); }
-        .step-header { background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary)); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem 1.25rem; margin: 2rem 0 1rem; }
-        .step-header h3 { margin: 0; color: var(--accent-orange); }
-        ul, ol { margin: 0.5rem 0 1rem 1.5rem; color: var(--text-secondary); }
-        li { margin-bottom: 0.25rem; }
-        .check { color: var(--accent-green); } .cross { color: var(--accent-red); }
-        .comment { color: #3fb950; font-style: italic; }
-        details { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; margin: 0.5rem 0; padding: 0.75rem 1rem; }
-        summary { cursor: pointer; color: var(--accent-blue); font-weight: 600; font-size: 0.9rem; }
-        summary:hover { color: var(--accent-cyan); }
-
-        /* Quiz Styles */
-        .quiz-header { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .score-display { font-size: 1.25rem; font-weight: 600; }
-        .score-correct { color: var(--accent-green); } .score-total { color: var(--text-secondary); }
-        .quiz-controls { display: flex; gap: 0.75rem; }
-        .btn { padding: 0.6rem 1.25rem; border: none; border-radius: 8px; font-family: inherit; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; }
-        .btn-primary { background: var(--accent-blue); color: var(--bg-primary); }
-        .btn-primary:hover { background: #79b8ff; }
-        .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
-        .btn-secondary:hover { background: var(--border-color); }
-        .question-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
-        .question-card.answered-correct { border-color: var(--accent-green); }
-        .question-card.answered-incorrect { border-color: var(--accent-red); }
-        .question-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
-        .question-number { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); background: var(--bg-tertiary); padding: 0.25rem 0.75rem; border-radius: 20px; }
-        .question-type { font-size: 0.8rem; font-weight: 500; color: var(--accent-orange); }
-        .question-text { font-size: 1rem; font-weight: 500; color: var(--text-primary); margin-bottom: 1.25rem; line-height: 1.5; }
-        .question-text pre { font-size: 0.7rem; margin: 0.75rem 0; }
-        .options-list { display: flex; flex-direction: column; gap: 0.75rem; }
-        .option-item { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--bg-tertiary); border: 2px solid transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
-        .option-item:hover:not(.disabled) { background: var(--bg-primary); border-color: var(--border-color); }
-        .option-item.selected { border-color: var(--accent-blue); background: rgba(88,166,255,0.1); }
-        .option-item.correct { border-color: var(--accent-green); background: rgba(63,185,80,0.1); }
-        .option-item.incorrect { border-color: var(--accent-red); background: rgba(248,81,73,0.1); }
-        .option-item.disabled { cursor: default; }
-        .option-checkbox { min-width: 24px; height: 24px; border: 2px solid var(--border-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.75rem; font-weight: 600; }
-        .option-item.selected .option-checkbox { border-color: var(--accent-blue); background: var(--accent-blue); color: var(--bg-primary); }
-        .option-item.correct .option-checkbox { border-color: var(--accent-green); background: var(--accent-green); color: var(--bg-primary); }
-        .option-item.incorrect .option-checkbox { border-color: var(--accent-red); background: var(--accent-red); color: white; }
-        .option-text { flex: 1; color: var(--text-primary); font-size: 0.9rem; }
-        .option-text pre { font-size: 0.68rem; margin: 0.5rem 0 0; background: var(--bg-primary); padding: 0.5rem; border-radius: 6px; }
-        .submit-btn { margin-top: 1rem; width: 100%; padding: 0.75rem; background: var(--accent-blue); color: var(--bg-primary); border: none; border-radius: 8px; font-family: inherit; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .submit-btn:hover:not(:disabled) { background: #79b8ff; }
-        .submit-btn:disabled { background: var(--bg-tertiary); color: var(--text-secondary); cursor: not-allowed; }
-        .explanation { margin-top: 1rem; padding: 1rem; background: var(--bg-primary); border-radius: 8px; border-left: 4px solid var(--accent-blue); display: none; }
-        .explanation.show { display: block; }
-        .explanation-title { font-weight: 600; color: var(--accent-blue); margin-bottom: 0.5rem; }
-        .explanation-text { color: var(--text-secondary); font-size: 0.85rem; white-space: pre-wrap; }
-        .progress-bar { width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); border-radius: 4px; transition: width 0.3s ease; }
-
-
-        /* Block-fill question styles */
-        .block-container { display: flex; flex-direction: column; gap: 1.5rem; }
-        .block-section { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 10px; padding: 1rem 1.25rem; }
-        .block-title { font-size: 0.85rem; font-weight: 600; color: var(--accent-orange); margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .block-slots { display: flex; flex-direction: column; gap: 0.4rem; min-height: 40px; }
-        .block-slot { min-height: 38px; border: 2px dashed var(--border-color); border-radius: 6px; display: flex; align-items: center; padding: 0.4rem 0.75rem; font-size: 0.78rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s; }
-        .block-slot.drag-over { border-color: var(--accent-blue); background: rgba(88,166,255,0.05); }
-        .block-slot.filled { border-style: solid; border-color: var(--accent-purple); background: rgba(163,113,247,0.1); color: var(--text-primary); cursor: pointer; }
-        .block-slot.filled:hover { border-color: var(--accent-red); }
-        .block-slot.correct-slot { border-color: var(--accent-green); background: rgba(63,185,80,0.1); border-style: solid; }
-        .block-slot.wrong-slot { border-color: var(--accent-red); background: rgba(248,81,73,0.1); border-style: solid; }
-        .block-slot .slot-remove { margin-left: auto; color: var(--accent-red); font-size: 0.75rem; opacity: 0; transition: opacity 0.15s; }
-        .block-slot.filled:hover .slot-remove { opacity: 1; }
-        .cmd-pool { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 10px; margin-top: 0.5rem; }
-        .cmd-pool-title { font-size: 0.8rem; font-weight: 600; color: var(--accent-cyan); width: 100%; margin-bottom: 0.25rem; }
-        .cmd-chip { padding: 0.4rem 0.9rem; background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 6px; cursor: grab; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; user-select: none; transition: all 0.2s; white-space: nowrap; }
-        .cmd-chip:hover:not(.used) { border-color: var(--accent-blue); background: rgba(88,166,255,0.1); }
-        .cmd-chip.dragging { opacity: 0.4; }
-        .cmd-chip.used { opacity: 0.3; cursor: default; border-style: dashed; }
-
-        @media (max-width: 768px) {
-            .nav-content { flex-direction: column; gap: 1rem; }
-            .main-content { padding: 8rem 1rem 2rem; }
-            h1 { font-size: 1.75rem; }
-            .quiz-header { flex-direction: column; text-align: center; }
-            pre { font-size: 0.6rem; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RESTCONF Operations — IOS-XE ACL CRUD Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f7f7f5;--card:#fff;--text:#1a1a1a;--text2:#666;--text3:#999;--border:#e0e0de;--hover:#f0efeb;--sel:#e8e5ff;--sel-border:#7c6cef;--correct:#d4f5e5;--correct-border:#1d9e75;--correct-text:#085041;--wrong:#fde8e8;--wrong-border:#e24b4a;--wrong-text:#791f1f;--missed:#d4f5e5;--blue:#e8f1fb;--blue-text:#185fa5;--purple:#ece8ff;--purple-text:#534ab7;--code-bg:#f0efeb;--tree-hl:#fff3cd;--tree-hl-text:#856404;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono','SF Mono',monospace}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--card:#242424;--text:#e8e6df;--text2:#a0a0a0;--text3:#707070;--border:#333;--hover:#2a2a2a;--sel:#2d2854;--sel-border:#7c6cef;--correct:#0a3d2e;--correct-border:#1d9e75;--correct-text:#9fe1cb;--wrong:#3d1515;--wrong-border:#e24b4a;--wrong-text:#f7c1c1;--missed:#0a3d2e;--blue:#0a2a4a;--blue-text:#85b7eb;--purple:#2d2854;--purple-text:#b0a4f0;--code-bg:#2c2c2a;--tree-hl:#3d3510;--tree-hl-text:#f0d861}}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6}
+.exam{max-width:800px;margin:0 auto;padding:1.5rem 1rem;min-height:100vh}
+.exam-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.exam-title{font-size:1.2rem;font-weight:600;margin-bottom:0.25rem}
+.exam-sub{font-size:0.8rem;color:var(--text2)}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:1.25rem;position:sticky;top:0.5rem;z-index:10}
+.top-left{display:flex;align-items:center;gap:12px}
+.score-box{display:flex;align-items:baseline;gap:4px}
+.score-num{font-size:1.3rem;font-weight:600}
+.score-den{font-size:0.8rem;color:var(--text3)}
+.progress-track{width:180px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-bar{height:100%;background:var(--correct-border);border-radius:3px;transition:width 0.4s ease}
+.top-right{font-size:0.8rem;color:var(--text2)}
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.q-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.q-num{font-size:0.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em}
+.q-tag{font-size:0.65rem;font-weight:600;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em}
+.tag-single{background:var(--blue);color:var(--blue-text)}
+.tag-multi{background:var(--purple);color:var(--purple-text)}
+.q-text{font-size:0.95rem;font-weight:500;line-height:1.55;margin-bottom:10px}
+.q-scenario{font-size:0.78rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:10px;white-space:pre-wrap;line-height:1.55;border-left:3px solid var(--border)}
+.yang-tree{font-size:0.72rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:14px;white-space:pre;line-height:1.6;overflow-x:auto;border-left:3px solid var(--sel-border)}
+.yang-tree .hl{background:var(--tree-hl);color:var(--tree-hl-text);padding:1px 4px;border-radius:3px;font-weight:500}
+.yang-label{font-size:0.65rem;font-weight:600;color:var(--sel-border);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.options{display:flex;flex-direction:column;gap:10px}
+.option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.15s;background:transparent}
+.option:hover:not(.locked){border-color:var(--sel-border);background:var(--hover)}
+.option.selected{border-color:var(--sel-border);background:var(--sel)}
+.option.correct{border-color:var(--correct-border);background:var(--correct);cursor:default}
+.option.wrong{border-color:var(--wrong-border);background:var(--wrong);cursor:default}
+.option.missed{border-color:var(--correct-border);background:var(--missed);opacity:0.7;cursor:default}
+.option.locked{cursor:default}
+.radio{width:20px;height:20px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.radio.checkbox{border-radius:4px}
+.option.selected .radio{border-color:var(--sel-border)}
+.option.selected .radio::after{content:'';width:10px;height:10px;background:var(--sel-border);border-radius:50%;display:block}
+.option.selected .radio.checkbox::after{border-radius:2px}
+.option.correct .radio{border-color:var(--correct-border)}
+.option.correct .radio::after{content:'';width:10px;height:10px;background:var(--correct-border);border-radius:50%;display:block}
+.option.correct .radio.checkbox::after{border-radius:2px}
+.option.wrong .radio{border-color:var(--wrong-border)}
+.option.wrong .radio::after{content:'';width:10px;height:10px;background:var(--wrong-border);border-radius:50%;display:block}
+.option.wrong .radio.checkbox::after{border-radius:2px}
+.option.missed .radio{border-color:var(--correct-border)}
+.opt-content{flex:1;min-width:0}
+.opt-label{font-size:0.85rem;font-weight:500;line-height:1.5;margin-bottom:2px}
+.curl-wrap{position:relative;margin-top:8px;background:var(--code-bg);border-radius:8px;padding:10px 12px;padding-right:56px;overflow-x:auto}
+.curl-code{font-family:var(--mono);font-size:0.7rem;line-height:1.55;white-space:pre;color:var(--text2)}
+.copy-btn{position:absolute;top:8px;right:8px;font-size:0.65rem;font-family:var(--font);padding:3px 10px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--text3);cursor:pointer;transition:all 0.15s}
+.copy-btn:hover{color:var(--text);background:var(--hover)}
+.actions{display:flex;gap:10px;margin-top:14px}
+.btn{padding:9px 22px;border-radius:8px;font-size:0.82rem;font-family:var(--font);font-weight:500;cursor:pointer;transition:all 0.15s;border:none}
+.btn-submit{background:var(--sel-border);color:#fff}
+.btn-submit:hover{opacity:0.9}
+.btn-submit:disabled{opacity:0.35;cursor:default}
+.explanation{margin-top:14px;padding:14px;background:var(--code-bg);border-radius:8px;border-left:3px solid var(--correct-border);display:none;font-size:0.82rem;color:var(--text2);line-height:1.7}
+.explanation strong{color:var(--text);font-weight:500}
+.exp-tree{font-family:var(--mono);font-size:0.72rem;display:block;margin:8px 0;line-height:1.5;white-space:pre}
+</style>
 </head>
 <body>
-    <nav class="nav-container">
-        <div class="nav-content">
-            <div class="nav-title">🌐 RESTCONF Operations & ACL CRUD - DevNet Expert</div>
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
-                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
-            </div>
-        </div>
-    </nav>
-    <main class="main-content">
-        <section id="learn" class="section active">
-            <h1>RESTCONF Operations & ACL CRUD</h1>
-            <p class="intro-text">Master RESTCONF CRUD operations (GET, POST, PUT, PATCH, DELETE), URI construction rules, payload structure, and RFC 8040 compliance for the CCIE DevNet Expert exam.</p>
+<div class="exam">
+<div class="exam-header">
+<div class="exam-title">IOS-XE ACL CRUD operations</div>
+<div class="exam-sub">Cisco-IOS-XE-native &middot; RFC 8040 &middot; Standard + Extended &middot; 18 questions</div>
+</div>
+<div class="top-bar">
+<div class="top-left">
+<div class="score-box"><span class="score-num" id="sc">0</span><span class="score-den" id="sden">/ 18 correct</span></div>
+<div class="progress-track"><div class="progress-bar" id="pb"></div></div>
+</div>
+<div class="top-right" id="prog">0 of 18 answered</div>
+</div>
+<div id="qs"></div>
+</div>
+<script>
+const H="192.168.89.71",U="expert",P="1234QWer!",B=`https://${H}/restconf/data/Cisco-IOS-XE-native:native`;
+const Q=[
+// ══════════════════════════════════════════════════════════
+// Q1 — POST create new standard ACL
+// ══════════════════════════════════════════════════════════
+{q:"You want to CREATE a new standard ACL 'TEST-ACL' using POST. Which curl is correct?",
+s:"Method: POST\nTarget: create standard=TEST-ACL",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=TEST-ACL
+            ├── name
+            └── access-list-seq-rule`,
+m:false,
+opts:[
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list/standard=TEST-ACL" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"name":"TEST-ACL"}'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{
+    "Cisco-IOS-XE-native:standard": [
+      {"name": "TEST-ACL"}
+    ]
+  }'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"name":"TEST-ACL"}'`},
+{l:"",c:`curl -sk -X POST "${B}" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{
+    "ip": {
+      "access-list": {
+        "standard": [{"name":"TEST-ACL"}]
+      }
+    }
+  }'`}
+],ans:[1],exp:`<strong>POST = "Create a new child under this parent"</strong><span class="exp-tree">/native/ip/access-list/standard=TEST-ACL\n   ↑    ↑       ↑            ↑\n root folder folder       THE FILE\n                ↑\n        POST URI here (parent)</span>URI → PARENT (one level up). Payload MUST wrap with child YANG list name (module-qualified: <code>Cisco-IOS-XE-native:standard</code>). A targets the object itself — POST can't. C has no wrapper — server doesn't know what to create. D targets native — POST must go to the <em>direct</em> parent, not an ancestor (that's PATCH territory).`},
 
-            <!-- YANG Reference -->
-            <h2>📋 YANG Model Reference</h2>
-            <table>
-                <thead><tr><th>Module</th><th>Namespace</th><th>Prefix</th></tr></thead>
-                <tbody>
-                    <tr><td><code>Cisco-IOS-XE-native.yang</code></td><td><code>http://cisco.com/ns/yang/Cisco-IOS-XE-native</code></td><td><code>ios</code></td></tr>
-                    <tr><td><code>Cisco-IOS-XE-acl.yang</code></td><td><code>http://cisco.com/ns/yang/Cisco-IOS-XE-acl</code></td><td><code>ios-acl</code></td></tr>
-                </tbody>
-            </table>
-            <div class="tip-box">
-                <strong>💡 JSON Payload Prefixes:</strong><br>
-                Container path: <code>Cisco-IOS-XE-native:native/ip/access-list</code><br>
-                ACL lists: <code>Cisco-IOS-XE-acl:standard</code>, <code>Cisco-IOS-XE-acl:extended</code>
-            </div>
+// ══════════════════════════════════════════════════════════
+// Q2 — PUT replace e2-restconf-15
+// ══════════════════════════════════════════════════════════
+{q:"You want to REPLACE e2-restconf-15 entirely using PUT. Which payload is correct?",
+s:"Method: PUT\nURI: .../ip/access-list/standard=e2-restconf-15",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=e2-restconf-15
+            ├── name
+            └── access-list-seq-rule`,
+m:false,
+opts:[
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=e2-restconf-15" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"standard":[{"name":"e2-restconf-15","access-list-seq-rule":[]}]}'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=e2-restconf-15" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{
+    "name": "e2-restconf-15",
+    "access-list-seq-rule": [
+      {"sequence":"15","permit":{"std-ace":{"host":"10.10.10.15"}}}
+    ]
+  }'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"standard":[{"name":"e2-restconf-15","access-list-seq-rule":[]}]}'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=e2-restconf-15" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"access-list":{"standard":[{"name":"e2-restconf-15"}]}}'`}
+],ans:[1],exp:`<strong>PUT = "Place this thing exactly here"</strong><span class="exp-tree">/native/ip/access-list/standard=e2-restconf-15\n                              ↑\n                     PUT URI here (target)\n                     payload = just attributes</span>URI → THE OBJECT itself. Payload = just the entry's attributes, NO wrapping. A double-wraps (<code>/standard/standard</code>). C targets parent — would replace ALL standard ACLs. D wraps with access-list which the URI already covers.`},
 
-            <!-- ACL CRUD Brief -->
-            <h2>⚡ ACL CRUD Brief</h2>
-            <div class="golden-box">
-                <strong>GET</strong> — can operate URI with list without key / list with key / container<br>
-                <strong>POST</strong> — only container in URI and list with <em>new</em> key in the payload<br>
-                <strong>PUT</strong> — URI and payload must be same, 201 for new resource and 204 if replaced<br>
-                <strong>PATCH</strong> — URI and payload must be same, 204 for new or replaced<br>
-                <strong>DELETE</strong> — can be container or list <em>must be with key</em>
-            </div>
+// ══════════════════════════════════════════════════════════
+// Q3 — PATCH ACE on extended ACL
+// ══════════════════════════════════════════════════════════
+{q:"You PATCH sequence 10 of extended ACL challenge-207-pod-10 to change action to deny. Which curl succeeds?",
+s:"Method: PATCH to specific ACE\nURI: .../extended=challenge-207-pod-10/access-list-seq-rule=10",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── extended=challenge-207-pod-10
+            └── access-list-seq-rule=10
+                ├── sequence
+                └── ace-rule
+                    ├── action
+                    └── protocol`,
+m:false,
+opts:[
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/extended=challenge-207-pod-10/access-list-seq-rule=10" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{
+    "sequence": "10",
+    "ace-rule": {
+      "action": "deny",
+      "protocol": "tcp"
+    }
+  }'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/extended=challenge-207-pod-10/access-list-seq-rule=10" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"access-list-seq-rule":[{"sequence":"10","ace-rule":{"action":"deny"}}]}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/extended=challenge-207-pod-10/access-list-seq-rule=10" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"extended":[{"name":"challenge-207-pod-10","access-list-seq-rule":[{"sequence":"10"}]}]}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/extended=challenge-207-pod-10/access-list-seq-rule/10" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{"sequence":"10","ace-rule":{"action":"deny"}}'`}
+],ans:[0],exp:`<strong>PATCH to target = bare attributes.</strong> B wraps access-list-seq-rule → double path (<code>.../access-list-seq-rule/access-list-seq-rule</code>). C wraps two extra levels. D uses <code>/10</code> as a path segment instead of the RFC 8040 list-key syntax <code>=10</code> → 404. The list key goes <em>after</em> <code>=</code>, never as a separate path segment.`},
 
-            <!-- YANG Tree -->
-            <h2>🌳 YANG Tree — Extended ACL</h2>
-<pre>module: Cisco-IOS-XE-native
-  +--rw native
-     +--rw ip
-        +--rw access-list
-           +--rw ios-acl:extended* [name]
-              +--rw ios-acl:name                    ext-acl-type       &larr; KEY
-              +--rw ios-acl:access-list-seq-rule* [sequence]
-                 +--rw ios-acl:sequence    acl-sequence               &larr; KEY
-                 +--rw ios-acl:ace-rule
-                    +--rw ios-acl:action?                    acl-action
-                    +--rw ios-acl:protocol?                  protocol-type
-                    +--rw (ios-acl:source)?
-                    |  +--:(any-source)       &rarr; &lt;any/&gt;
-                    |  +--:(host-source)      &rarr; &lt;host-address&gt;
-                    |  +--:(network-source)   &rarr; &lt;ipv4-address&gt; + &lt;mask&gt;
-                    +--rw (ios-acl:src-port-match)?
-                    |  +--:(src-equal)   &rarr; &lt;src-eq&gt;
-                    |  +--:(src-gt)      &rarr; &lt;src-gt&gt;
-                    |  +--:(src-lt)      &rarr; &lt;src-lt&gt;
-                    +--rw (ios-acl:destination)?
-                    |  +--:(any-destination)      &rarr; &lt;dst-any/&gt;
-                    |  +--:(host-destination)     &rarr; &lt;dst-host-address&gt;
-                    |  +--:(network-destination)  &rarr; &lt;dest-ipv4-address&gt; + &lt;dest-mask&gt;
-                    +--rw (ios-acl:dst-port-match)?
-                       +--:(dst-equal)   &rarr; &lt;dst-eq&gt;
-                       +--:(dst-gt)      &rarr; &lt;dst-gt&gt;
-                       +--:(dst-lt)      &rarr; &lt;dst-lt&gt;</pre>
+// ══════════════════════════════════════════════════════════
+// Q4 — Multi-resource in ONE request
+// ══════════════════════════════════════════════════════════
+{q:"Which can CREATE a new standard ACL 'NEW-ACL' AND modify seq 35 of e2-restconf-15 in ONE request? (select correct answers)",
+s:"Goal: single request for both new ACL creation + existing ACL modification\nNEW-ACL doesn't exist. e2-restconf-15 exists.",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        ├── standard=NEW-ACL           ← create this
+        └── standard=e2-restconf-15    ← modify seq 35 here`,
+m:true,
+opts:[
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{
+    "Cisco-IOS-XE-native:standard": [
+      {"name": "NEW-ACL", "access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"any":[null]}}}]},
+      {"name": "e2-restconf-15", "access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}
+    ]
+  }'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{
+    "Cisco-IOS-XE-native:standard": [
+      {"name": "NEW-ACL", "access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"any":[null]}}}]},
+      {"name": "e2-restconf-15", "access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}
+    ]
+  }'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list" -H 'content-type: application/yang-data+json' -u ${U}:'${P}' -d '{...same...}'`},
+{l:"",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' \\
+  -d '{
+    "ip":{"access-list":{"standard":[
+      {"name":"NEW-ACL","access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"any":[null]}}}]},
+      {"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}
+    ]}}
+  }'`},
+{l:"",c:`# Request 1\ncurl -sk -X POST "${B}/ip/access-list" ... (create NEW-ACL)\n# Request 2\ncurl -sk -X PATCH "${B}/ip/access-list/standard=e2-restconf-15" ... (modify seq 35)`},
+{l:"Not possible in any single request",c:""}
+],ans:[1,3],exp:`<strong>PATCH at the common ancestor works.</strong> POST fails because e2-restconf-15 already exists → 409. PUT to access-list would REPLACE all standard ACLs, wiping SNMP-ACL entirely. <em>Both B (PATCH to access-list) and D (PATCH to native)</em> work — PATCH merges at any level. E works but is two requests, not one.`},
 
-            <h3>Prefix to JSON Mapping</h3>
-            <table>
-                <thead><tr><th>YANG Tree Prefix</th><th>JSON Payload Prefix</th></tr></thead>
-                <tbody>
-                    <tr><td><code>native</code></td><td><code>Cisco-IOS-XE-native:native</code></td></tr>
-                    <tr><td><code>ios-acl:standard</code></td><td><code>Cisco-IOS-XE-acl:standard</code></td></tr>
-                    <tr><td><code>ios-acl:extended</code></td><td><code>Cisco-IOS-XE-acl:extended</code></td></tr>
-                </tbody>
-            </table>
+// ══════════════════════════════════════════════════════════
+// Q5 — Update only seq 35 safely
+// ══════════════════════════════════════════════════════════
+{q:"e2-restconf-15 has seq 15, 35, 45. Which safely change ONLY seq 35 without touching 15 and 45? (select correct answers)",
+s:"Existing ACEs: seq 15 permit 10.10.10.15, seq 35 permit 5.35.35.35, seq 45 permit any\nGoal: change seq 35 to permit 100.35.35.35, keep 15 and 45.",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=e2-restconf-15
+            ├── sequence=15    ← keep
+            ├── sequence=35    ← change to 100.35.35.35
+            └── sequence=45    ← keep`,
+m:true,
+opts:[
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/standard=e2-restconf-15/access-list-seq-rule=35" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=e2-restconf-15/access-list-seq-rule=35" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/standard=e2-restconf-15" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=e2-restconf-15" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}'`}
+],ans:[0,1,2],exp:`<strong>A, B, C — each leaves seq 15 and 45 intact.</strong> A (PATCH to ACE) and B (PUT to ACE) target only sequence=35, so other ACEs are untouched. C (PATCH to parent) merges — unmentioned list entries are preserved. D (PUT to parent) <em>replaces the entire ACL</em> — seq 15 and 45 get wiped because they're not in the body. This is the #1 trap: PUT replaces, PATCH merges, and the URI scope decides what gets replaced.`},
 
-            <!-- TEST CASES -->
-            <h2>🧪 Test Cases — RESTCONF CRUD on IOS-XE 17.5</h2>
-            <p>All tests run against Cisco Catalyst 8000V (17.5) — the mandated platform for DevNet Expert exam.</p>
+// ══════════════════════════════════════════════════════════
+// Q6 — DELETE two ACLs
+// ══════════════════════════════════════════════════════════
+{q:"DELETE e2-restconf-15 AND exam2-netconf-create-16. Minimum curl requests needed?",
+s:"Goal: remove both ACLs completely\ne2-restconf-15 is standard, exam2-netconf-create-16 is extended",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        ├── standard=e2-restconf-15
+        └── extended=exam2-netconf-create-16`,
+m:false,
+opts:[
+{l:"",c:`curl -sk -X DELETE "${B}" -u ${U}:'${P}'`},
+{l:"",c:`# Request 1\ncurl -sk -X DELETE "${B}/ip/access-list/standard=e2-restconf-15" -u ${U}:'${P}'\n\n# Request 2\ncurl -sk -X DELETE "${B}/ip/access-list/extended=exam2-netconf-create-16" -u ${U}:'${P}'`},
+{l:"",c:`curl -sk -X DELETE "${B}" -u ${U}:'${P}' \\
+  -d '{"ip":{"access-list":{...}}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list" -H 'content-type: application/yang-data+json' \\
+  -u ${U}:'${P}' -d '{"standard":[{"name":"e2-restconf-15"}],"extended":[{"name":"exam2-netconf-create-16"}]}'`},
+{l:"",c:`curl -sk -X DELETE "${B}/ip/access-list" -u ${U}:'${P}'`}
+],ans:[1],exp:`<strong>DELETE = no payload, URI = what gets deleted.</strong> A deletes the ENTIRE native tree (catastrophic). C is invalid — DELETE doesn't accept a body. D is a PATCH merge and doesn't remove anything (to remove via PATCH you'd need YANG-Patch with operation "delete"). E deletes <em>all</em> ACLs including SNMP-ACL and challenge-207-pod-10. Two separate targeted DELETEs is the safe answer.`},
 
-            <!-- TEST-1: GET -->
-            <div class="step-header"><h3>TEST-1: GET — list in URI without key</h3></div>
-<pre>curl -i -k -X GET \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended' \
-  --header 'Accept: application/yang-data+json' \
-  --header 'Content-Type: application/yang-data+json' \
-  --header 'Authorization: Basic ZXhwZXJ0OjEyMzRRV2VyIQ=='</pre>
-            <details>
-                <summary>✅ RESULT: GET works for list with or without key and container</summary>
-<pre>{
-  "Cisco-IOS-XE-acl:extended": [
+// ══════════════════════════════════════════════════════════
+// Q7 — PATCH creates non-existent
+// ══════════════════════════════════════════════════════════
+{q:"PATCH creates a new standard ACL 'NEW-ACL' even though it doesn't exist. Why no 404?",
+s:"NEW-ACL does NOT exist.\nPATCH returns 204 No Content (success).",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=NEW-ACL   ← does NOT exist
+            ├── name
+            └── access-list-seq-rule`,
+m:false,
+opts:[
+{l:"Bug — PATCH shouldn't create. Use POST instead",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"NEW-ACL"}]}'`},
+{l:"RFC 8040: RESTCONF PATCH = NETCONF merge (creates if missing, updates if exists)",c:`curl -sk -X PATCH "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"NEW-ACL"}]}'`},
+{l:"Works because wrapping with standard acts like POST",c:`curl -sk -X PATCH "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"NEW-ACL"}]}'`},
+{l:"Works because PATCH at native level auto-creates all containers",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"ip":{"access-list":{"standard":[{"name":"NEW-ACL"}]}}}'`},
+{l:"PATCH silently converts to PUT when resource is missing",c:""},
+{l:"PATCH and POST are identical in RESTCONF",c:""}
+],ans:[1],exp:`<strong>RFC 8040: RESTCONF PATCH = NETCONF edit-config with merge operation.</strong> Merge creates missing resources AND updates existing ones. Not a bug (A). Not the same as POST (C/F) — POST returns 409 if resource exists; PATCH doesn't. Not "auto-container creation" (D) — it's the merge semantic. No silent conversion to PUT (E); PUT and PATCH behave differently (PUT replaces, PATCH merges).`},
+
+// ══════════════════════════════════════════════════════════
+// Q8 — PATCH wrapping levels from native
+// ══════════════════════════════════════════════════════════
+{q:"PATCH to native to add an ACE to e2-restconf-15. Which wrapping level is correct?",
+s:"PATCH /restconf/data/Cisco-IOS-XE-native:native\nGoal: add seq 50 permit host 50.50.50.50 to e2-restconf-15",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=e2-restconf-15
+            └── access-list-seq-rule`,
+m:false,
+opts:[
+{l:"",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"sequence":"50","permit":{"std-ace":{"host":"50.50.50.50"}}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"access-list":{"standard":[{"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"50","permit":{"std-ace":{"host":"50.50.50.50"}}}]}]}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"ip":{"access-list":{"standard":{"access-list-seq-rule":[{"sequence":"50"}]}}}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{
+    "ip": {
+      "access-list": {
+        "standard": [
+          {
+            "name": "e2-restconf-15",
+            "access-list-seq-rule": [
+              {"sequence":"50","permit":{"std-ace":{"host":"50.50.50.50"}}}
+            ]
+          }
+        ]
+      }
+    }
+  }'`}
+],ans:[3],exp:`<strong>PATCH = "Merge this data into whatever I point at"</strong><span class="exp-tree">/native/ ip / access-list / standard=e2-restconf-15 / seq-rule\n   ↑     ↑       ↑                ↑                      ↑\n  URI  payload payload          payload                payload\n       level 1 level 2          level 3                level 4</span>Payload fills the ENTIRE gap. A has no path — server doesn't know where. B skips <code>ip</code>. C skips the list key (<code>name</code>) — <code>standard</code> is a YANG list, entries need <code>name</code> to identify. D correctly threads through every level including the list key.`},
+
+// ══════════════════════════════════════════════════════════
+// Q9 — Content-type (6 options)
+// ══════════════════════════════════════════════════════════
+{q:"Which content-type headers work on IOS-XE RESTCONF? (select correct answers)",
+s:"PATCH /restconf/data/Cisco-IOS-XE-native:native\nContent-Type: ???",
+t:`(no YANG tree — header question)`,
+m:true,
+opts:[
+{l:"application/yang-data+json",c:""},
+{l:"application/yang.data+json",c:""},
+{l:"application/json",c:""},
+{l:"application/yang-data+xml",c:""},
+{l:"application/yang+json",c:""},
+{l:"text/json",c:""}
+],ans:[0,3],exp:`IOS-XE uses the RFC 8040 <strong>HYPHEN form</strong> (yang-data). The DOT form (yang.data) is NX-OS 9.3 only — it's rejected on IOS-XE. <code>application/json</code> is generic HTTP and is not RESTCONF media type (often rejected for write ops). E is missing <code>-data</code>. F is not a RESTCONF media type. <em>Remember: IOS-XE = hyphen; NX-OS 9.3 = dot.</em>`},
+
+// ══════════════════════════════════════════════════════════
+// Q10 — NEW-ACL doesn't exist (6 options, select 4)
+// ══════════════════════════════════════════════════════════
+{q:"NEW-ACL does NOT exist. Which curls create it successfully? (select correct answers)",
+s:"standard=NEW-ACL does NOT exist on the router.",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        ├── standard=SNMP-ACL        ← exists
+        ├── standard=e2-restconf-15  ← exists
+        └── standard=NEW-ACL         ← does NOT exist`,
+m:true,
+opts:[
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"NEW-ACL"}]}'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=NEW-ACL" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"NEW-ACL","access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"any":[null]}}}]}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/standard=NEW-ACL" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"NEW-ACL"}'`},
+{l:"",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"ip":{"access-list":{"standard":[{"name":"NEW-ACL"}]}}}'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list/standard=NEW-ACL" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"NEW-ACL"}'`},
+{l:"",c:`curl -sk -X DELETE "${B}/ip/access-list/standard=NEW-ACL" -u ${U}:'${P}'\ncurl -sk -X POST "${B}/ip/access-list" -u ${U}:'${P}' -d '...'`}
+],ans:[0,1,2,3],exp:`<strong>A, B, C, D all work</strong> when the resource doesn't exist. POST creates (parent, wrapped with module prefix). PUT creates/replaces (target, bare). PATCH merges which = creates if missing. E fails — POST can't target the object itself, it must go to the parent. F is wrong: you can't DELETE a resource that doesn't exist (returns 404), and it's unnecessary anyway. <em>Compare with the next question!</em>`},
+
+// ══════════════════════════════════════════════════════════
+// Q11 — e2-restconf-15 ALREADY exists (6 options, select 4)
+// ══════════════════════════════════════════════════════════
+{q:"e2-restconf-15 ALREADY EXISTS (seq 15, 35, 45). Which modify seq 35 to 'permit 100.35.35.35' without error? (select correct answers)",
+s:"Existing: standard=e2-restconf-15 with seq 15, 35, 45\nGoal: change seq 35 from 5.35.35.35 to 100.35.35.35, keep 15 and 45",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=e2-restconf-15   ← ALREADY EXISTS
+            ├── sequence=15 (host 10.10.10.15)
+            ├── sequence=35 (host 5.35.35.35)    ← change to 100.35.35.35
+            └── sequence=45 (any)`,
+m:true,
+opts:[
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"e2-restconf-15"}]}'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=e2-restconf-15/access-list-seq-rule=35" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/standard=e2-restconf-15/access-list-seq-rule=35" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/standard=e2-restconf-15" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}]}'`},
+{l:"",c:`curl -sk -X PUT "${B}/ip/access-list/standard=e2-restconf-15" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"host":"100.35.35.35"}}}]}'`}
+],ans:[1,2,3,4],exp:`<strong>POST fails with 409</strong> — resource exists; POST = create-only. A fails. F (PUT to parent with only seq 35) also fails the goal — it <em>replaces</em> the entire ACL with only seq 35, wiping 15 and 45. B (PUT to the ACE) replaces only that ACE, leaving 15 and 45 alone. C, D, E (all PATCH variants) merge safely — PATCH works at any URI level and preserves unmentioned entries. <em>Compare with Q10 — same methods, different results because the resource exists now.</em>`},
+
+// ══════════════════════════════════════════════════════════
+// Q12 — Three changes one request (6 options)
+// ══════════════════════════════════════════════════════════
+{q:"Create new standard 'NEW-ACL', add seq 50 to e2-restconf-15, AND modify seq 10 of challenge-207-pod-10 — all in ONE request. Which curl?",
+s:"3 changes in 1 request.\nNEW-ACL doesn't exist. e2-restconf-15 and challenge-207-pod-10 exist.",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        ├── standard=NEW-ACL                   ← create
+        ├── standard=e2-restconf-15            ← add seq 50
+        └── extended=challenge-207-pod-10      ← modify seq 10`,
+m:false,
+opts:[
+{l:"",c:`curl -sk -X POST "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"ip":{"access-list":{"standard":[...],"extended":[...]}}}'`},
+{l:"",c:`curl -sk -X PATCH "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{
+    "ip": {
+      "access-list": {
+        "standard": [
+          {"name":"NEW-ACL","access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"any":[null]}}}]},
+          {"name":"e2-restconf-15","access-list-seq-rule":[{"sequence":"50","permit":{"std-ace":{"host":"50.50.50.50"}}}]}
+        ],
+        "extended": [
+          {"name":"challenge-207-pod-10","access-list-seq-rule":[{"sequence":"10","ace-rule":{"action":"deny","protocol":"tcp"}}]}
+        ]
+      }
+    }
+  }'`},
+{l:"Not possible — max 2 objects per PATCH",c:""},
+{l:"",c:`curl -sk -X PUT "${B}" -H 'content-type: application/yang-data+json' -u ${U}:'${P}' -d '{...}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list/extended=challenge-207-pod-10" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"challenge-207-pod-10","access-list-seq-rule":[{"sequence":"10","ace-rule":{"action":"deny"}}]}'`},
+{l:"",c:`curl -sk -X PATCH "${B}/ip/access-list" ... (create NEW-ACL)\ncurl -sk -X PATCH "${B}/ip/access-list/standard=e2-restconf-15/access-list-seq-rule=50" ...\ncurl -sk -X PATCH "${B}/ip/access-list/extended=challenge-207-pod-10/access-list-seq-rule=10" ...`}
+],ans:[1],exp:`<strong>PATCH to native — one request, full tree.</strong> POST fails → 409 because native exists. No "max 2 objects" limit on PATCH payload. PUT to native would <em>replace the entire router config</em> with just the ACL tree. E only modifies challenge-207-pod-10 and misses the other two changes. F works but is 3 requests, not 1. PATCH-at-root is the canonical way to bundle unrelated changes atomically.`},
+
+// ══════════════════════════════════════════════════════════
+// Q13 — PATCH payloads for given URI
+// ══════════════════════════════════════════════════════════
+{q:"Given this PATCH URI, which payloads are valid? (select correct answers)",
+s:"PATCH /restconf/data/.../extended=challenge-207-pod-10/access-list-seq-rule=10\nGoal: change action to deny, add dst-port-operator eq, dst-port-number 80",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── extended=challenge-207-pod-10
+            └── access-list-seq-rule=10
+                ├── sequence
+                └── ace-rule`,
+m:true,
+opts:[
+{l:"",c:`{"sequence":"10","ace-rule":{"action":"deny","dst-port-operator":"eq","dst-port-number":"80"}}`},
+{l:"",c:`{"access-list-seq-rule":[{"sequence":"10","ace-rule":{"action":"deny"}}]}`},
+{l:"",c:`{"extended":[{"name":"challenge-207-pod-10","access-list-seq-rule":[{"sequence":"10","ace-rule":{"action":"deny"}}]}]}`},
+{l:"",c:`{"ace-rule":{"action":"deny","dst-port-operator":"eq","dst-port-number":"80"}}`},
+{l:"",c:`{"ip":{"access-list":{"extended":[{"name":"challenge-207-pod-10","access-list-seq-rule":[{"sequence":"10","ace-rule":{"action":"deny"}}]}]}}}`}
+],ans:[0],exp:`<strong>URI already points to access-list-seq-rule=10 — payload = just attributes.</strong><span class="exp-tree">URI covers:    .../access-list-seq-rule=10\nPayload needs: just the entry's direct children</span>B wraps access-list-seq-rule (double path). C wraps two extra levels. D missing the list key — RFC 8040 requires the key in body to match the URI. E wraps four extra levels. Every wrapper is a level the URI already covers — each causes unknown-element error.`},
+
+// ══════════════════════════════════════════════════════════
+// Q14 — PUT payloads for given URI
+// ══════════════════════════════════════════════════════════
+{q:"Given this PUT URI, which payloads are valid? (select correct answers)",
+s:"PUT /restconf/data/.../standard=NEW-ACL\nGoal: create or replace NEW-ACL with a single ACE permit host 10.0.0.1",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=NEW-ACL
+            ├── name
+            └── access-list-seq-rule`,
+m:true,
+opts:[
+{l:"",c:`{"name":"NEW-ACL","access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"host":"10.0.0.1"}}}]}`},
+{l:"",c:`{"standard":[{"name":"NEW-ACL","access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"host":"10.0.0.1"}}}]}]}`},
+{l:"",c:`{"access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"host":"10.0.0.1"}}}]}`},
+{l:"",c:`{"access-list":{"standard":[{"name":"NEW-ACL","access-list-seq-rule":[{"sequence":"10"}]}]}}`},
+{l:"",c:`{"ip":{"access-list":{"standard":[{"name":"NEW-ACL","access-list-seq-rule":[{"sequence":"10"}]}]}}}`}
+],ans:[0],exp:`<strong>PUT = "Place this thing exactly here" — URI points to target, payload = bare attributes.</strong><span class="exp-tree">URI:     .../standard=NEW-ACL  ← already says WHICH object\nPayload: just attributes       ← says WHAT goes inside</span>B wraps with standard (double path → <code>/standard/standard</code>). C missing the list key <code>name</code> — PUT replaces entirely, and without the key the resource identity is broken. D and E wrap with levels the URI already covers.`},
+
+// ══════════════════════════════════════════════════════════
+// Q15 — POST payloads for given URI
+// ══════════════════════════════════════════════════════════
+{q:"Given this POST URI, which payloads are valid? (select correct answers)",
+s:"POST /restconf/data/.../ip/access-list\nGoal: create a new standard ACL named 'WEB-ACL'",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=WEB-ACL
+            ├── name
+            └── access-list-seq-rule`,
+m:true,
+opts:[
+{l:"",c:`{"Cisco-IOS-XE-native:standard":[{"name":"WEB-ACL","access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"any":[null]}}}]}]}`},
+{l:"",c:`{"name":"WEB-ACL","access-list-seq-rule":[{"sequence":"10","permit":{"std-ace":{"any":[null]}}}]}`},
+{l:"",c:`{"access-list":{"standard":[{"name":"WEB-ACL"}]}}`},
+{l:"",c:`{"Cisco-IOS-XE-native:extended":[{"name":"WEB-ACL"}]}`},
+{l:"",c:`{"Cisco-IOS-XE-native:standard":{"name":"WEB-ACL"}}`}
+],ans:[0],exp:`<strong>POST = "Create a new child under this parent" — payload MUST wrap with child's YANG list name.</strong><span class="exp-tree">URI:     .../access-list       ← PARENT\nPayload: {"Cisco-IOS-XE-native:standard":[...]}  ← tells server WHICH child list</span>B has no wrapper — server doesn't know what to create. C wraps with access-list which the URI already covers. D uses the wrong list name (extended ≠ standard). E uses object instead of array — YANG lists MUST be arrays in JSON. <em>Extra trap:</em> the module prefix <code>Cisco-IOS-XE-native:</code> is required when the data is at a module boundary in a POST body.`},
+
+// ══════════════════════════════════════════════════════════
+// Q16 — All valid method+URI+payload for SNMP-ACL
+// ══════════════════════════════════════════════════════════
+{q:"Which are VALID method + URI + payload combinations for SNMP-ACL? (select correct answers)",
+s:"Target: standard=SNMP-ACL under /ip/access-list/\nSNMP-ACL exists. All combinations must be syntactically correct.",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── standard=SNMP-ACL
+            ├── name: "SNMP-ACL"
+            └── access-list-seq-rule
+                ├── sequence=10 (permit 192.168.89.0 0.0.0.255)
+                └── sequence=20 (deny any log)`,
+m:true,
+opts:[
+{l:'GET  .../standard=SNMP-ACL → no payload',c:""},
+{l:'DELETE  .../standard=SNMP-ACL → no payload',c:""},
+{l:'PUT  .../standard=SNMP-ACL → {"name":"SNMP-ACL","access-list-seq-rule":[...]}',c:""},
+{l:'POST  .../access-list → {"Cisco-IOS-XE-native:standard":[{"name":"SNMP-ACL",...}]}',c:""},
+{l:'PATCH  .../standard=SNMP-ACL → {"name":"SNMP-ACL","access-list-seq-rule":[...]}',c:""},
+{l:'PATCH  .../access-list → {"Cisco-IOS-XE-native:standard":[{"name":"SNMP-ACL",...}]}',c:""},
+{l:'PATCH  .../native → {"ip":{"access-list":{"standard":[{"name":"SNMP-ACL",...}]}}}',c:""},
+{l:'POST  .../standard=SNMP-ACL → {"name":"SNMP-ACL"}',c:""},
+{l:'PUT  .../access-list → {"standard":[{"name":"SNMP-ACL"}]}',c:""},
+{l:'GET  .../standard=SNMP-ACL → {"name":"SNMP-ACL"}',c:""},
+{l:'DELETE  .../access-list → no payload',c:""}
+],ans:[0,1,2,3,4,5,6],exp:`<strong>First 7 are all syntactically correct — each follows its method's rules:</strong><span class="exp-tree">GET/DELETE → target, no payload              ✓ A, B\nPUT        → target, bare attributes          ✓ C\nPOST       → parent, wrapped (module-qual.)   ✓ D\nPATCH      → target (bare)                    ✓ E\nPATCH      → parent (wrapped)                 ✓ F\nPATCH      → native (full tree)               ✓ G</span>H fails — POST can't target the object itself, must go to parent. I fails — PUT must target the object, not the parent. J fails — GET has no payload. K would delete ALL standard ACLs (SNMP-ACL and e2-restconf-15), not just SNMP-ACL. <em>Note about D (POST on existing):</em> syntactically valid but semantically would return 409 since SNMP-ACL exists — the question asks about syntactic validity.`},
+
+// ══════════════════════════════════════════════════════════
+// Q17 — POST scenarios — which work
+// ══════════════════════════════════════════════════════════
+{q:"Which POST requests succeed without error? (select correct answers)",
+s:"Router state:\n- standard NEW-ACL does NOT exist\n- standard e2-restconf-15 EXISTS (seq 15, 35, 45 present; seq 99 absent)\n- extended challenge-207-pod-10 EXISTS (seq 10, 20 present; seq 5 absent)\n- extended exam2-netconf-create-16 EXISTS (seq 16 present)",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        ├── standard=NEW-ACL              ← does NOT exist
+        ├── standard=e2-restconf-15       ← exists
+        │   ├── sequence=35               ← exists
+        │   └── sequence=99               ← does NOT exist
+        ├── extended=challenge-207-pod-10 ← exists
+        │   └── sequence=5                ← does NOT exist
+        └── extended=exam2-netconf-create-16  ← exists
+            └── sequence=16               ← exists`,
+m:true,
+opts:[
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"NEW-ACL"}]}'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:standard":[{"name":"e2-restconf-15"}]}'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list/standard=e2-restconf-15/access-list-seq-rule" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:access-list-seq-rule":[{"sequence":"99","permit":{"std-ace":{"any":[null]}}}]}'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list/standard=e2-restconf-15/access-list-seq-rule" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:access-list-seq-rule":[{"sequence":"35","permit":{"std-ace":{"any":[null]}}}]}'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list/extended=challenge-207-pod-10/access-list-seq-rule" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"Cisco-IOS-XE-native:access-list-seq-rule":[{"sequence":"5","ace-rule":{"action":"permit","protocol":"ip"}}]}'`},
+{l:"",c:`curl -sk -X POST "${B}/ip/access-list/standard=NEW-ACL" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"name":"NEW-ACL"}'`},
+{l:"",c:`curl -sk -X POST "${B}" \\
+  -H 'content-type: application/yang-data+json' -u ${U}:'${P}' \\
+  -d '{"ip":{"access-list":{"standard":[{"name":"NEW-ACL"}]}}}'`}
+],ans:[0,2,4],exp:`<strong>POST = create-only. Resource must NOT exist, URI must be the direct parent.</strong><span class="exp-tree">A ✓ NEW-ACL doesn't exist, URI=parent, wrapped         → creates\nB ✗ e2-restconf-15 ALREADY exists                      → 409 Conflict\nC ✓ seq 99 doesn't exist, URI=parent (seq-rule list)   → creates\nD ✗ seq 35 ALREADY exists                              → 409 Conflict\nE ✓ seq 5 doesn't exist, URI=parent (seq-rule list)    → creates\nF ✗ POST targets the object itself, not parent         → error\nG ✗ POST to native (grandparent), not direct parent    → error</span>Key insight: POST requires the URI to be the <em>direct</em> parent of the resource being created, and the target resource must not already exist. This applies to both the ACL-level (A vs B) and the ACE-level (C vs D).`},
+
+// ══════════════════════════════════════════════════════════
+// Q18 — ONE URI for CRUD (GET/PUT/PATCH/DELETE) — pick correct payload
+// ══════════════════════════════════════════════════════════
+{q:"A Python script uses the SAME URI for GET, PUT, PATCH, and DELETE on a single ACE. GET and DELETE send no payload. PUT and PATCH share the SAME payload. Which payload is correct?",
+s:"URI (used for all 4 methods):\n  https://.../ip/access-list/extended=challenge-207-pod-10/access-list-seq-rule=10\n\nGoal: ACE seq 10 should be 'permit tcp any gt 100 203.36.36.32 0.0.0.15'\nPayload reused for both PUT and PATCH (no payload for GET/DELETE).",
+t:`Cisco-IOS-XE-native:native
+└── ip
+    └── access-list
+        └── extended=challenge-207-pod-10
+            └── access-list-seq-rule=10
+                ├── sequence
+                └── ace-rule
+                    ├── action
+                    ├── protocol
+                    └── ...`,
+m:false,
+opts:[
+{l:"",c:`{
+  "Cisco-IOS-XE-native:access-list-seq-rule": [
     {
-      "name": "challenge-207-pod-10",
-      "access-list-seq-rule": [
-        {
-          "sequence": "10",
-          "ace-rule": {
-            "action": "permit",
-            "protocol": "tcp",
-            "any": [null],
-            "src-gt": 100,
-            "dest-ipv4-address": "203.36.36.32",
-            "dest-mask": "0.0.0.15",
-            "dst-eq": 636
-          }
-        },
-        {
-          "sequence": "20",
-          "ace-rule": {
-            "action": "deny",
-            "protocol": "ip",
-            "host-address": "198.51.100.6",
-            "dst-any": [null]
-          }
-        }
-      ]
+      "sequence": "10",
+      "ace-rule": {
+        "action": "permit",
+        "protocol": "tcp",
+        "ipv4-address": "any",
+        "src-port-operator": "gt",
+        "src-port-number": "100",
+        "dest-ipv4-address": "203.36.36.32",
+        "dest-mask": "0.0.0.15"
+      }
     }
   ]
-}</pre>
-            </details>
-
-            <!-- TEST-2: POST container+container -->
-            <div class="step-header"><h3>TEST-2: POST — URI and payload contain same container</h3></div>
-<pre>curl -i -k -X POST \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list' \
-  --data '{
-    "Cisco-IOS-XE-native:access-list": {
-        "Cisco-IOS-XE-acl:standard": [{
-            "name": "Pod10_Task043",
-            "access-list-seq-rule": [{"sequence": "5", "permit": {"std-ace": {"host-address": "203.0.113.2"}}}]
-        }]
+}`},
+{l:"",c:`{
+  "Cisco-IOS-XE-native:access-list-seq-rule": {
+    "sequence": "10",
+    "ace-rule": {
+      "action": "permit",
+      "protocol": "tcp",
+      "ipv4-address": "any",
+      "src-port-operator": "gt",
+      "src-port-number": "100",
+      "dest-ipv4-address": "203.36.36.32",
+      "dest-mask": "0.0.0.15"
     }
-}'</pre>
-            <details>
-                <summary>❌ RESULT: FAILED — Payload contains parent container name</summary>
-                <p>POST payload should contain only the <strong>child element</strong> (e.g., <code>Cisco-IOS-XE-acl:standard</code>), not the parent container name (<code>Cisco-IOS-XE-native:access-list</code>).</p>
-                <p><strong>RFC 8040:</strong> The message-body MUST contain exactly one instance of the <strong>child resource</strong> to create within the parent.</p>
-            </details>
-
-            <!-- TEST-3: POST existing container -->
-            <div class="step-header"><h3>TEST-3: POST — container in URI with existing children</h3></div>
-<pre>curl -i -k -X POST \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip' \
-  --data '{
-    "Cisco-IOS-XE-native:access-list": {
-        "Cisco-IOS-XE-acl:standard": [{
-            "name": "Pod10_Task043",
-            "access-list-seq-rule": [{"sequence": "5", "permit": {"std-ace": {"host-address": "203.0.113.2"}}}]
-        }]
+  }
+}`},
+{l:"",c:`{
+  "Cisco-IOS-XE-native:access-list-seq-rule": [
+    {
+      "ace-rule": {
+        "action": "permit",
+        "protocol": "tcp",
+        "ipv4-address": "any",
+        "src-port-operator": "gt",
+        "src-port-number": "100",
+        "dest-ipv4-address": "203.36.36.32",
+        "dest-mask": "0.0.0.15"
+      }
     }
-}'</pre>
-            <details>
-                <summary>❌ RESULT: 409 Conflict — Resource already exists</summary>
-                <p><strong>RFC 8040 Section 4.4:</strong> <em>"If the data resource already exists, then the POST request MUST fail and a '409 Conflict' status-line MUST be returned."</em></p>
-                <p><strong>Solution:</strong> Use PATCH to merge new ACL into existing container, or PUT to replace specific ACL.</p>
-            </details>
-
-            <!-- TEST-4: POST correct -->
-            <div class="step-header"><h3>TEST-4: POST — container in URI, new child list in payload</h3></div>
-<pre>curl -i -k -X POST \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list' \
-  --data '{
-    "Cisco-IOS-XE-acl:extended": [{
-        "name": "challenge-207-pod-10",
-        "access-list-seq-rule": [
-            {"sequence": "10", "ace-rule": {"action": "permit", "protocol": "tcp", "any": [null], "src-gt": 100, "dest-ipv4-address": "203.36.36.32", "dest-mask": "0.0.0.15", "dst-eq": 636}},
-            {"sequence": "20", "ace-rule": {"action": "deny", "protocol": "ip", "host-address": "198.51.100.6", "dst-any": [null]}}
-        ]
-    }]
-}'</pre>
-            <details>
-                <summary>✅ RESULT: PASSED — Create when container is empty</summary>
-                <p><strong>RFC 8040 Section 4.4:</strong> POST succeeds when target parent has no existing data for the child resource being created.</p>
-                <p><strong>Key Rule:</strong> URI must be the <strong>container</strong> (<code>/access-list</code>), NOT the list. Payload includes the list-name and key.</p>
-            </details>
-
-            <!-- TEST-5: POST list in URI -->
-            <div class="step-header"><h3>TEST-5: POST — list in URI with existing list in payload</h3></div>
-<pre>curl -i -k -X POST \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended' \
-  --data '{
-    "Cisco-IOS-XE-acl:extended": [{
-        "name": "exam2-netconf-create-16",
-        "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "tcp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}]
-    }]
-}'</pre>
-            <details>
-                <summary>❌ RESULT: FAILED — "POST on list must be on list element"</summary>
-                <p><strong>Error:</strong> POST target is <code>/extended</code> (a list), but POST must target the <strong>parent container</strong> (<code>/access-list</code>). You cannot POST to a list directly.</p>
-            </details>
-
-            <!-- TEST-6: POST list without wrapper -->
-            <div class="step-header"><h3>TEST-6: POST — list in URI without list wrapper in payload</h3></div>
-<pre>curl -i -k -X POST \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended' \
-  --data '{
-    "name": "exam2-netconf-create-16",
-    "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "tcp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}]
-}'</pre>
-            <details>
-                <summary>❌ RESULT: FAILED — Missing list wrapper in payload</summary>
-                <p><strong>RFC 8040:</strong> <em>"The message-body MUST contain exactly one instance of the expected data resource."</em></p>
-                <p>When POST target is a list, payload must include the list wrapper <code>"Cisco-IOS-XE-acl:extended": [...]</code>.</p>
-            </details>
-
-            <!-- TEST-7: POST correct with new key -->
-            <div class="step-header"><h3>TEST-7: POST — container in URI, new list in payload</h3></div>
-<pre>curl -i -k -X POST \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list' \
-  --data '{
-    "Cisco-IOS-XE-acl:extended": [{
-        "name": "exam2-netconf-create-16",
-        "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "tcp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}]
-    }]
-}'</pre>
-            <details>
-                <summary>✅ RESULT: PASSED — Create with correct child resource payload</summary>
-                <p>URI targets container (<code>/access-list</code>), payload contains child resource <code>Cisco-IOS-XE-acl:extended</code>. Container was empty, so POST succeeds.</p>
-            </details>
-
-            <!-- TEST-8: PUT container+list mismatch -->
-            <div class="step-header"><h3>TEST-8: PUT — container in URI, list in payload (mismatch)</h3></div>
-<pre>curl -i -k -X PUT \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list' \
-  --data '{
-    "Cisco-IOS-XE-acl:extended": [{
-        "name": "exam2-netconf-create-15",
-        "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "tcp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}]
-    }]
-}'</pre>
-            <details>
-                <summary>❌ RESULT: FAILED — Mismatched keypaths</summary>
-                <p><strong>Error:</strong> <code>mismatched keypaths: /ios:native/ios:ip/ios:extended , /ios:native/ios:ip/ios:access-list</code></p>
-                <p><strong>RFC 8040 Section 4.5:</strong> URI targets <code>/access-list</code> (container), but payload contains <code>extended</code> (list). PUT requires payload to match the URI target exactly.</p>
-            </details>
-
-            <!-- TEST-9: PUT list no key -->
-            <div class="step-header"><h3>TEST-9: PUT — list in URI without key</h3></div>
-<pre>curl -i -k -X PUT \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended' \
-  --data '{
-    "name": "exam2-create-1115",
-    "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "tcp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}]
-}'</pre>
-            <details>
-                <summary>❌ RESULT: FAILED — PUT to list without key (405 Method Not Allowed)</summary>
-                <p><strong>RFC 8040 Section 4.5:</strong> PUT requires the target URI to be the <strong>resource itself</strong>. For a list, this means the URI must include the list key (e.g., <code>/extended=ACL-NAME</code>).</p>
-            </details>
-
-            <!-- TEST-11: PUT correct with key -->
-            <div class="step-header"><h3>TEST-11: PUT — list with key in URI and payload ✅</h3></div>
-<pre>curl -i -k -X PUT \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16' \
-  --data '{
-    "Cisco-IOS-XE-acl:extended": [{
-        "name": "exam2-netconf-create-16",
-        "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "udp", "src-eq": 636, "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16", "dst-eq": 6000}}]
-    }]
-}'</pre>
-            <details>
-                <summary>✅ RESULT: PASSED — Replace list instance with key in URI</summary>
-                <p>URI key (<code>=exam2-netconf-create-16</code>) matches payload key (<code>"name": "exam2-netconf-create-16"</code>). The entire ACL is replaced.</p>
-            </details>
-
-            <!-- TEST-12: PUT container+container -->
-            <div class="step-header"><h3>TEST-12: PUT — container in URI and payload ✅</h3></div>
-<pre>curl -i -k -X PUT \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list' \
-  --data '{
-    "Cisco-IOS-XE-native:access-list": {
-        "Cisco-IOS-XE-acl:extended": [
-            {"name": "challenge-207-pod-10", "access-list-seq-rule": [
-                {"sequence": "10", "ace-rule": {"action": "permit", "protocol": "tcp", "any": [null], "src-gt": 100, "dest-ipv4-address": "203.36.36.32", "dest-mask": "0.0.0.15", "dst-eq": 636}},
-                {"sequence": "20", "ace-rule": {"action": "deny", "protocol": "ip", "host-address": "198.51.100.6", "dst-any": [null]}}
-            ]},
-            {"name": "exam2-netconf-create-16", "access-list-seq-rule": [
-                {"sequence": "16", "ace-rule": {"action": "permit", "protocol": "tcp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}
-            ]}
-        ]
-    }
-}'</pre>
-            <details>
-                <summary>✅ RESULT: PASSED — Replace entire container</summary>
-                <p><strong>RFC 8040 Section 4.5:</strong> URI targets container, payload is full container structure with <code>Cisco-IOS-XE-native:access-list</code> wrapper. Replaces ALL ACLs.</p>
-            </details>
-
-            <!-- TEST-13: PATCH without list wrapper -->
-            <div class="step-header"><h3>TEST-13: PATCH — list with key in URI, payload without list wrapper</h3></div>
-<pre>curl -i -k -X PATCH \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16' \
-  --data '{
-    "name": "exam2-netconf-create-16",
-    "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "udp", "host-address": "16.16.16.16", "dst-host-address": "16.16.16.16"}}]
-}'</pre>
-            <details>
-                <summary>❌ RESULT: 400 Bad Request — Missing list wrapper</summary>
-                <p><strong>Error:</strong> <code>missing element: extended</code> — Even with key in URI, payload must include list wrapper <code>"Cisco-IOS-XE-acl:extended": [...]</code>.</p>
-            </details>
-
-            <!-- TEST-14: PATCH at seq level -->
-            <div class="step-header"><h3>TEST-14: PATCH — merge at specific sequence level ✅</h3></div>
-<pre>curl -i -k -X PATCH \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16/access-list-seq-rule=16' \
-  --data '{
-    "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "udp", "host-address": "25.25.25.25", "dst-host-address": "25.25.25.25"}}]
-}'</pre>
-            <details>
-                <summary>✅ RESULT: 204 No Content — Merge successful</summary>
-                <p>PATCH merges the seq-rule content. Existing seq 16 is updated in place.</p>
-            </details>
-
-            <!-- TEST-15: PATCH with key and list wrapper -->
-            <div class="step-header"><h3>TEST-15: PATCH — list with key in URI and list wrapper ✅</h3></div>
-<pre>curl -i -k -X PATCH \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16' \
-  --data '{
-    "Cisco-IOS-XE-acl:extended": [{
-        "name": "exam2-netconf-create-16",
-        "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "udp", "host-address": "16.16.16.16", "dst-host-address": "16.16.16.16"}}]
-    }]
-}'</pre>
-            <details>
-                <summary>✅ RESULT: 204 No Content — Merge with list wrapper</summary>
-                <p>Payload includes <code>Cisco-IOS-XE-acl:extended</code> wrapper with matching key. RFC 8040 Section 4.6.1: Plain patch merges contents with target.</p>
-            </details>
-
-            <!-- TEST-16: PATCH without key in URI -->
-            <div class="step-header"><h3>TEST-16: PATCH — list without key in URI ✅</h3></div>
-<pre>curl -i -k -X PATCH \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended' \
-  --data '{
-    "Cisco-IOS-XE-acl:extended": [{
-        "name": "exam2-netconf-create-16",
-        "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "udp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}]
-    }]
-}'</pre>
-            <details>
-                <summary>✅ RESULT: 204 No Content — PATCH works with or without key in URI</summary>
-                <p>Unlike POST, PATCH can target a list without key in URI when payload includes the list wrapper with key inside. Useful for adding new entries to existing data.</p>
-            </details>
-
-            <!-- TEST-17: GET with key -->
-            <div class="step-header"><h3>TEST-17: GET — list with key in URI</h3></div>
-<pre>curl -i -k -X GET \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16' \
-  --header 'Accept: application/yang-data+json'</pre>
-            <details>
-                <summary>✅ RESULT: Returns specific ACL</summary>
-<pre>{
-  "Cisco-IOS-XE-acl:extended": [{
-    "name": "exam2-netconf-create-16",
-    "access-list-seq-rule": [{"sequence": "16", "ace-rule": {"action": "permit", "protocol": "udp", "host-address": "198.51.100.16", "dst-host-address": "203.0.113.16"}}]
-  }]
-}</pre>
-            </details>
-
-            <!-- TEST-18: DELETE without key -->
-            <div class="step-header"><h3>TEST-18: DELETE — list without key</h3></div>
-<pre>curl -i -k -X DELETE \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended'</pre>
-            <details>
-                <summary>❌ RESULT: FAILED — "Operation not allowed"</summary>
-                <p><strong>RFC 8040 Section 4.7:</strong> DELETE requires a specific list instance (key). <code>/extended</code> without key is not a valid delete target.</p>
-                <p><strong>Valid:</strong> <code>/extended=ACL-NAME</code> ✅ or <code>/access-list</code> (container) ✅</p>
-            </details>
-
-            <!-- TEST-19: DELETE with key -->
-            <div class="step-header"><h3>TEST-19: DELETE — list with key ✅</h3></div>
-<pre>curl -i -k -X DELETE \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16'</pre>
-            <details>
-                <summary>✅ RESULT: 204 No Content — Specific ACL deleted</summary>
-            </details>
-
-            <!-- TEST-20: DELETE container -->
-            <div class="step-header"><h3>TEST-20: DELETE — entire container ✅</h3></div>
-<pre>curl -i -k -X DELETE \
-  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list'</pre>
-            <details>
-                <summary>✅ RESULT: 204 No Content — Entire access-list container deleted (ALL ACLs)</summary>
-            </details>
-
-            <!-- Quick Reference Table -->
-            <h2>📊 Quick Reference Table</h2>
-            <table>
-                <thead><tr><th>Method</th><th>URI Target</th><th>Payload Wrapper</th><th>Result</th></tr></thead>
-                <tbody>
-                    <tr><td><strong>GET</strong></td><td><code>/extended</code> (list)</td><td>N/A</td><td><span class="check">✅</span></td></tr>
-                    <tr><td><strong>GET</strong></td><td><code>/extended=KEY</code></td><td>N/A</td><td><span class="check">✅</span></td></tr>
-                    <tr><td><strong>POST</strong></td><td><code>/access-list</code> (container)</td><td><code>Cisco-IOS-XE-acl:extended</code> with <em>new</em> key</td><td><span class="check">✅</span></td></tr>
-                    <tr><td><strong>POST</strong></td><td><code>/access-list</code> (container)</td><td><code>Cisco-IOS-XE-acl:extended</code> with <em>existing</em> key</td><td><span class="cross">❌ data-exists</span></td></tr>
-                    <tr><td><strong>POST</strong></td><td><code>/extended</code> (list)</td><td>any</td><td><span class="cross">❌ POST on list must be on list element</span></td></tr>
-                    <tr><td><strong>PUT</strong></td><td><code>/access-list</code> (container)</td><td><code>Cisco-IOS-XE-native:access-list</code></td><td><span class="check">✅ replaces all</span></td></tr>
-                    <tr><td><strong>PUT</strong></td><td><code>/extended=KEY</code></td><td><code>Cisco-IOS-XE-acl:extended</code> with same key</td><td><span class="check">✅</span></td></tr>
-                    <tr><td><strong>PUT</strong></td><td><code>/extended</code> (list, no key)</td><td>any</td><td><span class="cross">❌</span></td></tr>
-                    <tr><td><strong>PATCH</strong></td><td><code>/extended=KEY</code></td><td><code>Cisco-IOS-XE-acl:extended</code></td><td><span class="check">✅</span></td></tr>
-                    <tr><td><strong>PATCH</strong></td><td><code>/extended</code> (list)</td><td><code>Cisco-IOS-XE-acl:extended</code></td><td><span class="check">✅</span></td></tr>
-                    <tr><td><strong>DELETE</strong></td><td><code>/access-list</code> (container)</td><td>N/A</td><td><span class="check">✅ deletes all</span></td></tr>
-                    <tr><td><strong>DELETE</strong></td><td><code>/extended=KEY</code></td><td>N/A</td><td><span class="check">✅</span></td></tr>
-                    <tr><td><strong>DELETE</strong></td><td><code>/extended</code> (list, no key)</td><td>N/A</td><td><span class="cross">❌ Operation not allowed</span></td></tr>
-                </tbody>
-            </table>
-
-            <!-- RFC Comparison -->
-            <h2>📖 POST vs PUT vs PATCH — RFC 8040</h2>
-            <table>
-                <thead><tr><th>Aspect</th><th>POST</th><th>PUT</th><th>PATCH</th></tr></thead>
-                <tbody>
-                    <tr><td><strong>RFC Section</strong></td><td>4.4</td><td>4.5</td><td>4.6</td></tr>
-                    <tr><td><strong>Purpose</strong></td><td>Create only</td><td>Create OR Replace</td><td>Merge/Update only</td></tr>
-                    <tr><td><strong>Target Resource</strong></td><td>Parent of new resource</td><td>The resource itself</td><td>The resource itself</td></tr>
-                    <tr><td><strong>Key in URI?</strong></td><td><span class="cross">❌ No</span> (key in payload)</td><td><span class="check">✅ Yes</span> (must match payload)</td><td><span class="check">✅ Yes</span></td></tr>
-                    <tr><td><strong>If Target Doesn't Exist</strong></td><td><span class="check">✅ Creates</span></td><td><span class="check">✅ Creates</span></td><td><span class="cross">❌ MUST NOT create</span></td></tr>
-                    <tr><td><strong>If Target Exists</strong></td><td><span class="cross">❌ 409 Conflict</span></td><td><span class="check">✅ Replaces entirely</span></td><td><span class="check">✅ Merges/Updates</span></td></tr>
-                    <tr><td><strong>Success Response</strong></td><td>201 Created</td><td>201 Created / 204 No Content</td><td>200 OK / 204 No Content</td></tr>
-                    <tr><td><strong>Idempotent?</strong></td><td><span class="cross">❌ No</span></td><td><span class="check">✅ Yes</span></td><td><span class="check">✅ Yes</span></td></tr>
-                </tbody>
-            </table>
-
-            <!-- Side-by-Side Comparison -->
-            <h2>⚖️ Side-by-Side: Same ACL, Different Methods</h2>
-            <p>Scenario: ACL <code>TEST-ACL</code> exists with sequence rules 10 and 20.</p>
-            <table>
-                <thead><tr><th>Method</th><th>URI</th><th>Payload</th><th>Result</th><th>Final State</th></tr></thead>
-                <tbody>
-                    <tr><td><strong>POST</strong></td><td><code>/access-list</code></td><td>name: TEST-ACL, seq 30</td><td><span class="cross">❌ 409 Conflict</span></td><td>Unchanged (seq 10, 20)</td></tr>
-                    <tr><td><strong>PUT</strong></td><td><code>/extended=TEST-ACL</code></td><td>seq 30 only</td><td><span class="check">✅ 204</span></td><td><strong>Only</strong> seq 30 (replaced)</td></tr>
-                    <tr><td><strong>PATCH</strong></td><td><code>/extended=TEST-ACL</code></td><td>seq 30 only</td><td><span class="check">✅ 204</span></td><td>seq 10, 20, <strong>and</strong> 30 (merged)</td></tr>
-                </tbody>
-            </table>
-
-            <!-- Visual Comparison -->
-            <h2>📐 Visual Comparison</h2>
-<pre>
-┌─────────────────────────────────────────────────────────────┐
-│  POST (Create Only)                                         │
-│  URI: /access-list (parent)    Payload: {"extended":[...]}  │
-│  Before: [ACL-A, ACL-B]       After: [ACL-A, ACL-B, X] ✅  │
-│  Before: [ACL-X exists]       After: 409 Conflict ❌        │
-├─────────────────────────────────────────────────────────────┤
-│  PUT (Create or Replace)                                    │
-│  URI: /extended=X (target)     Payload: {"extended":[...]}  │
-│  Before: X not exists          After: X created ✅           │
-│  Before: X has [seq10, seq20]  After: X has [seq30] only ✅  │
-│          Payload: [seq30]            (REPLACED entirely)    │
-├─────────────────────────────────────────────────────────────┤
-│  PATCH (Merge Only)                                         │
-│  URI: /extended=X (target)     Payload: {"extended":[...]}  │
-│  Before: X not exists          After: Error ❌               │
-│  Before: X has [seq10, seq20]  After: [seq10, seq20, 30] ✅  │
-│          Payload: [seq30]            (MERGED)               │
-└─────────────────────────────────────────────────────────────┘</pre>
-
-            <!-- Python Script -->
-            <h2>🐍 Python RESTCONF Client — ch_rest_acl.py</h2>
-            <p>Complete Python script for ACL CRUD operations using <code>requests</code> library:</p>
-<pre>import os
-import requests
-import json
-import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-USERNAME=os.getenv(&quot;USERNAME&quot;)
-PASSWORD=os.getenv(&quot;PASSWORD&quot;)
-HOST=os.getenv(&quot;HOST_ADDRESS&quot;)
-headers = {
-&#x27;Accept&#x27;: &#x27;application/yang-data+json&#x27;,
-&#x27;Content-Type&#x27;: &#x27;application/yang-data+json&#x27;,
-}
-
-device_acl_payload={
-  &quot;Cisco-IOS-XE-acl:extended&quot;: {
-    &quot;name&quot;: &quot;challenge-207-pod-10&quot;,
-    &quot;access-list-seq-rule&quot;: [
-      {
-        &quot;sequence&quot;: &quot;10&quot;,
-        &quot;ace-rule&quot;: {
-          &quot;action&quot;: &quot;permit&quot;,
-          &quot;protocol&quot;: &quot;tcp&quot;,
-          &quot;any&quot;: [None],
-          &quot;src-gt&quot;: 100,
-          &quot;dest-ipv4-address&quot;: &quot;203.36.36.32&quot;,
-          &quot;dest-mask&quot;: &quot;0.0.0.15&quot;
-        }
-      },
-      {
-        &quot;sequence&quot;: &quot;20&quot;,
-        &quot;ace-rule&quot;: {
-          &quot;action&quot;: &quot;deny&quot;,
-          &quot;protocol&quot;: &quot;ip&quot;,
-          &quot;host-address&quot;: &quot;198.51.100.6&quot;,
-          &quot;dst-any&quot;: [None]
+  ]
+}`},
+{l:"",c:`{
+  "Cisco-IOS-XE-native:access-list-seq-rule": [
+    {
+      "sequence": "10",
+      "permit": {
+        "std-ace": {
+          "ipv4-address": "203.36.36.32",
+          "mask": "0.0.0.15"
         }
       }
-    ]
-  }
-}
+    }
+  ]
+}`}
+],ans:[0],exp:`<strong>Only A satisfies all four structural rules.</strong><span class="exp-tree">Rule                            A    B    C    D\n────────────────────────────  ───  ───  ───  ───\nYANG list as JSON array        ✓    ✗    ✓    ✓\nIncludes list key (sequence)   ✓    ✓    ✗    ✓\nExtended ACE shape (ace-rule)  ✓    ✓    ✓    ✗\nModule prefix at boundary      ✓    ✓    ✓    ✓</span><strong>B</strong> — uses a dict instead of an array. <code>access-list-seq-rule</code> is a YANG <em>list</em>; lists are JSON arrays, always. Single entry doesn't change that.<br><br><strong>C</strong> — array is correct, but missing <code>"sequence":"10"</code>. RFC 8040 requires the list key in the body to identify the entry. PUT especially fails because it can't match the URI key to the body without it.<br><br><strong>D</strong> — wrong ACE shape. <code>permit:{std-ace:{...}}</code> is the <em>standard</em>-ACL form. Extended ACLs use <code>ace-rule</code> with <code>action:"permit"</code> as a leaf. Using std-ace under an extended ACL gets rejected at YANG validation.<br><br><strong>Why this works for PUT and PATCH:</strong> the body is <em>complete</em> — every field the ACE needs is in there. PUT replaces with this content, PATCH merges this content over what's there; either way, the final state is identical. GET and DELETE on the same URI just don't send the body at all.`}
+];
 
-def get_acl():
-  #! TODO-1: Complete the url for GET to print extended acl &quot;challenge-207-pod-10&quot;
-  url=f&quot;https://{HOST}/restconf/data/#TODO&quot;
-  response=requests.get(url, headers=headers, auth=(USERNAME, PASSWORD), verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  print(json.dumps(response.json(), indent=2))
-
-def delete_acl():
-  #! TODO-2: Complete the url for DELETE to DELETE extended acl &quot;challenge-207-pod-10&quot;
-  url=f&quot;https://{HOST}/restconf/data/#TODO&quot;
-  response=requests.delete(url, headers=headers, auth=(USERNAME, PASSWORD), verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  ########
-  print(&quot;\nPRINTING THE GET RESULT IF THE ACL EXIST&quot;)
-  url=f&quot;https://{HOST}/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10&quot;
-  response=requests.get(url, headers=headers, auth=(USERNAME, PASSWORD), verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-
-def post_acl():
-  #! TODO-3: Complete the url for POST and add the payload if needed to create extended acl &quot;challenge-207-pod-10&quot;
-  url=f&quot;https://{HOST}/restconf/data/#TODO&quot;
-  response=requests.post(url, headers=headers, auth=(USERNAME, PASSWORD), json=device_acl_payload, verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  ########
-  print(&quot;\nPRINTING THE GET RESULT IF THE ACL CREATED BY POST OPERATION&quot;)
-  url=f&quot;https://{HOST}/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10&quot;
-  response=requests.get(url, headers=headers, auth=(USERNAME, PASSWORD), verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  print(json.dumps(response.json(), indent=2))
-
-def put_acl():
-  #! TODO-4: Complete the url for PUT and add the payload if needed to replace extended acl &quot;challenge-207-pod-10&quot;
-  url=f&quot;https://{HOST}/restconf/data/#TODO&quot;
-  response=requests.put(url, headers=headers, auth=(USERNAME, PASSWORD), json=device_acl_payload, verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  ########
-  print(&quot;\nPRINTING THE GET RESULT IF THE ACL REPLACED&quot;)
-  url=f&quot;https://{HOST}/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10&quot;
-  response=requests.get(url, headers=headers, auth=(USERNAME, PASSWORD), verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  print(json.dumps(response.json(), indent=2))
-
-def patch_acl():
-  #! TODO-5: Complete the url for PATCH and add the payload if needed to update/modify extended acl &quot;challenge-207-pod-10&quot;
-  url=f&quot;https://{HOST}/restconf/data/#TODO&quot;
-  response=requests.patch(url, headers=headers, auth=(USERNAME, PASSWORD), json=device_acl_payload, verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  ########
-  print(&quot;\nPRINTING THE GET RESULT IF THE ACL UPDATED&quot;)
-  url=f&quot;https://{HOST}/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10&quot;
-  response=requests.get(url, headers=headers, auth=(USERNAME, PASSWORD), verify=False)
-  print(f&quot;\n{HOST}: RESPONSE STATUS CODE {response.status_code}&quot;)
-  print(json.dumps(response.json(), indent=2))
-  #!* PATCH works wKEY and woKEY
-  
-#!** CLI INPUT
-operation = input(&quot;Enter operation (get/post/put/patch/delete): &quot;).strip().lower()
-
-if operation==&#x27;get&#x27;:
-  get_acl()
-elif operation==&#x27;delete&#x27;:
-  delete_acl()
-elif operation==&#x27;post&#x27;:
-  post_acl()
-elif operation==&#x27;put&#x27;:
-  put_acl()
-elif operation==&#x27;patch&#x27;:
-  patch_acl()
-else:
-  print(&quot;❌ Invalid operation&quot;)
-
-
-
-
-</pre>
-
-            <!-- Key Takeaways -->
-            <h2>🏆 Key Takeaways</h2>
-            <div class="golden-box">
-                <strong>1.</strong> <strong>POST</strong> only works on empty containers — use PATCH for adding to existing data<br>
-                <strong>2.</strong> <strong>PUT</strong> requires exact URI-to-payload match (container→container, list+key→list)<br>
-                <strong>3.</strong> <strong>PATCH</strong> is most flexible — works with or without key in URI<br>
-                <strong>4.</strong> <strong>DELETE</strong> on list requires key; on container deletes everything<br>
-                <strong>5.</strong> Always use <code>-i</code> flag to see HTTP status codes (204 = success)<br>
-                <strong>6.</strong> PATCH <strong>MUST NOT create</strong> target resource — target must exist<br>
-                <strong>7.</strong> PATCH <strong>cannot delete</strong> child resources — use YANG Patch for delete<br>
-                <strong>8.</strong> PUT replaces <strong>entirely</strong> — unmentioned sequences are deleted
-            </div>
-
-        </section>
-
-        <!-- ==================== SECTION 2: MCQ PRACTICE ==================== -->
-        <section id="quiz" class="section">
-            <h1>MCQ Practice — RESTCONF Operations & ACL CRUD</h1>
-            <p class="intro-text">26 questions covering RESTCONF CRUD operations, URI construction, payload structure, RFC 8040 rules, and Python implementation.</p>
-
-            <div class="quiz-header">
-                <div>
-                    <div class="progress-bar"><div class="progress-fill" id="progressBar" style="width: 0%"></div></div>
-                    <span class="score-display">Score: <span class="score-correct" id="correctCount">0</span> <span class="score-total">/ <span id="totalAnswered">0</span> answered</span></span>
-                </div>
-                <div class="quiz-controls">
-                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
-                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
-                </div>
-            </div>
-
-            <div id="quizContainer"></div>
-        </section>
-    </main>
-    <script>
-        const questions = [
-            {id:1,type:"single",count:1,question:"Which RESTCONF method targets the PARENT container (not the resource itself) and uses the key ONLY in the payload?",options:[{text:"GET",correct:false},{text:"POST",correct:true},{text:"PUT",correct:false},{text:"PATCH",correct:false}],explanation:"📖 Explanation\nPOST creates a new resource within the parent. The URI targets the parent container (e.g., /access-list), and the key for the new resource is in the payload, NOT in the URI.\n\n    A → ❌ GET reads resources — it targets the resource itself (with or without key).\n    C → ❌ PUT targets the resource itself — key is in both URI AND payload.\n    D → ❌ PATCH targets the resource itself — key is in the URI."},
-
-            {id:2,type:"single",count:1,question:"What happens when you POST to /access-list to create ACL 'MY-ACL', but 'MY-ACL' already exists?",options:[{text:"201 Created — ACL is updated",correct:false},{text:"204 No Content — ACL is merged",correct:false},{text:"409 Conflict — data-exists error",correct:true},{text:"400 Bad Request — malformed message",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.4: 'If the data resource already exists, then the POST request MUST fail and a 409 Conflict status-line MUST be returned.'\n\n    A → ❌ POST does not update — it only creates. 201 is returned only on successful creation.\n    B → ❌ 204 with merge is PATCH behavior, not POST.\n    D → ❌ 400 Bad Request is for malformed payloads, not duplicate resources."},
-
-            {id:3,type:"single",count:1,question:"You POST to this URI with the ACL payload:\n\nhttps://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended\n\nWhat is the result?",options:[{text:"✅ 201 Created — ACL created successfully",correct:false},{text:"❌ 'POST on list must be on list element'",correct:true},{text:"❌ 409 Conflict — data-exists",correct:false},{text:"✅ 204 No Content — merged",correct:false}],explanation:"📖 Explanation\nPOST must target the PARENT container, not the list itself. /extended is a list, not a container. The correct URI for POST is /access-list (the parent).\n\n    A → ❌ POST to a list (not container) always fails on IOS-XE.\n    C → ❌ 409 data-exists occurs when POST to the correct container but resource already exists.\n    D → ❌ 204 merge is PATCH behavior."},
-
-            {id:4,type:"single",count:1,question:"You PUT to this URI:\n\nhttps://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list\n\nWith this payload:\n{\"Cisco-IOS-XE-acl:extended\": [{\"name\": \"MY-ACL\", ...}]}\n\nWhat is the result?",options:[{text:"✅ 204 No Content — ACL replaced",correct:false},{text:"❌ Mismatched keypaths — URI is container but payload is list",correct:true},{text:"❌ 409 Conflict — data-exists",correct:false},{text:"✅ 201 Created — new ACL created",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.5: PUT requires the payload to match the URI target exactly. URI targets /access-list (container), but payload contains Cisco-IOS-XE-acl:extended (list). For container URI, payload must be Cisco-IOS-XE-native:access-list {...}.\n\n    A → ❌ Can't succeed — payload doesn't match URI target.\n    C → ❌ 409 is POST-specific for existing resources.\n    D → ❌ Can't create — mismatched keypaths error."},
-
-            {id:5,type:"single",count:1,question:"What is the correct URI for PUT to create or replace ACL 'challenge-207-pod-10'?",options:[{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10",correct:true},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/Cisco-IOS-XE-acl:extended=challenge-207-pod-10",correct:false}],explanation:"📖 Explanation\nPUT targets the resource itself. For a list instance, the URI must include the key: /extended=challenge-207-pod-10. The payload must also contain 'Cisco-IOS-XE-acl:extended' with matching 'name'.\n\n    A → ❌ This is the container URI — PUT here requires container-level payload wrapper.\n    B → ❌ No key in URI — PUT to a list without key fails (405 Method Not Allowed).\n    D → ❌ The YANG module prefix belongs in the payload, not in the URI path. URI uses the short form /extended=KEY."},
-
-            {id:6,type:"single",count:1,question:"ACL 'TEST-ACL' exists with sequences 10 and 20. You PATCH with only sequence 30. What is the final state?",options:[{text:"Only sequence 30 (replaced entirely)",correct:false},{text:"Sequences 10, 20, and 30 (merged)",correct:true},{text:"Error — PATCH cannot add new sequences",correct:false},{text:"Error — PATCH target must not exist",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.6: 'Plain patch can be used to create or update, but not delete, a child resource within the target resource.' PATCH merges seq 30 into the existing ACL without removing seq 10 and 20.\n\n    A → ❌ That's PUT behavior — PUT replaces entirely. PATCH merges.\n    C → ❌ PATCH CAN create child resources (like new sequences) within an existing target.\n    D → ❌ PATCH requires the TARGET to exist, but it can create CHILDREN within that target."},
-
-            {id:7,type:"single",count:1,question:"ACL 'TEST-ACL' exists with sequences 10 and 20. You PUT with only sequence 30. What is the final state?",options:[{text:"Sequences 10, 20, and 30 (merged)",correct:false},{text:"Only sequence 30 (replaced entirely)",correct:true},{text:"Error — cannot remove sequences with PUT",correct:false},{text:"Only sequences 10 and 20 (PUT ignored)",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.5: 'A PUT on a data resource only replaces that data resource within the datastore.' PUT replaces the ENTIRE ACL — only what's in the payload survives. Sequences 10 and 20 are deleted.\n\n    A → ❌ That's PATCH behavior — PATCH merges, PUT replaces.\n    C → ❌ PUT absolutely can (and does) remove unmentioned config.\n    D → ❌ PUT doesn't ignore — it replaces everything."},
-
-            {id:8,type:"single",count:1,question:"Which RESTCONF method MUST NOT create the target resource if it doesn't exist?",options:[{text:"POST",correct:false},{text:"PUT",correct:false},{text:"PATCH",correct:true},{text:"DELETE",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.6: 'If the target resource instance does not exist, the server MUST NOT create it.' PATCH only merges into EXISTING resources.\n\n    A → ❌ POST creates new resources — that's its entire purpose.\n    B → ❌ PUT creates if not exists, replaces if exists.\n    D → ❌ DELETE removes resources — it fails if target doesn't exist, but the rule is different from PATCH's 'MUST NOT create'."},
-
-            {id:9,type:"single",count:1,question:"What is the correct URI for DELETE to remove ACL 'exam2-netconf-create-16'?",options:[{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16",correct:true},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip",correct:false}],explanation:"📖 Explanation\nDELETE on a list requires the key to identify which instance to remove: /extended=exam2-netconf-create-16.\n\n    A → ❌ /extended without key — 'Operation not allowed'. DELETE on a list requires a key.\n    C → ❌ /access-list is the container — this would delete ALL ACLs (standard + extended), not just one.\n    D → ❌ /ip is way too broad — would delete all IP configuration, not just one ACL."},
-
-            {id:10,type:"single",count:1,question:"You try DELETE on /access-list/extended (without a key). What happens?",options:[{text:"✅ All extended ACLs are deleted",correct:false},{text:"✅ 204 No Content — list type deleted",correct:false},{text:"❌ 'Operation not allowed' — DELETE on list requires key",correct:true},{text:"❌ 400 Bad Request — missing payload",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.7: DELETE requires a specific list instance (key). /extended without key is not a valid delete target.\n\nValid DELETE targets:\n• /extended=ACL-NAME — specific ACL ✅\n• /access-list — entire container ✅\n• /extended (no key) — ❌ Operation not allowed\n\n    A → ❌ DELETE without key on a list is not allowed.\n    B → ❌ Same — can't delete a list type without specifying which instance.\n    D → ❌ DELETE doesn't need a payload — the URI identifies the target."},
-
-            {id:11,type:"single",count:1,question:"In the Python script ch_rest_acl.py, what is the correct URL for the GET function to retrieve extended ACL 'challenge-207-pod-10'?",options:[{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10",correct:true},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/Cisco-IOS-XE-acl:extended=challenge-207-pod-10",correct:false}],explanation:"📖 Explanation\nGET with a list key returns that specific ACL instance. URI: /extended=challenge-207-pod-10.\n\n    A → ❌ Without key, this returns ALL extended ACLs — not specific to challenge-207-pod-10.\n    C → ❌ /access-list returns the entire container (all standard + extended ACLs).\n    D → ❌ The module prefix (Cisco-IOS-XE-acl:) goes in the JSON payload, not in the URI path."},
-
-            {id:12,type:"single",count:1,question:"In the Python script, what is the correct URL for the POST function to create ACL 'challenge-207-pod-10'?",options:[{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list",correct:true},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip",correct:false}],explanation:"📖 Explanation\nPOST targets the PARENT container. The key ('challenge-207-pod-10') is in the payload, NOT in the URI. URI must be /access-list (the parent of extended).\n\n    A → ❌ Key in URI is for PUT/PATCH, not POST. POST never has the key in the URI.\n    B → ❌ /extended is the list itself — POST must target the parent container, not the list.\n    D → ❌ /ip is too high — POST here would try to create 'access-list' container, not the ACL within it."},
-
-            {id:13,type:"single",count:1,question:"In the Python script, what is the correct URL for the PUT function to replace ACL 'challenge-207-pod-10'?",options:[{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10",correct:true},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended",correct:false},{text:"https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/challenge-207-pod-10",correct:false}],explanation:"📖 Explanation\nPUT targets the resource itself with the key: /extended=challenge-207-pod-10. URI key must match payload key.\n\n    A → ❌ Container URI — PUT here requires container-level payload wrapper (Cisco-IOS-XE-native:access-list), and would replace ALL ACLs.\n    C → ❌ No key — PUT to a list without key fails (405 Method Not Allowed).\n    D → ❌ Missing 'extended' — /access-list/challenge-207-pod-10 is not a valid YANG path."},
-
-            {id:14,type:"single",count:1,question:"In the Python script, the PATCH function can work with which URI(s)?",options:[{text:"Only /extended=challenge-207-pod-10 (with key)",correct:false},{text:"Only /extended (without key)",correct:false},{text:"Both /extended=challenge-207-pod-10 and /extended (PATCH works with or without key)",correct:true},{text:"Only /access-list (container)",correct:false}],explanation:"📖 Explanation\nPATCH is the most flexible method — it works with key in URI (/extended=KEY) and without key (/extended) as long as the payload includes the list wrapper with the key inside.\n\n    A → ❌ PATCH also works without key in URI (TEST-16 proved this).\n    B → ❌ PATCH also works with key in URI (TEST-15 proved this).\n    D → ❌ While PATCH may work on containers, the typical and tested usage is on lists."},
-
-            {id:15,type:"single",count:1,question:"Which HTTP status code indicates a successful PUT that REPLACED an existing resource?",options:[{text:"200 OK",correct:false},{text:"201 Created",correct:false},{text:"204 No Content",correct:true},{text:"409 Conflict",correct:false}],explanation:"📖 Explanation\nRFC 8040: PUT returns 201 Created for new resources and 204 No Content for replaced resources.\n\n    A → ❌ 200 OK is for PATCH (with body) and GET responses, not PUT replacement.\n    B → ❌ 201 Created is for PUT creating a NEW resource, not replacing existing.\n    D → ❌ 409 Conflict is POST-specific when resource already exists."},
-
-            {id:16,type:"single",count:1,question:"According to RFC 8040, which statement about PATCH is correct?",options:[{text:"PATCH can create, update, and delete child resources",correct:false},{text:"PATCH can create and update, but NOT delete child resources",correct:true},{text:"PATCH can only update existing child resources",correct:false},{text:"PATCH replaces the entire target resource",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.6: 'Plain patch can be used to create or update, but not delete, a child resource within the target resource.' To delete children, use YANG Patch (a different media type).\n\n    A → ❌ Plain PATCH cannot delete — that requires YANG Patch.\n    C → ❌ PATCH CAN create new children (e.g., add a new sequence to an ACL).\n    D → ❌ That's PUT behavior. PATCH merges, PUT replaces."},
-
-            {id:17,type:"single",count:1,question:"You PATCH to /extended=MY-ACL but 'MY-ACL' does not exist on the device. What happens?",options:[{text:"✅ 201 Created — ACL is created",correct:false},{text:"✅ 204 No Content — ACL is created silently",correct:false},{text:"❌ Error — PATCH MUST NOT create the target resource",correct:true},{text:"❌ 409 Conflict — data-exists",correct:false}],explanation:"📖 Explanation\nRFC 8040 Section 4.6: 'If the target resource instance does not exist, the server MUST NOT create it.' PATCH only works on existing targets.\n\n    A → ❌ 201 Created is POST/PUT behavior, not PATCH.\n    B → ❌ PATCH cannot create the target — it can only merge into existing targets.\n    D → ❌ 409 data-exists is POST-specific. PATCH fails differently — it cannot create."},
-
-            {id:18,type:"single",count:1,question:"What is the correct JSON payload structure for the 'any' source (match all source IPs) in a RESTCONF ACL?",options:[{text:"\"any\": true",correct:false},{text:"\"any\": [null]",correct:true},{text:"\"any\": \"*\"",correct:false},{text:"\"source\": \"any\"",correct:false}],explanation:"📖 Explanation\nIn the YANG model, 'any' is type 'empty'. In JSON representation (RFC 7951), YANG 'empty' type is encoded as [null] — an array containing a single null value.\n\n    A → ❌ 'true' is for YANG boolean type, not empty type.\n    C → ❌ '*' is not a valid YANG empty representation.\n    D → ❌ 'source' is not a leaf in the YANG model — it's a choice node. The leaf is 'any'."},
-
-            {id:19,type:"single",count:1,question:"In the device_acl_payload from the Python script, sequence 20 denies IP from host 198.51.100.6 to any destination. Which JSON key represents the destination 'any'?",options:[{text:"\"any\": [null]",correct:false},{text:"\"dst-any\": [null]",correct:true},{text:"\"destination\": \"any\"",correct:false},{text:"\"dest-any\": [null]",correct:false}],explanation:"📖 Explanation\nIn the YANG tree, source 'any' and destination 'any' are DIFFERENT elements in different choice branches:\n• Source any → \"any\": [null]\n• Destination any → \"dst-any\": [null]\n\n    A → ❌ \"any\" is for SOURCE any, not destination.\n    C → ❌ \"destination\" is not a valid YANG leaf — it's a choice node.\n    D → ❌ \"dest-any\" is not the correct YANG element name. The model uses \"dst-any\"."},
-
-            {id:20,type:"single",count:1,question:"You need to add a new sequence 30 to an EXISTING ACL 'challenge-207-pod-10' without removing sequences 10 and 20. Which method and URI should you use?",options:[{text:"POST to /access-list with the full ACL payload including seq 30",correct:false},{text:"PUT to /extended=challenge-207-pod-10 with only seq 30",correct:false},{text:"PATCH to /extended=challenge-207-pod-10 with seq 30 merged into existing",correct:true},{text:"DELETE seq 10 and 20, then POST the full ACL with all three sequences",correct:false}],explanation:"📖 Explanation\nPATCH merges seq 30 into the existing ACL without removing seq 10 and 20. This is the correct approach for adding to existing data.\n\n    A → ❌ POST fails if the ACL already exists (409 Conflict). POST only creates new resources.\n    B → ❌ PUT with only seq 30 would REPLACE the entire ACL — seq 10 and 20 would be deleted. PUT replaces, not merges.\n    D → ❌ This works but is destructive and unnecessary. PATCH achieves the same result in one operation without deleting anything."},
-
-            /* ===== Q21: Drag-and-Drop — URIs for each RESTCONF operation ===== */
-            {id:21,type:"blocks",question:"Given this payload for ACL 'challenge-207-pod-10':\n\n{\n  \"Cisco-IOS-XE-acl:extended\": {\n    \"name\": \"challenge-207-pod-10\",\n    \"access-list-seq-rule\": [\n      {\"sequence\": \"10\", \"ace-rule\": {\"action\": \"permit\", \"protocol\": \"tcp\", \"any\": [null], \"src-gt\": 100, \"dest-ipv4-address\": \"203.36.36.32\", \"dest-mask\": \"0.0.0.15\"}},\n      {\"sequence\": \"20\", \"ace-rule\": {\"action\": \"deny\", \"protocol\": \"ip\", \"host-address\": \"198.51.100.6\", \"dst-any\": [null]}}\n    ]\n  }\n}\n\nDrag the correct URI into each RESTCONF operation block:",blocks:[{title:"GET — Retrieve this specific ACL",slots:1,answer:[".../access-list/extended=challenge-207-pod-10"]},{title:"POST — Create this ACL (new resource)",slots:1,answer:[".../access-list"]},{title:"PUT — Create or replace this ACL",slots:1,answer:[".../access-list/extended=challenge-207-pod-10"]},{title:"PATCH — Merge/update this existing ACL",slots:1,answer:[".../access-list/extended=challenge-207-pod-10"]},{title:"DELETE — Remove this ACL",slots:1,answer:[".../access-list/extended=challenge-207-pod-10"]}],pool:[".../access-list/extended=challenge-207-pod-10",".../access-list",".../access-list/extended",".../ip",".../access-list/Cisco-IOS-XE-acl:extended=challenge-207-pod-10",".../access-list/extended=challenge-207-pod-10",".../access-list/extended=challenge-207-pod-10",".../access-list/extended=challenge-207-pod-10"],explanation:"📖 Explanation\n\nGET → .../access-list/extended=challenge-207-pod-10\n→ GET targets the resource directly. List with key returns that specific ACL instance.\n\nPOST → .../access-list\n→ POST targets the PARENT container. The key (challenge-207-pod-10) is in the payload, NOT in the URI. This is the fundamental POST rule — URI = parent, key = payload only.\n\nPUT → .../access-list/extended=challenge-207-pod-10\n→ PUT targets the resource itself with key in URI. Key in URI must match key in payload. Creates if not exists, replaces entirely if exists.\n\nPATCH → .../access-list/extended=challenge-207-pod-10\n→ PATCH targets the resource itself. Merges payload into existing resource. Target MUST exist. PATCH also works without key (.../extended) but with key is more explicit.\n\nDELETE → .../access-list/extended=challenge-207-pod-10\n→ DELETE requires a specific list instance (key). Cannot DELETE /extended without key.\n\nWhy NOT the others:\n    .../access-list/extended → ❌ List without key. Invalid for PUT (405), DELETE (Operation not allowed), and POST (must be on parent container, not list).\n    .../ip → ❌ Too broad — this is the parent of access-list. POST here would try to create the access-list container itself.\n    .../Cisco-IOS-XE-acl:extended=... → ❌ Module prefix belongs in the JSON payload, not in the URI path."},
-
-            /* ===== Q22: PUT — pick correct payload ===== */
-            {id:22,type:"single",count:1,question:"You want to PUT (create or replace) ACL 'NEW-ACL' using this URI:\n\nhttps://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=NEW-ACL\n\nWhich payload is correct?",options:[{text:"{\n  \"Cisco-IOS-XE-acl:extended\": [\n    {\n      \"name\": \"NEW-ACL\",\n      \"access-list-seq-rule\": [\n        {\n          \"sequence\": \"10\",\n          \"ace-rule\": {\n            \"action\": \"permit\",\n            \"protocol\": \"tcp\",\n            \"any\": [null],\n            \"dst-any\": [null]\n          }\n        }\n      ]\n    }\n  ]\n}",correct:true},{text:"{\n  \"name\": \"NEW-ACL\",\n  \"access-list-seq-rule\": [\n    {\n      \"sequence\": \"10\",\n      \"ace-rule\": {\n        \"action\": \"permit\",\n        \"protocol\": \"tcp\",\n        \"any\": [null],\n        \"dst-any\": [null]\n      }\n    }\n  ]\n}",correct:false},{text:"{\n  \"Cisco-IOS-XE-acl:extended\": {\n    \"name\": \"NEW-ACL\",\n    \"access-list-seq-rule\": [\n      {\n        \"sequence\": \"10\",\n        \"ace-rule\": {\n          \"action\": \"permit\",\n          \"protocol\": \"tcp\",\n          \"any\": [null],\n          \"dst-any\": [null]\n        }\n      }\n    ]\n  }\n}",correct:false},{text:"{\n  \"Cisco-IOS-XE-acl:extended\": [\n    {\n      \"name\": \"DIFFERENT-ACL\",\n      \"access-list-seq-rule\": [\n        {\n          \"sequence\": \"10\",\n          \"ace-rule\": {\n            \"action\": \"permit\",\n            \"protocol\": \"tcp\",\n            \"any\": [null],\n            \"dst-any\": [null]\n          }\n        }\n      ]\n    }\n  ]\n}",correct:false}],explanation:"📖 Explanation\nThe correct PUT payload (A) has:\n• List wrapper: \"Cisco-IOS-XE-acl:extended\": [...] — the extended list must be wrapped in an array (YANG list = JSON array)\n• Matching key: \"name\": \"NEW-ACL\" matches the URI key =NEW-ACL\n• Complete structure: list wrapper → list entry with key → access-list-seq-rule → ace-rule\n\n    B → ❌ Missing list wrapper. The payload has only the list ENTRY content (name, access-list-seq-rule) without the \"Cisco-IOS-XE-acl:extended\": [...] wrapper. IOS-XE returns 'missing element: extended'.\n    C → ❌ Wrong data type: \"Cisco-IOS-XE-acl:extended\": {...} uses a dict/object instead of a list/array [...]. YANG lists are JSON arrays — must use [...] not {...}. Even though there's only one ACL, it must be inside an array.\n    D → ❌ Key mismatch: URI says =NEW-ACL but payload says \"name\": \"DIFFERENT-ACL\". RFC 8040: key in URI must match key in payload — mismatched keys cause 400 Bad Request."},
-
-            /* ===== Q23: POST — pick correct payload ===== */
-            {id:23,type:"single",count:1,question:"You want to POST (create) a new ACL 'challenge-207-pod-10' using this URI:\n\nhttps://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list\n\nWhich payload is correct?",options:[{text:"{\n  \"Cisco-IOS-XE-native:access-list\": {\n    \"Cisco-IOS-XE-acl:extended\": [\n      {\n        \"name\": \"challenge-207-pod-10\",\n        \"access-list-seq-rule\": [\n          {\"sequence\": \"10\", \"ace-rule\": {\"action\": \"permit\", \"protocol\": \"tcp\", \"any\": [null], \"dst-any\": [null]}}\n        ]\n      }\n    ]\n  }\n}",correct:false},{text:"{\n  \"Cisco-IOS-XE-acl:extended\": [\n    {\n      \"name\": \"challenge-207-pod-10\",\n      \"access-list-seq-rule\": [\n        {\"sequence\": \"10\", \"ace-rule\": {\"action\": \"permit\", \"protocol\": \"tcp\", \"any\": [null], \"dst-any\": [null]}}\n      ]\n    }\n  ]\n}",correct:true},{text:"{\n  \"name\": \"challenge-207-pod-10\",\n  \"access-list-seq-rule\": [\n    {\"sequence\": \"10\", \"ace-rule\": {\"action\": \"permit\", \"protocol\": \"tcp\", \"any\": [null], \"dst-any\": [null]}}\n  ]\n}",correct:false},{text:"{\n  \"Cisco-IOS-XE-acl:extended\": {\n    \"name\": \"challenge-207-pod-10\",\n    \"access-list-seq-rule\": [\n      {\"sequence\": \"10\", \"ace-rule\": {\"action\": \"permit\", \"protocol\": \"tcp\", \"any\": [null], \"dst-any\": [null]}}\n    ]\n  }\n}",correct:false}],explanation:"📖 Explanation\nPOST payload (B) must contain the CHILD resource to create within the parent URI (/access-list).\n• The child is \"Cisco-IOS-XE-acl:extended\": [...] — the list wrapper with key inside\n• No parent container wrapper — POST payload is the child only, not the parent\n• Array [...] for YANG list, not dict {...}\n\n    A → ❌ Contains PARENT container wrapper (\"Cisco-IOS-XE-native:access-list\"). RFC 8040: POST payload must contain only the child resource, not the parent. This causes 'unknown element: access-list' error — the server sees access-list inside access-list.\n    C → ❌ Missing list wrapper. Only has the list entry content without \"Cisco-IOS-XE-acl:extended\": [...]. IOS-XE needs the list wrapper to know which list type (extended vs standard) to create.\n    D → ❌ Wrong data type: uses dict {...} instead of array [...]. YANG lists must be JSON arrays even with a single entry. IOS-XE expects [...] for list data."},
-
-            /* ===== Q24: PATCH — pick correct payload ===== */
-            {id:24,type:"single",count:1,question:"ACL 'EXISTING-ACL' exists with seq 10 and 20. You want to PATCH (merge) a new sequence 40 into it using this URI:\n\nhttps://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=EXISTING-ACL\n\nWhich payload is correct?",options:[{text:"{\n  \"Cisco-IOS-XE-acl:extended\": [\n    {\n      \"name\": \"EXISTING-ACL\",\n      \"access-list-seq-rule\": [\n        {\n          \"sequence\": \"40\",\n          \"ace-rule\": {\n            \"action\": \"deny\",\n            \"protocol\": \"udp\",\n            \"any\": [null],\n            \"dst-any\": [null]\n          }\n        }\n      ]\n    }\n  ]\n}",correct:true},{text:"{\n  \"name\": \"EXISTING-ACL\",\n  \"access-list-seq-rule\": [\n    {\n      \"sequence\": \"40\",\n      \"ace-rule\": {\n        \"action\": \"deny\",\n        \"protocol\": \"udp\",\n        \"any\": [null],\n        \"dst-any\": [null]\n      }\n    }\n  ]\n}",correct:false},{text:"{\n  \"Cisco-IOS-XE-acl:extended\": [\n    {\n      \"name\": \"NEW-DIFFERENT-ACL\",\n      \"access-list-seq-rule\": [\n        {\n          \"sequence\": \"40\",\n          \"ace-rule\": {\n            \"action\": \"deny\",\n            \"protocol\": \"udp\",\n            \"any\": [null],\n            \"dst-any\": [null]\n          }\n        }\n      ]\n    }\n  ]\n}",correct:false},{text:"{\n  \"Cisco-IOS-XE-acl:extended\": {\n    \"name\": \"EXISTING-ACL\",\n    \"access-list-seq-rule\": {\n      \"sequence\": \"40\",\n      \"ace-rule\": {\n        \"action\": \"deny\",\n        \"protocol\": \"udp\",\n        \"any\": [null],\n        \"dst-any\": [null]\n      }\n    }\n  }\n}",correct:false}],explanation:"📖 Explanation\nCorrect PATCH payload (A) has:\n• List wrapper: \"Cisco-IOS-XE-acl:extended\": [...] — required even with key in URI\n• Matching key: \"name\": \"EXISTING-ACL\" matches URI =EXISTING-ACL\n• Only seq 40 — PATCH merges this into existing seq 10, 20. Final state: seq 10, 20, AND 40\n• Array for both extended [...] and access-list-seq-rule [...]\n\n    B → ❌ Missing list wrapper \"Cisco-IOS-XE-acl:extended\": [...]. Even with key in URI, PATCH still requires the list wrapper. IOS-XE returns 'missing element: extended'.\n    C → ❌ Key mismatch: URI says =EXISTING-ACL but payload says \"name\": \"NEW-DIFFERENT-ACL\". Keys must match between URI and payload.\n    D → ❌ TWO errors: (1) \"Cisco-IOS-XE-acl:extended\" uses dict {...} not array [...]. YANG list = JSON array. (2) \"access-list-seq-rule\" also uses dict {...} instead of array [...]. Both are YANG lists and must be JSON arrays."},
-
-            /* ===== Q25: GET — pick correct response format ===== */
-            {id:25,type:"single",count:1,question:"You GET this URI:\n\nhttps://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=challenge-207-pod-10\n\nWhich response body structure is correct?",options:[{text:"{\n  \"Cisco-IOS-XE-acl:extended\": [\n    {\n      \"name\": \"challenge-207-pod-10\",\n      \"access-list-seq-rule\": [\n        {\"sequence\": \"10\", \"ace-rule\": {\"action\": \"permit\", \"protocol\": \"tcp\", \"any\": [null], \"src-gt\": 100, \"dest-ipv4-address\": \"203.36.36.32\", \"dest-mask\": \"0.0.0.15\", \"dst-eq\": 636}},\n        {\"sequence\": \"20\", \"ace-rule\": {\"action\": \"deny\", \"protocol\": \"ip\", \"host-address\": \"198.51.100.6\", \"dst-any\": [null]}}\n      ]\n    }\n  ]\n}",correct:true},{text:"{\n  \"extended\": {\n    \"name\": \"challenge-207-pod-10\",\n    \"access-list-seq-rule\": [\n      {\"sequence\": \"10\", \"ace-rule\": {\"action\": \"permit\", \"protocol\": \"tcp\", \"any\": [null], \"src-gt\": 100}},\n      {\"sequence\": \"20\", \"ace-rule\": {\"action\": \"deny\", \"protocol\": \"ip\", \"host-address\": \"198.51.100.6\", \"dst-any\": [null]}}\n    ]\n  }\n}",correct:false},{text:"{\n  \"Cisco-IOS-XE-native:access-list\": {\n    \"Cisco-IOS-XE-acl:extended\": [\n      {\"name\": \"challenge-207-pod-10\", \"access-list-seq-rule\": [...]}\n    ]\n  }\n}",correct:false},{text:"[\n  {\n    \"name\": \"challenge-207-pod-10\",\n    \"access-list-seq-rule\": [\n      {\"sequence\": \"10\", \"ace-rule\": {...}},\n      {\"sequence\": \"20\", \"ace-rule\": {...}}\n    ]\n  }\n]",correct:false}],explanation:"📖 Explanation\nGET response (A) returns the resource at the URI level:\n• URI targets /extended=challenge-207-pod-10 — a list instance\n• Response wraps in the list name: \"Cisco-IOS-XE-acl:extended\": [...] — full module prefix required\n• Inside the array: the specific ACL entry with name and all seq-rules\n• YANG list = JSON array [...], even for a single entry\n\n    B → ❌ Missing module prefix: \"extended\" should be \"Cisco-IOS-XE-acl:extended\". Also uses dict {...} instead of array [...] for the list.\n    C → ❌ Response includes parent container \"Cisco-IOS-XE-native:access-list\". GET response starts at the URI target level (/extended=KEY), not the parent.\n    D → ❌ Missing list name wrapper. Response is a bare array without the \"Cisco-IOS-XE-acl:extended\" key. IOS-XE always wraps the response in the list/container name."},
-
-            /* ===== Q26: DELETE — pick correct scenario ===== */
-            {id:26,type:"single",count:1,question:"You want to delete ONLY ACL 'exam2-netconf-create-16' while keeping all other ACLs intact. Which curl command is correct?",options:[{text:"curl -i -k -X DELETE \\\n  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16' \\\n  --header 'Accept: application/yang-data+json'",correct:true},{text:"curl -i -k -X DELETE \\\n  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended' \\\n  --header 'Accept: application/yang-data+json'",correct:false},{text:"curl -i -k -X DELETE \\\n  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list' \\\n  --header 'Accept: application/yang-data+json'",correct:false},{text:"curl -i -k -X DELETE \\\n  'https://192.168.89.71/restconf/data/Cisco-IOS-XE-native:native/ip/access-list/extended=exam2-netconf-create-16' \\\n  --header 'Accept: application/yang-data+json' \\\n  --data '{\"Cisco-IOS-XE-acl:extended\": [{\"name\": \"exam2-netconf-create-16\"}]}'",correct:false}],explanation:"📖 Explanation\nCorrect DELETE (A):\n• URI includes the key: /extended=exam2-netconf-create-16 — identifies exactly which ACL to delete\n• No payload needed — DELETE identifies the target via URI only\n• Returns 204 No Content on success\n• Other ACLs (challenge-207-pod-10, etc.) remain untouched\n\n    B → ❌ /extended without key — 'Operation not allowed'. DELETE on a list requires a key to identify which instance. This would need to delete ALL extended ACLs which IOS-XE doesn't allow at list level.\n    C → ❌ /access-list is the container — this deletes the ENTIRE access-list container including ALL standard and extended ACLs. Way too broad — the question asks to delete only one ACL.\n    D → ❌ DELETE does not use a payload/message-body. The target is identified entirely by the URI. Adding --data is unnecessary and may cause errors on some implementations."}
-        ];
-
-        let answers = {}, submitted = {}, score = 0;
-        const blockState = {};
-
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
-            document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.remove('active'); });
-            document.getElementById(id).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function initQuiz() {
-            var container = document.getElementById('quizContainer');
-            container.innerHTML = questions.map(function(q, idx){ return renderQuestion(q, idx); }).join('');
-            // Init block states
-            questions.forEach(function(q){
-                if (q.type === 'blocks') {
-                    blockState[q.id] = { slots: {}, usedPool: [] };
-                    q.blocks.forEach(function(b, bi){ blockState[q.id].slots[bi] = new Array(b.slots).fill(null); });
-                }
-            });
-            updateProgress();
-        }
-
-        function renderQuestion(q, idx) {
-            var expHtml = q.explanation.replace(/\n/g, '<br>');
-            if (q.type === 'single' || q.type === 'multi') {
-                var typeLabel = q.count === 1 ? 'Choose 1' : 'Choose ' + q.count;
-                return '<div class="question-card" id="q' + q.id + '">' +
-                    '<div class="question-header"><span class="question-number">Q' + (idx+1) + '</span><span class="question-type">' + typeLabel + '</span></div>' +
-                    '<div class="question-text">' + q.question.replace(/\n/g, '<br>').replace(/ {2}/g, '&nbsp;&nbsp;') + '</div>' +
-                    '<div class="options-list">' +
-                    q.options.map(function(opt, i) {
-                        var optHtml = opt.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                        if (opt.text.indexOf('\n') > -1) { optHtml = '<pre>' + optHtml + '</pre>'; }
-                        return '<div class="option-item" data-qid="' + q.id + '" data-idx="' + i + '" onclick="selectOption(' + q.id + ',' + i + ',\'' + q.type + '\',' + q.count + ')">' +
-                            '<div class="option-checkbox">' + String.fromCharCode(65 + i) + '</div>' +
-                            '<div class="option-text">' + optHtml + '</div></div>';
-                    }).join('') + '</div>' +
-                    '<button class="submit-btn" id="sub' + q.id + '" onclick="submitAnswer(' + q.id + ')" disabled>Submit Answer</button>' +
-                    '<div class="explanation" id="exp' + q.id + '"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">' + expHtml + '</div></div></div>';
-            }
-            if (q.type === 'blocks') {
-                return '<div class="question-card" id="q' + q.id + '">' +
-                    '<div class="question-header"><span class="question-number">Q' + (idx+1) + '</span><span class="question-type">Drag Commands to Blocks</span></div>' +
-                    '<div class="question-text">' + q.question.replace(/\n/g, '<br>').replace(/ {2}/g, '&nbsp;&nbsp;') + '</div>' +
-                    '<div class="block-container" id="blocks' + q.id + '">' +
-                    q.blocks.map(function(b, bi) {
-                        var slotsHtml = '';
-                        for (var s = 0; s < b.slots; s++) {
-                            slotsHtml += '<div class="block-slot" data-qid="' + q.id + '" data-block="' + bi + '" data-slot="' + s + '" ondrop="dropBlock(event,' + q.id + ',' + bi + ',' + s + ')" ondragover="event.preventDefault();this.classList.add(\'drag-over\')" ondragleave="this.classList.remove(\'drag-over\')" onclick="removeFromSlot(' + q.id + ',' + bi + ',' + s + ')"><span class="slot-text" style="opacity:0.4">Drop URI here</span><span class="slot-remove">✕</span></div>';
-                        }
-                        return '<div class="block-section"><div class="block-title">' + b.title + '</div><div class="block-slots">' + slotsHtml + '</div></div>';
-                    }).join('') + '</div>' +
-                    '<div class="cmd-pool" id="pool' + q.id + '"><div class="cmd-pool-title">📦 URI Pool — drag URIs into the operation blocks above</div>' +
-                    q.pool.map(function(cmd, ci) { return '<div class="cmd-chip" draggable="true" data-qid="' + q.id + '" data-cmd="' + cmd + '" ondragstart="dragChip(event,\'' + cmd.replace(/'/g, "\\'") + '\')" id="chip' + q.id + '_' + ci + '">' + cmd + '</div>'; }).join('') + '</div>' +
-                    '<button class="submit-btn" id="sub' + q.id + '" onclick="submitBlocks(' + q.id + ')" disabled>Submit Answer</button>' +
-                    '<div class="explanation" id="exp' + q.id + '"><div class="explanation-title">📖 Explanation</div><div class="explanation-text">' + expHtml + '</div></div></div>';
-            }
-            return '';
-        }
-
-        // ---- SINGLE/MULTI ----
-        function selectOption(qid, idx, type, count) {
-            if (submitted[qid]) return;
-            if (!answers[qid]) answers[qid] = [];
-            if (type === 'single') answers[qid] = [idx];
-            else { var i = answers[qid].indexOf(idx); if (i > -1) answers[qid].splice(i,1); else if (answers[qid].length < count) answers[qid].push(idx); else { answers[qid].shift(); answers[qid].push(idx); } }
-            document.querySelectorAll('.option-item[data-qid="'+qid+'"]').forEach(function(el,j){ el.classList.toggle('selected', answers[qid] && answers[qid].includes(j)); });
-            document.getElementById('sub'+qid).disabled = answers[qid].length !== count;
-        }
-
-        function submitAnswer(qid) {
-            if (submitted[qid]) return; submitted[qid] = true;
-            var q = questions.find(function(x){ return x.id === qid; });
-            var correct = q.options.map(function(o,i){ return o.correct ? i : -1; }).filter(function(i){ return i > -1; });
-            var user = answers[qid] || [];
-            var isCorrect = user.length === q.count && user.every(function(i){ return correct.includes(i); }) && correct.every(function(i){ return user.includes(i); });
-            if (isCorrect) score++;
-            document.querySelectorAll('.option-item[data-qid="'+qid+'"]').forEach(function(el,i){
-                el.classList.add('disabled'); el.classList.remove('selected');
-                if (q.options[i].correct) el.classList.add('correct');
-                else if (user.includes(i)) el.classList.add('incorrect');
-            });
-            markQuestion(qid, isCorrect);
-        }
-
-        // ---- BLOCKS ----
-        function dragChip(e, cmd) { e.dataTransfer.setData('text/plain', cmd); }
-        function dropBlock(e, qid, blockIdx, slotIdx) {
-            e.preventDefault(); e.target.classList.remove('drag-over');
-            if (submitted[qid]) return;
-            var cmd = e.dataTransfer.getData('text/plain'); if (!cmd) return;
-            var bs = blockState[qid];
-            // Remove from previous slot
-            Object.keys(bs.slots).forEach(function(bi){ bs.slots[bi].forEach(function(v,si){ if (v === cmd) bs.slots[bi][si] = null; }); });
-            bs.slots[blockIdx][slotIdx] = cmd;
-            var allUsed = [];
-            Object.keys(bs.slots).forEach(function(bi){ bs.slots[bi].forEach(function(v){ if (v) allUsed.push(v); }); });
-            bs.usedPool = allUsed;
-            rerenderBlockSlots(qid); updateBlockChips(qid); checkBlocksComplete(qid);
-        }
-        function removeFromSlot(qid, blockIdx, slotIdx) {
-            if (submitted[qid]) return;
-            var bs = blockState[qid]; if (!bs.slots[blockIdx][slotIdx]) return;
-            bs.slots[blockIdx][slotIdx] = null;
-            var allUsed = [];
-            Object.keys(bs.slots).forEach(function(bi){ bs.slots[bi].forEach(function(v){ if (v) allUsed.push(v); }); });
-            bs.usedPool = allUsed;
-            rerenderBlockSlots(qid); updateBlockChips(qid);
-            document.getElementById('sub'+qid).disabled = true;
-        }
-        function rerenderBlockSlots(qid) {
-            var bs = blockState[qid];
-            Object.keys(bs.slots).forEach(function(bi){ bs.slots[bi].forEach(function(v, si){
-                var el = document.querySelector('.block-slot[data-qid="'+qid+'"][data-block="'+bi+'"][data-slot="'+si+'"]');
-                if (v) { el.classList.add('filled'); el.querySelector('.slot-text').textContent = v; el.querySelector('.slot-text').style.opacity = '1'; }
-                else { el.classList.remove('filled'); el.querySelector('.slot-text').textContent = 'Drop URI here'; el.querySelector('.slot-text').style.opacity = '0.4'; }
-            }); });
-        }
-        function updateBlockChips(qid) {
-            var bs = blockState[qid];
-            document.querySelectorAll('.cmd-chip[data-qid="'+qid+'"]').forEach(function(el){ el.classList.toggle('used', bs.usedPool.includes(el.dataset.cmd)); });
-        }
-        function checkBlocksComplete(qid) {
-            var q = questions.find(function(x){ return x.id === qid; }); var bs = blockState[qid]; var allFilled = true;
-            q.blocks.forEach(function(b, bi){ bs.slots[bi].forEach(function(v){ if (!v) allFilled = false; }); });
-            document.getElementById('sub'+qid).disabled = !allFilled;
-        }
-        function submitBlocks(qid) {
-            if (submitted[qid]) return; submitted[qid] = true;
-            var q = questions.find(function(x){ return x.id === qid; }); var bs = blockState[qid]; var allCorrect = true;
-            q.blocks.forEach(function(b, bi){ bs.slots[bi].forEach(function(v, si){
-                var el = document.querySelector('.block-slot[data-qid="'+qid+'"][data-block="'+bi+'"][data-slot="'+si+'"]');
-                var isCorrect = v === b.answer[si]; if (!isCorrect) allCorrect = false;
-                el.classList.remove('filled'); el.classList.add(isCorrect ? 'correct-slot' : 'wrong-slot');
-                el.querySelector('.slot-remove').style.display = 'none'; el.onclick = null;
-            }); });
-            document.querySelectorAll('.cmd-chip[data-qid="'+qid+'"]').forEach(function(el){ el.removeAttribute('draggable'); el.classList.add('used'); el.style.cursor = 'default'; });
-            if (allCorrect) score++;
-            markQuestion(qid, allCorrect);
-        }
-
-        // ---- COMMON ----
-        function markQuestion(qid, isCorrect) {
-            document.getElementById('q'+qid).classList.add(isCorrect ? 'answered-correct' : 'answered-incorrect');
-            var btn = document.getElementById('sub'+qid);
-            btn.textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
-            btn.style.background = isCorrect ? 'var(--accent-green)' : 'var(--accent-red)';
-            btn.disabled = true;
-            document.getElementById('exp'+qid).classList.add('show');
-            document.getElementById('correctCount').textContent = score;
-            document.getElementById('totalAnswered').textContent = Object.keys(submitted).length;
-            updateProgress();
-        }
-
-        function updateProgress() {
-            document.getElementById('progressBar').style.width = (Object.keys(submitted).length / questions.length * 100) + '%';
-        }
-
-        function resetQuiz() {
-            answers = {}; submitted = {}; score = 0;
-            Object.keys(blockState).forEach(function(k){ delete blockState[k]; });
-            document.getElementById('correctCount').textContent = '0';
-            document.getElementById('totalAnswered').textContent = '0';
-            initQuiz();
-        }
-
-        function showAllAnswers() {
-            questions.forEach(function(q) {
-                if (submitted[q.id]) return;
-                if (q.type === 'single' || q.type === 'multi') {
-                    answers[q.id] = q.options.map(function(o,i){ return o.correct ? i : -1; }).filter(function(i){ return i > -1; }).slice(0, q.count);
-                    submitAnswer(q.id);
-                } else if (q.type === 'blocks') {
-                    if (!blockState[q.id]) { blockState[q.id] = { slots: {}, usedPool: [] }; q.blocks.forEach(function(b,bi){ blockState[q.id].slots[bi] = new Array(b.slots).fill(null); }); }
-                    q.blocks.forEach(function(b, bi){ b.answer.forEach(function(a, si){ blockState[q.id].slots[bi][si] = a; }); });
-                    rerenderBlockSlots(q.id);
-                    submitBlocks(q.id);
-                }
-            });
-        }
-
-        initQuiz();
-    </script>
-
+let score=0,answered=0;
+const total=Q.length;
+const ctn=document.getElementById('qs');
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function mkCurl(raw,id){if(!raw)return '';return `<div class="curl-wrap"><div class="curl-code" id="${id}">${esc(raw)}</div><button class="copy-btn" onclick="cpCurl('${id}',this)">copy</button></div>`;}
+window.cpCurl=function(id,btn){const el=document.getElementById(id);navigator.clipboard.writeText(el.textContent).then(()=>{btn.textContent='copied!';setTimeout(()=>{btn.textContent='copy';},1500);});};
+function upd(){document.getElementById('sc').textContent=score;document.getElementById('prog').textContent=answered+' of '+total+' answered';document.getElementById('pb').style.width=(answered/total*100)+'%';}
+Q.forEach((q,qi)=>{
+const card=document.createElement('div');card.className='q-card';
+const tag=q.m?'<span class="q-tag tag-multi">select '+q.ans.length+'</span>':'<span class="q-tag tag-single">single answer</span>';
+const rType=q.m?'checkbox':'';
+let oh=q.opts.map((o,oi)=>{const cid='q'+qi+'c'+oi;return `<div class="option" data-q="${qi}" data-o="${oi}"><div class="radio ${rType}"></div><div class="opt-content"><div class="opt-label">${esc(o.l)}</div>${mkCurl(o.c,cid)}</div></div>`;}).join('');
+card.innerHTML=`<div class="q-top"><span class="q-num">Question ${qi+1} of ${total}</span>${tag}</div><div class="q-text">${q.q}</div><div class="q-scenario">${esc(q.s)}</div><div class="yang-label">YANG tree</div><div class="yang-tree">${q.t}</div><div class="options" id="opts-${qi}">${oh}</div><div class="actions" id="act-${qi}"><button class="btn btn-submit" id="sub-${qi}" onclick="submitQ(${qi})">Submit</button></div><div class="explanation" id="exp-${qi}">${q.exp}</div>`;
+ctn.appendChild(card);
+});
+document.querySelectorAll('.option').forEach(el=>{el.addEventListener('click',function(){const qi=parseInt(this.dataset.q);const p=document.getElementById('opts-'+qi);if(p.classList.contains('done'))return;if(Q[qi].m){this.classList.toggle('selected');}else{p.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));this.classList.add('selected');}});});
+window.submitQ=function(qi){const p=document.getElementById('opts-'+qi);if(p.classList.contains('done'))return;const allO=p.querySelectorAll('.option');const sel=[];allO.forEach((o,i)=>{if(o.classList.contains('selected'))sel.push(i);});if(sel.length===0)return;p.classList.add('done');allO.forEach(o=>{o.classList.remove('selected');o.classList.add('locked');});const cor=Q[qi].ans;let perfect=true;if(Q[qi].m){sel.forEach(s=>{if(cor.includes(s))allO[s].classList.add('correct');else{allO[s].classList.add('wrong');perfect=false;}});cor.forEach(c=>{if(!sel.includes(c)){allO[c].classList.add('missed');perfect=false;}});}else{if(cor.includes(sel[0])){allO[sel[0]].classList.add('correct');}else{allO[sel[0]].classList.add('wrong');allO[cor[0]].classList.add('correct');perfect=false;}}if(perfect)score++;answered++;upd();document.getElementById('sub-'+qi).disabled=true;document.getElementById('sub-'+qi).textContent=perfect?'Correct ✓':'Incorrect ✗';document.getElementById('sub-'+qi).style.background=perfect?'var(--correct-border)':'var(--wrong-border)';document.getElementById('exp-'+qi).style.display='block';};
+</script>
 </body>
 </html>

@@ -687,6 +687,428 @@
   </div>
 </div>
 
+<!-- QUESTION 3 -->
+<div class="question-block" id="q3-block">
+  <div class="q-header">
+    <div class="q-number">3</div>
+    <div class="q-title">Fix the invalid payload — Choose TWO</div>
+  </div>
+  <p class="q-instruction">The following Python script sends a RESTCONF PATCH using the extended BGP peering YANG model below. The request returns <code>400 Bad Request</code>. Choose <strong>two</strong> options that would <strong>independently</strong> fix the payload.</p>
+
+  <div class="yang-block">
+    <span class="label">bgp-peering-ext.yang</span>
+<pre><span class="kw">module</span> bgp-peering-ext {
+  <span class="kw">namespace</span> <span class="str">"http://example.com/bgp-peering-ext"</span>;  <span class="kw">prefix</span> bpe;
+  <span class="kw">import</span> ietf-inet-types { <span class="kw">prefix</span> inet; }
+
+  <span class="kw">list</span> bgp-peering {
+    <span class="kw">key</span> <span class="str">"name"</span>;
+    <span class="kw">leaf</span> name        { <span class="kw">type</span> <span class="tp">string</span>; }
+    <span class="kw">leaf</span> local-as    { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> remote-as   { <span class="kw">type</span> <span class="tp">uint32</span>; }
+    <span class="kw">leaf</span> neighbor-ip { <span class="kw">type</span> <span class="tp">inet:ipv4-address</span>; }
+
+    <span class="kw">leaf</span> peer-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> direct    { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> untrusted { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> transit   { <span class="kw">value</span> <span class="num">3</span>; }
+    } }
+    <span class="kw">leaf</span> as-type {
+      <span class="kw">type</span> <span class="tp">enumeration</span> {
+        <span class="kw">enum</span> customer { <span class="kw">value</span> <span class="num">1</span>; }
+        <span class="kw">enum</span> provider { <span class="kw">value</span> <span class="num">2</span>; }
+        <span class="kw">enum</span> peer     { <span class="kw">value</span> <span class="num">3</span>; }
+    } }
+
+    <span class="kw">leaf-list</span> allowed-ip-prefixes {
+      <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted'"</span>;
+    }
+    <span class="kw">container</span> static-routes {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'direct' or ../peer-type = 'untrusted'"</span>;
+      <span class="kw">leaf-list</span> route { <span class="kw">type</span> <span class="tp">inet:ipv4-prefix</span>; }
+    }
+    <span class="kw">container</span> bfd {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'direct' or ../peer-type = 'untrusted'"</span>;
+      <span class="kw">leaf</span> enabled      { <span class="kw">type</span> <span class="tp">boolean</span>; <span class="kw">default</span> false; }
+      <span class="kw">leaf</span> min-interval { <span class="kw">type</span> <span class="tp">uint32</span>; <span class="kw">when</span> <span class="str">"../enabled = 'true'"</span>; }
+      <span class="kw">leaf</span> multiplier   { <span class="kw">type</span> <span class="tp">uint8</span>;  <span class="kw">when</span> <span class="str">"../enabled = 'true'"</span>; }
+    }
+    <span class="kw">leaf</span> ttl-security {
+      <span class="kw">type</span> <span class="tp">uint8</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted' or ../peer-type = 'transit'"</span>;
+    }
+    <span class="kw">container</span> md5-auth {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted' or ../peer-type = 'transit'"</span>;
+      <span class="kw">leaf</span> key-chain  { <span class="kw">type</span> <span class="tp">string</span>; }
+      <span class="kw">leaf</span> encrypted  { <span class="kw">type</span> <span class="tp">boolean</span>; <span class="kw">default</span> true; }
+    }
+    <span class="kw">container</span> dampening {
+      <span class="kw">when</span> <span class="str">"../peer-type = 'untrusted'"</span>;
+      <span class="kw">leaf</span> half-life { <span class="kw">type</span> <span class="tp">uint16</span>; }
+      <span class="kw">leaf</span> reuse     { <span class="kw">type</span> <span class="tp">uint16</span>; }
+      <span class="kw">leaf</span> suppress  { <span class="kw">type</span> <span class="tp">uint16</span>; }
+    }
+    <span class="kw">leaf-list</span> community-set {
+      <span class="kw">type</span> <span class="tp">string</span>;
+      <span class="kw">when</span> <span class="str">"../as-type = 'customer'"</span>;
+    }
+    <span class="kw">leaf</span> route-map-in {
+      <span class="kw">type</span> <span class="tp">string</span>;
+      <span class="kw">when</span> <span class="str">"../as-type = 'customer' or ../as-type = 'peer'"</span>;
+    }
+    <span class="kw">leaf</span> route-map-out {
+      <span class="kw">type</span> <span class="tp">string</span>;
+      <span class="kw">when</span> <span class="str">"../as-type = 'customer'"</span>;
+    }
+    <span class="kw">container</span> prefix-limit {
+      <span class="kw">when</span> <span class="str">"../peer-type != 'direct'"</span>;
+      <span class="kw">leaf</span> max-prefixes       { <span class="kw">type</span> <span class="tp">uint32</span>; }
+      <span class="kw">leaf</span> warning-threshold  { <span class="kw">type</span> <span class="tp">uint8</span>;  <span class="kw">when</span> <span class="str">"../max-prefixes"</span>; }
+      <span class="kw">leaf</span> action {
+        <span class="kw">type</span> <span class="tp">enumeration</span> { <span class="kw">enum</span> warning; <span class="kw">enum</span> teardown; <span class="kw">enum</span> restart; }
+        <span class="kw">when</span> <span class="str">"../max-prefixes"</span>;
+    } }
+    <span class="kw">leaf</span> max-prefix {
+      <span class="kw">type</span> <span class="tp">uint32</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type != 'direct'"</span>;
+    }
+    <span class="kw">leaf</span> import-policy {
+      <span class="kw">type</span> <span class="tp">string</span>;
+      <span class="kw">when</span> <span class="str">"../as-type = 'customer' or ../as-type = 'peer'"</span>;
+    }
+    <span class="kw">leaf</span> next-hop-self {
+      <span class="kw">type</span> <span class="tp">boolean</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type = 'transit'"</span>;
+    }
+    <span class="kw">leaf</span> default-originate {
+      <span class="kw">type</span> <span class="tp">boolean</span>;
+      <span class="kw">when</span> <span class="str">"../peer-type = 'direct' and ../as-type = 'customer'"</span>;
+    }
+  }
+}</pre>
+  </div>
+
+  <div class="payload-block" style="border-left:3px solid var(--orange);">
+    <span class="label">Python + Payload</span>
+<pre><span class="cm"># nso_patch_q3.py</span>
+<span class="kw">import</span> requests, urllib3
+urllib3.disable_warnings()
+
+url  = <span class="str">"https://nso.lab.local:8888/restconf/data/bgp-peering-ext:bgp-peering=CE-SOUTH-03"</span>
+hdrs = {<span class="str">"Content-Type"</span>: <span class="str">"application/yang-data+json"</span>,
+        <span class="str">"Accept"</span>:       <span class="str">"application/yang-data+json"</span>}
+
+payload = {
+  <span class="jk">"bgp-peering-ext:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"CE-SOUTH-03"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65310</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.3.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"transit"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"customer"</span>,
+    <span class="jk">"allowed-ip-prefixes"</span>: [<span class="jv">"192.168.10.0/24"</span>, <span class="jv">"192.168.20.0/24"</span>],
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"192.168.10.0/24"</span>, <span class="jv">"192.168.20.0/24"</span>]
+    },
+    <span class="jk">"bfd"</span>: {
+      <span class="jk">"enabled"</span>: <span class="jn">true</span>,
+      <span class="jk">"min-interval"</span>: <span class="jn">300</span>,
+      <span class="jk">"multiplier"</span>: <span class="jn">3</span>
+    },
+    <span class="jk">"ttl-security"</span>: <span class="jn">255</span>,
+    <span class="jk">"md5-auth"</span>: {
+      <span class="jk">"key-chain"</span>: <span class="jv">"BGP-KEYS"</span>,
+      <span class="jk">"encrypted"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"community-set"</span>: [<span class="jv">"65000:100"</span>, <span class="jv">"65000:200"</span>],
+    <span class="jk">"route-map-in"</span>: <span class="jv">"TRANSIT-CUST-IN"</span>,
+    <span class="jk">"route-map-out"</span>: <span class="jv">"TRANSIT-CUST-OUT"</span>,
+    <span class="jk">"prefix-limit"</span>: {
+      <span class="jk">"max-prefixes"</span>: <span class="jn">5000</span>,
+      <span class="jk">"warning-threshold"</span>: <span class="jn">80</span>,
+      <span class="jk">"action"</span>: <span class="jv">"teardown"</span>
+    },
+    <span class="jk">"max-prefix"</span>: <span class="jn">5000</span>,
+    <span class="jk">"import-policy"</span>: <span class="jv">"CUST-IMPORT-V3"</span>
+  }]
+}
+
+resp = requests.patch(url, json=payload, headers=hdrs, auth=(<span class="str">"admin"</span>,<span class="str">"admin"</span>), verify=<span class="jn">False</span>)
+print(resp.status_code, resp.text)   <span class="cm"># 400 Bad Request</span></pre>
+  </div>
+
+  <div class="options-grid" id="q3-options">
+    <button class="option-btn" data-val="A" onclick="selectMulti('q3',this)"><span class="letter">A</span><span>Remove <code>allowed-ip-prefixes</code>, <code>bfd</code>, and <code>static-routes</code> from the payload</span></button>
+    <button class="option-btn" data-val="B" onclick="selectMulti('q3',this)"><span class="letter">B</span><span>Remove <code>ttl-security</code> and <code>md5-auth</code> from the payload</span></button>
+    <button class="option-btn" data-val="C" onclick="selectMulti('q3',this)"><span class="letter">C</span><span>Change <code>peer-type</code> from <code>transit</code> to <code>untrusted</code></span></button>
+    <button class="option-btn" data-val="D" onclick="selectMulti('q3',this)"><span class="letter">D</span><span>Change <code>as-type</code> from <code>customer</code> to <code>provider</code></span></button>
+    <button class="option-btn" data-val="E" onclick="selectMulti('q3',this)"><span class="letter">E</span><span>Remove <code>prefix-limit</code> and <code>max-prefix</code> from the payload</span></button>
+  </div>
+  <div class="btn-row">
+    <button class="submit-btn" id="q3-submit" disabled onclick="submitMulti('q3',['A','C'])">Check Answer</button>
+    <button class="reset-btn" onclick="resetMulti('q3')">Reset</button>
+  </div>
+  <div class="result-banner" id="q3-result"></div>
+  <div class="explanation" id="q3-explanation">
+    <h3>Explanation — peer-type=transit, as-type=customer</h3>
+    <table class="eval-table">
+      <tr><th>Node</th><th>when condition</th><th>Eval</th><th>In Payload?</th><th>Verdict</th></tr>
+      <tr><td>allowed-ip-prefixes</td><td>untrusted</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>static-routes</td><td>direct or untrusted</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>bfd</td><td>direct or untrusted</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>ttl-security</td><td>untrusted or transit</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>md5-auth</td><td>untrusted or transit</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>community-set</td><td>customer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>route-map-in</td><td>customer or peer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>route-map-out</td><td>customer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>prefix-limit</td><td>!= direct</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>max-prefix</td><td>!= direct</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>import-policy</td><td>customer or peer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+    </table>
+    <p><strong>Three violations:</strong> <code>allowed-ip-prefixes</code>, <code>static-routes</code>, <code>bfd</code> — all need <code>direct</code> or <code>untrusted</code>, but peer-type is <code>transit</code>.</p>
+    <div class="exp-option"><div class="exp-label is-correct">✅ A — Removes all three offending nodes. Remaining 8 nodes are valid for transit+customer.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ B — ttl-security and md5-auth are valid for transit. Removing them fixes nothing.</div></div>
+    <div class="exp-option"><div class="exp-label is-correct">✅ C — Changing to untrusted: allowed-ip-prefixes (✅), static-routes (✅), bfd (✅). And ttl-security/md5-auth stay valid (untrusted or transit). All nodes pass.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ D — Changing to provider breaks community-set, route-map-in, route-map-out, import-policy. Goes from 3→7 violations.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ E — prefix-limit and max-prefix are valid (!= direct). Removing them fixes nothing.</div></div>
+  </div>
+</div>
+
+<!-- QUESTION 4 -->
+<div class="question-block" id="q4-block">
+  <div class="q-header">
+    <div class="q-number">4</div>
+    <div class="q-title">Fix the invalid payload — Choose TWO</div>
+  </div>
+  <p class="q-instruction">The following Python script sends a RESTCONF PATCH using the same extended YANG model. The request returns <code>400 Bad Request</code>. Choose <strong>two</strong> options that would <strong>independently</strong> fix the payload.</p>
+
+  <div class="yang-block">
+    <span class="label">bgp-peering-ext.yang — key when conditions</span>
+<pre><span class="cm">// Same extended model as Q3. Key when conditions:</span>
+<span class="cm">// allowed-ip-prefixes:   when "../peer-type = 'untrusted'"</span>
+<span class="cm">// static-routes:         when "../peer-type = 'direct' or 'untrusted'"</span>
+<span class="cm">// bfd:                   when "../peer-type = 'direct' or 'untrusted'"</span>
+<span class="cm">// ttl-security:          when "../peer-type = 'untrusted' or 'transit'"</span>
+<span class="cm">// md5-auth:              when "../peer-type = 'untrusted' or 'transit'"</span>
+<span class="cm">// dampening:             when "../peer-type = 'untrusted'"</span>
+<span class="cm">// community-set:         when "../as-type = 'customer'"</span>
+<span class="cm">// route-map-in:          when "../as-type = 'customer' or 'peer'"</span>
+<span class="cm">// route-map-out:         when "../as-type = 'customer'"</span>
+<span class="cm">// prefix-limit:          when "../peer-type != 'direct'"</span>
+<span class="cm">// max-prefix:            when "../peer-type != 'direct'"</span>
+<span class="cm">// import-policy:         when "../as-type = 'customer' or 'peer'"</span>
+<span class="cm">// next-hop-self:         when "../peer-type = 'transit'"</span>
+<span class="cm">// default-originate:     when "../peer-type = 'direct' and ../as-type = 'customer'"</span></pre>
+  </div>
+
+  <div class="payload-block" style="border-left:3px solid var(--orange);">
+    <span class="label">Python + Payload</span>
+<pre><span class="cm"># nso_patch_q4.py</span>
+<span class="kw">import</span> requests, urllib3
+urllib3.disable_warnings()
+
+url  = <span class="str">"https://nso.lab.local:8888/restconf/data/bgp-peering-ext:bgp-peering=PE-NORTH-01"</span>
+hdrs = {<span class="str">"Content-Type"</span>: <span class="str">"application/yang-data+json"</span>,
+        <span class="str">"Accept"</span>:       <span class="str">"application/yang-data+json"</span>}
+
+payload = {
+  <span class="jk">"bgp-peering-ext:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"PE-NORTH-01"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65400</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.4.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"untrusted"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"provider"</span>,
+    <span class="jk">"allowed-ip-prefixes"</span>: [<span class="jv">"10.50.0.0/16"</span>, <span class="jv">"10.60.0.0/16"</span>],
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"10.50.0.0/16"</span>]
+    },
+    <span class="jk">"dampening"</span>: {
+      <span class="jk">"half-life"</span>: <span class="jn">15</span>,
+      <span class="jk">"reuse"</span>: <span class="jn">750</span>,
+      <span class="jk">"suppress"</span>: <span class="jn">2000</span>
+    },
+    <span class="jk">"md5-auth"</span>: {
+      <span class="jk">"key-chain"</span>: <span class="jv">"PROVIDER-KEYS"</span>,
+      <span class="jk">"encrypted"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"ttl-security"</span>: <span class="jn">1</span>,
+    <span class="jk">"static-filter"</span>: {
+      <span class="jk">"allowed-vlans"</span>: [<span class="jn">500</span>, <span class="jn">600</span>, <span class="jn">700</span>],
+      <span class="jk">"strict-rpf"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"community-set"</span>: [<span class="jv">"65000:400"</span>, <span class="jv">"65000:500"</span>],
+    <span class="jk">"route-map-in"</span>: <span class="jv">"PROVIDER-IN"</span>,
+    <span class="jk">"route-map-out"</span>: <span class="jv">"PROVIDER-OUT"</span>,
+    <span class="jk">"prefix-limit"</span>: {
+      <span class="jk">"max-prefixes"</span>: <span class="jn">10000</span>,
+      <span class="jk">"warning-threshold"</span>: <span class="jn">90</span>,
+      <span class="jk">"action"</span>: <span class="jv">"warning"</span>
+    },
+    <span class="jk">"max-prefix"</span>: <span class="jn">10000</span>,
+    <span class="jk">"import-policy"</span>: <span class="jv">"PROV-IMPORT"</span>
+  }]
+}
+
+resp = requests.patch(url, json=payload, headers=hdrs, auth=(<span class="str">"admin"</span>,<span class="str">"admin"</span>), verify=<span class="jn">False</span>)
+print(resp.status_code, resp.text)   <span class="cm"># 400 Bad Request</span></pre>
+  </div>
+
+  <div class="options-grid" id="q4-options">
+    <button class="option-btn" data-val="A" onclick="selectMulti('q4',this)"><span class="letter">A</span><span>Remove <code>static-filter</code>, <code>community-set</code>, <code>route-map-in</code>, <code>route-map-out</code>, and <code>import-policy</code></span></button>
+    <button class="option-btn" data-val="B" onclick="selectMulti('q4',this)"><span class="letter">B</span><span>Change <code>as-type</code> from <code>provider</code> to <code>customer</code></span></button>
+    <button class="option-btn" data-val="C" onclick="selectMulti('q4',this)"><span class="letter">C</span><span>Change <code>peer-type</code> from <code>untrusted</code> to <code>direct</code></span></button>
+    <button class="option-btn" data-val="D" onclick="selectMulti('q4',this)"><span class="letter">D</span><span>Remove <code>dampening</code> and <code>md5-auth</code> from the payload</span></button>
+    <button class="option-btn" data-val="E" onclick="selectMulti('q4',this)"><span class="letter">E</span><span>Change <code>as-type</code> from <code>provider</code> to <code>peer</code></span></button>
+  </div>
+  <div class="btn-row">
+    <button class="submit-btn" id="q4-submit" disabled onclick="submitMulti('q4',['A','B'])">Check Answer</button>
+    <button class="reset-btn" onclick="resetMulti('q4')">Reset</button>
+  </div>
+  <div class="result-banner" id="q4-result"></div>
+  <div class="explanation" id="q4-explanation">
+    <h3>Explanation — peer-type=untrusted, as-type=provider</h3>
+    <table class="eval-table">
+      <tr><th>Node</th><th>when condition</th><th>Eval</th><th>In Payload?</th><th>Verdict</th></tr>
+      <tr><td>allowed-ip-prefixes</td><td>untrusted</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>dampening</td><td>untrusted</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>md5-auth</td><td>untrusted or transit</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>ttl-security</td><td>untrusted or transit</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>prefix-limit</td><td>!= direct</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>max-prefix</td><td>!= direct</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>static-filter</td><td>untrusted AND customer</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>community-set</td><td>customer</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>route-map-in</td><td>customer or peer</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>route-map-out</td><td>customer</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>import-policy</td><td>customer or peer</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+    </table>
+    <p><strong>Five violations</strong> — all caused by <code>as-type=provider</code>. The peer-type nodes are fine.</p>
+    <div class="exp-option"><div class="exp-label is-correct">✅ A — Removes all five offending nodes. The 7 peer-type-dependent nodes remain valid.</div></div>
+    <div class="exp-option"><div class="exp-label is-correct">✅ B — Changing to customer: static-filter (✅ untrusted+customer), community-set (✅), route-map-in (✅), route-map-out (✅), import-policy (✅). All fixed.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ C — Changing to direct breaks allowed-ip-prefixes, dampening, md5-auth, ttl-security, prefix-limit, max-prefix. Goes from 5→11 violations.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ D — dampening and md5-auth are valid for untrusted. Removing them fixes nothing.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ E — Changing to peer fixes route-map-in and import-policy, but NOT static-filter (needs customer), community-set (needs customer), or route-map-out (needs customer). Still 3 violations.</div></div>
+  </div>
+</div>
+
+<!-- QUESTION 5 -->
+<div class="question-block" id="q5-block">
+  <div class="q-header">
+    <div class="q-number">5</div>
+    <div class="q-title">Fix the invalid payload — Choose TWO</div>
+  </div>
+  <p class="q-instruction">The following Python script sends a RESTCONF PATCH using the same extended YANG model. The request returns <code>400 Bad Request</code>. Choose <strong>two</strong> options that would <strong>independently</strong> fix the payload.</p>
+
+  <div class="yang-block">
+    <span class="label">bgp-peering-ext.yang — key when conditions</span>
+<pre><span class="cm">// Same extended model as Q3 and Q4. Key when conditions:</span>
+<span class="cm">// allowed-ip-prefixes:   when "../peer-type = 'untrusted'"</span>
+<span class="cm">// static-routes:         when "../peer-type = 'direct' or 'untrusted'"</span>
+<span class="cm">// bfd:                   when "../peer-type = 'direct' or 'untrusted'"</span>
+<span class="cm">// ttl-security:          when "../peer-type = 'untrusted' or 'transit'"</span>
+<span class="cm">// md5-auth:              when "../peer-type = 'untrusted' or 'transit'"</span>
+<span class="cm">// dampening:             when "../peer-type = 'untrusted'"</span>
+<span class="cm">// community-set:         when "../as-type = 'customer'"</span>
+<span class="cm">// route-map-in:          when "../as-type = 'customer' or 'peer'"</span>
+<span class="cm">// route-map-out:         when "../as-type = 'customer'"</span>
+<span class="cm">// prefix-limit:          when "../peer-type != 'direct'"</span>
+<span class="cm">// max-prefix:            when "../peer-type != 'direct'"</span>
+<span class="cm">// import-policy:         when "../as-type = 'customer' or 'peer'"</span>
+<span class="cm">// next-hop-self:         when "../peer-type = 'transit'"</span>
+<span class="cm">// default-originate:     when "../peer-type = 'direct' and ../as-type = 'customer'"</span></pre>
+  </div>
+
+  <div class="payload-block" style="border-left:3px solid var(--orange);">
+    <span class="label">Python + Payload</span>
+<pre><span class="cm"># nso_patch_q5.py</span>
+<span class="kw">import</span> requests, urllib3
+urllib3.disable_warnings()
+
+url  = <span class="str">"https://nso.lab.local:8888/restconf/data/bgp-peering-ext:bgp-peering=CE-CORE-07"</span>
+hdrs = {<span class="str">"Content-Type"</span>: <span class="str">"application/yang-data+json"</span>,
+        <span class="str">"Accept"</span>:       <span class="str">"application/yang-data+json"</span>}
+
+payload = {
+  <span class="jk">"bgp-peering-ext:bgp-peering"</span>: [{
+    <span class="jk">"name"</span>: <span class="jv">"CE-CORE-07"</span>,
+    <span class="jk">"local-as"</span>: <span class="jn">65000</span>,
+    <span class="jk">"remote-as"</span>: <span class="jn">65507</span>,
+    <span class="jk">"neighbor-ip"</span>: <span class="jv">"10.7.1.2"</span>,
+    <span class="jk">"peer-type"</span>: <span class="jv">"direct"</span>,
+    <span class="jk">"as-type"</span>: <span class="jv">"customer"</span>,
+    <span class="jk">"bfd"</span>: {
+      <span class="jk">"enabled"</span>: <span class="jn">true</span>,
+      <span class="jk">"min-interval"</span>: <span class="jn">100</span>,
+      <span class="jk">"multiplier"</span>: <span class="jn">5</span>
+    },
+    <span class="jk">"static-routes"</span>: {
+      <span class="jk">"route"</span>: [<span class="jv">"172.20.0.0/16"</span>, <span class="jv">"172.21.0.0/16"</span>, <span class="jv">"172.22.0.0/16"</span>]
+    },
+    <span class="jk">"community-set"</span>: [<span class="jv">"65000:700"</span>, <span class="jv">"65000:701"</span>],
+    <span class="jk">"route-map-in"</span>: <span class="jv">"DIRECT-CUST-IN"</span>,
+    <span class="jk">"route-map-out"</span>: <span class="jv">"DIRECT-CUST-OUT"</span>,
+    <span class="jk">"dampening"</span>: {
+      <span class="jk">"half-life"</span>: <span class="jn">15</span>,
+      <span class="jk">"reuse"</span>: <span class="jn">750</span>,
+      <span class="jk">"suppress"</span>: <span class="jn">2000</span>
+    },
+    <span class="jk">"ttl-security"</span>: <span class="jn">254</span>,
+    <span class="jk">"md5-auth"</span>: {
+      <span class="jk">"key-chain"</span>: <span class="jv">"CORE-AUTH"</span>,
+      <span class="jk">"encrypted"</span>: <span class="jn">true</span>
+    },
+    <span class="jk">"prefix-limit"</span>: {
+      <span class="jk">"max-prefixes"</span>: <span class="jn">2000</span>,
+      <span class="jk">"warning-threshold"</span>: <span class="jn">85</span>,
+      <span class="jk">"action"</span>: <span class="jv">"restart"</span>
+    },
+    <span class="jk">"import-policy"</span>: <span class="jv">"CUST-IMPORT-CORE"</span>
+  }]
+}
+
+resp = requests.patch(url, json=payload, headers=hdrs, auth=(<span class="str">"admin"</span>,<span class="str">"admin"</span>), verify=<span class="jn">False</span>)
+print(resp.status_code, resp.text)   <span class="cm"># 400 Bad Request</span></pre>
+  </div>
+
+  <div class="options-grid" id="q5-options">
+    <button class="option-btn" data-val="A" onclick="selectMulti('q5',this)"><span class="letter">A</span><span>Remove <code>dampening</code>, <code>ttl-security</code>, <code>md5-auth</code>, and <code>prefix-limit</code> from the payload</span></button>
+    <button class="option-btn" data-val="B" onclick="selectMulti('q5',this)"><span class="letter">B</span><span>Change <code>peer-type</code> from <code>direct</code> to <code>untrusted</code></span></button>
+    <button class="option-btn" data-val="C" onclick="selectMulti('q5',this)"><span class="letter">C</span><span>Change <code>as-type</code> from <code>customer</code> to <code>provider</code></span></button>
+    <button class="option-btn" data-val="D" onclick="selectMulti('q5',this)"><span class="letter">D</span><span>Remove <code>bfd</code> and <code>static-routes</code> from the payload</span></button>
+    <button class="option-btn" data-val="E" onclick="selectMulti('q5',this)"><span class="letter">E</span><span>Change <code>peer-type</code> from <code>direct</code> to <code>transit</code></span></button>
+  </div>
+  <div class="btn-row">
+    <button class="submit-btn" id="q5-submit" disabled onclick="submitMulti('q5',['A','B'])">Check Answer</button>
+    <button class="reset-btn" onclick="resetMulti('q5')">Reset</button>
+  </div>
+  <div class="result-banner" id="q5-result"></div>
+  <div class="explanation" id="q5-explanation">
+    <h3>Explanation — peer-type=direct, as-type=customer</h3>
+    <table class="eval-table">
+      <tr><th>Node</th><th>when condition</th><th>Eval</th><th>In Payload?</th><th>Verdict</th></tr>
+      <tr><td>bfd</td><td>direct or untrusted</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>static-routes</td><td>direct or untrusted</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>community-set</td><td>customer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>route-map-in</td><td>customer or peer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>route-map-out</td><td>customer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>import-policy</td><td>customer or peer</td><td class="pass">✅</td><td>YES</td><td class="pass">✅</td></tr>
+      <tr><td>dampening</td><td>untrusted</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>ttl-security</td><td>untrusted or transit</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>md5-auth</td><td>untrusted or transit</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+      <tr><td>prefix-limit</td><td>!= direct</td><td class="fail">❌</td><td>YES</td><td class="fail">⛔</td></tr>
+    </table>
+    <p><strong>Four violations</strong> — <code>dampening</code> (untrusted only), <code>ttl-security</code> (untrusted/transit), <code>md5-auth</code> (untrusted/transit), <code>prefix-limit</code> (!= direct). All fail because peer-type is <code>direct</code>.</p>
+    <div class="exp-option"><div class="exp-label is-correct">✅ A — Removes all four offending nodes. Remaining 6 nodes (bfd, static-routes, community-set, route-map-in/out, import-policy) are valid for direct+customer.</div></div>
+    <div class="exp-option"><div class="exp-label is-correct">✅ B — Changing to untrusted: dampening (✅), ttl-security (✅), md5-auth (✅), prefix-limit (✅). And bfd/static-routes stay valid (direct or untrusted). All 10 nodes pass.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ C — Changing to provider breaks community-set, route-map-in, route-map-out, import-policy. Goes from 4→8 violations.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ D — bfd and static-routes are valid for direct. Removing them fixes nothing.</div></div>
+    <div class="exp-option"><div class="exp-label is-wrong">❌ E — Changing to transit fixes ttl-security, md5-auth, prefix-limit. But breaks bfd (needs direct/untrusted) and static-routes (needs direct/untrusted). Net: fixes 3, breaks 2, dampening still fails. Still 3 violations.</div></div>
+  </div>
+</div>
+
 </div><!-- /tab-lab -->
 
 </div><!-- /container -->
@@ -821,6 +1243,56 @@ function resetQ2() {
   document.getElementById('q2-result').textContent = '';
   document.getElementById('q2-explanation').classList.remove('show');
   document.getElementById('q2-submit').disabled = true;
+}
+
+// ---- Generic multi-select for Q3, Q4, Q5 ----
+const multiState = {};
+function getState(qid) {
+  if (!multiState[qid]) multiState[qid] = { selected: new Set(), locked: false };
+  return multiState[qid];
+}
+function selectMulti(qid, btn) {
+  const s = getState(qid);
+  if (s.locked) return;
+  const val = btn.dataset.val;
+  if (s.selected.has(val)) { s.selected.delete(val); btn.classList.remove('selected'); }
+  else {
+    if (s.selected.size >= 2) {
+      const oldest = s.selected.values().next().value;
+      s.selected.delete(oldest);
+      document.querySelector(`#${qid}-options .option-btn[data-val="${oldest}"]`).classList.remove('selected');
+    }
+    s.selected.add(val); btn.classList.add('selected');
+  }
+  document.getElementById(`${qid}-submit`).disabled = s.selected.size !== 2;
+}
+function submitMulti(qid, correctArr) {
+  const s = getState(qid);
+  if (s.locked || s.selected.size !== 2) return;
+  s.locked = true;
+  const cs = new Set(correctArr);
+  const result = document.getElementById(`${qid}-result`);
+  document.querySelectorAll(`#${qid}-options .option-btn`).forEach(b => {
+    b.classList.add('locked');
+    if (cs.has(b.dataset.val)) b.classList.add('correct-reveal');
+    else if (b.classList.contains('selected')) b.classList.add('wrong-reveal');
+  });
+  const ok = s.selected.size === 2 && [...s.selected].every(v => cs.has(v));
+  if (ok) { result.textContent = '✅ Correct! Both answers right.'; result.className = 'result-banner correct'; }
+  else { result.textContent = '❌ Wrong — Correct answers are ' + correctArr.join(' and '); result.className = 'result-banner wrong'; }
+  document.getElementById(`${qid}-explanation`).classList.add('show');
+  document.getElementById(`${qid}-submit`).disabled = true;
+}
+function resetMulti(qid) {
+  const s = getState(qid);
+  s.selected = new Set(); s.locked = false;
+  document.querySelectorAll(`#${qid}-options .option-btn`).forEach(b => {
+    b.classList.remove('selected', 'correct-reveal', 'wrong-reveal', 'locked');
+  });
+  document.getElementById(`${qid}-result`).className = 'result-banner';
+  document.getElementById(`${qid}-result`).textContent = '';
+  document.getElementById(`${qid}-explanation`).classList.remove('show');
+  document.getElementById(`${qid}-submit`).disabled = true;
 }
 </script>
 </body>

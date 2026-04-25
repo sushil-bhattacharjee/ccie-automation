@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>☸️ Kubernetes Exam Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0e14;--surface:#141722;--surface2:#1a1f2e;--surface3:#222839;--border:#2a3148;--text:#e2e8f0;--text-dim:#8892a8;--accent:#38bdf8;--accent2:#818cf8;--green:#34d399;--red:#f87171;--orange:#fbbf24;--pink:#f472b6;--cyan:#22d3ee;--code-bg:#0d1017;--correct-bg:rgba(52,211,153,0.08);--correct-border:rgba(52,211,153,0.3);--wrong-bg:rgba(248,113,113,0.08);--wrong-border:rgba(248,113,113,0.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
+.header{padding:2rem 2rem 0;text-align:center}
+.header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{color:var(--text-dim);margin-top:.3rem;font-size:.95rem}
+.tabs{display:flex;justify-content:center;gap:4px;margin:1.5rem auto;background:var(--surface);border-radius:12px;padding:4px;width:fit-content;border:1px solid var(--border)}
+.tab-btn{padding:.6rem 2rem;border:none;background:transparent;color:var(--text-dim);font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;border-radius:9px;transition:all .25s}
+.tab-btn.active{background:var(--accent);color:var(--bg)}
+.tab-btn:hover:not(.active){color:var(--text);background:var(--surface2)}
+.tab-content{display:none;max-width:960px;margin:0 auto;padding:1rem 2rem 3rem}
+.tab-content.active{display:block}
+.chapter{margin-bottom:1rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface)}
+.chapter-header{padding:1rem 1.3rem;cursor:pointer;display:flex;align-items:center;gap:.8rem;user-select:none;transition:background .2s}
+.chapter-header:hover{background:var(--surface2)}
+.chapter-num{font-family:'JetBrains Mono',monospace;font-size:.75rem;font-weight:700;color:var(--bg);background:var(--accent);border-radius:6px;padding:.15rem .5rem;min-width:28px;text-align:center}
+.chapter-title{font-weight:600;font-size:1rem;flex:1}
+.chapter-chevron{color:var(--text-dim);transition:transform .3s;font-size:.8rem}
+.chapter.open .chapter-chevron{transform:rotate(90deg)}
+.chapter-body{display:none;padding:0 1.3rem 1.3rem;border-top:1px solid var(--border)}
+.chapter.open .chapter-body{display:block;padding-top:1rem}
+.chapter-body p{margin-bottom:.7rem;font-size:.92rem}
+.chapter-body ul{margin:.5rem 0 .8rem 1.3rem}
+.chapter-body li{margin-bottom:.3rem;font-size:.92rem}
+.chapter-body li strong{color:var(--accent)}
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:.8rem 0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.65;white-space:pre}
+.code-block .kw{color:var(--accent2)}.code-block .str{color:var(--green)}.code-block .comment{color:var(--text-dim);font-style:italic}.code-block .key{color:var(--cyan)}.code-block .val{color:var(--orange)}
+.info-table{width:100%;border-collapse:collapse;margin:.8rem 0;font-size:.88rem}
+.info-table th{background:var(--surface3);padding:.6rem .8rem;text-align:left;font-weight:600;color:var(--accent);border-bottom:2px solid var(--border)}
+.info-table td{padding:.5rem .8rem;border-bottom:1px solid var(--border)}
+.info-table tr:hover td{background:rgba(56,189,248,0.03)}
+.note-box{background:rgba(56,189,248,0.06);border-left:3px solid var(--accent);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:.8rem 0;font-size:.9rem}
+.warn-box{background:rgba(248,113,113,0.06);border-left:3px solid var(--red);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:.8rem 0;font-size:.9rem}
+.ic{font-family:'JetBrains Mono',monospace;background:var(--surface3);padding:.15rem .45rem;border-radius:4px;font-size:.85rem;color:var(--cyan)}
+.score-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between}
+.score-label{color:var(--text-dim);font-size:.9rem}
+.score-val{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--accent)}
+.reset-btn{padding:.4rem 1rem;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.85rem;transition:all .2s}
+.reset-btn:hover{border-color:var(--red);color:var(--red)}
+.question-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:1.5rem;overflow:hidden;transition:border-color .3s}
+.question-card.answered-correct{border-color:var(--correct-border)}
+.question-card.answered-wrong{border-color:var(--wrong-border)}
+.q-header{padding:1.2rem 1.3rem .5rem;display:flex;gap:.8rem;align-items:flex-start}
+.q-badge{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:5px;white-space:nowrap;margin-top:2px}
+.q-badge.mcq{background:rgba(129,140,248,0.15);color:var(--accent2)}
+.q-badge.fill{background:rgba(251,191,36,0.15);color:var(--orange)}
+.q-badge.block{background:rgba(52,211,153,0.15);color:var(--green)}
+.q-badge.multi{background:rgba(244,114,182,0.15);color:var(--pink)}
+.q-text{font-size:.95rem;font-weight:500;line-height:1.6}
+.q-body{padding:.5rem 1.3rem 1.3rem}
+.block-scaffold{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:.8rem 0;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.65;overflow-x:auto;white-space:pre}
+.block-slot{display:block;min-height:36px;border:2px dashed var(--accent);border-radius:6px;margin:4px 0;padding:6px 10px;cursor:pointer;background:rgba(56,189,248,0.03);transition:all .2s;white-space:pre;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.65;color:var(--text-dim)}
+.block-slot:hover{background:rgba(56,189,248,0.07)}
+.block-slot.filled{border-color:var(--orange);color:var(--orange);background:rgba(251,191,36,0.04)}
+.block-slot.correct-slot{border-color:var(--green);color:var(--green);background:rgba(52,211,153,0.06)}
+.block-slot.wrong-slot{border-color:var(--red);color:var(--red);background:rgba(248,113,113,0.06)}
+.block-pool-label{font-size:.85rem;color:var(--text-dim);margin:1rem 0 .5rem;font-weight:600}
+.block-pool{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+.block-chip{font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.6;padding:8px 12px;background:var(--surface3);border:1px solid var(--border);border-radius:7px;cursor:pointer;color:var(--text);transition:all .2s;user-select:none;white-space:pre}
+.block-chip:hover{border-color:var(--accent)}
+.block-chip.selected-chip{border-color:var(--accent);background:rgba(56,189,248,0.1);box-shadow:0 0 0 1px var(--accent)}
+.block-chip.used{opacity:.25;pointer-events:none}
+.yaml-exercise{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:1rem;margin:.8rem 0;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.9;overflow-x:auto;white-space:pre}
+.blank-slot{display:inline-block;min-width:130px;border-bottom:2px dashed var(--accent);padding:0 4px;cursor:pointer;color:var(--accent);transition:all .2s;background:rgba(56,189,248,0.05);border-radius:3px 3px 0 0;text-align:center}
+.blank-slot:hover{background:rgba(56,189,248,0.1)}
+.blank-slot.filled{color:var(--orange);border-color:var(--orange);background:rgba(251,191,36,0.08)}
+.blank-slot.correct{color:var(--green);border-color:var(--green);background:rgba(52,211,153,0.08)}
+.blank-slot.wrong{color:var(--red);border-color:var(--red);background:rgba(248,113,113,0.08)}
+.pool-label{font-size:.8rem;color:var(--text-dim);margin:.8rem 0 .4rem;font-weight:600}
+.word-pool{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.8rem}
+.pool-word{font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:.3rem .7rem;background:var(--surface3);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);transition:all .2s;user-select:none}
+.pool-word:hover{border-color:var(--accent);color:var(--accent)}
+.pool-word.selected{opacity:.3;pointer-events:none}
+.mcq-options{display:flex;flex-direction:column;gap:8px;margin:.8rem 0}
+.mcq-opt{padding:.7rem 1rem;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:.88rem;transition:all .2s;display:flex;align-items:flex-start;gap:.7rem;background:var(--surface2)}
+.mcq-opt:hover:not(.disabled){border-color:var(--accent);background:rgba(56,189,248,0.04)}
+.mcq-opt .opt-letter{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.8rem;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:var(--surface3);border:1px solid var(--border);flex-shrink:0}
+.mcq-opt .opt-text{font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.5;white-space:pre-wrap}
+.mcq-opt.correct-choice{border-color:var(--green);background:var(--correct-bg)}
+.mcq-opt.correct-choice .opt-letter{background:var(--green);color:var(--bg);border-color:var(--green)}
+.mcq-opt.wrong-choice{border-color:var(--red);background:var(--wrong-bg)}
+.mcq-opt.wrong-choice .opt-letter{background:var(--red);color:var(--bg);border-color:var(--red)}
+.mcq-opt.disabled{cursor:default;opacity:.7}
+.mcq-opt.disabled.correct-choice{opacity:1}
+.mcq-opt.multi-selected{border-color:var(--accent2);background:rgba(129,140,248,0.08)}
+.mcq-opt.multi-selected .opt-letter{background:var(--accent2);color:var(--bg);border-color:var(--accent2)}
+.check-btn{padding:.55rem 1.5rem;border:none;background:var(--accent);color:var(--bg);font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;transition:all .2s;margin-top:.5rem}
+.check-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.check-btn:disabled{opacity:.4;cursor:default;transform:none}
+.explanation{display:none;margin-top:1rem;padding:1rem;border-radius:8px;font-size:.88rem;line-height:1.7}
+.explanation.show{display:block}
+.explanation.correct-exp{background:var(--correct-bg);border:1px solid var(--correct-border)}
+.explanation.wrong-exp{background:var(--wrong-bg);border:1px solid var(--wrong-border)}
+.explanation strong{color:var(--accent)}
+.exp-title{font-weight:700;margin-bottom:.5rem;font-size:.9rem}
+.exp-detail{margin-bottom:.3rem;padding-left:.5rem;border-left:2px solid var(--border)}
+@media(max-width:640px){.tab-content{padding:1rem}.header h1{font-size:1.5rem}.yaml-exercise,.block-scaffold{font-size:.7rem}.blank-slot{min-width:90px}}
+</style>
+</head>
+<body>
+<div class="header"><h1>☸️ Kubernetes Exam Prep</h1><p>CCIE Automation — Theory & Practice</p></div>
+<div class="tabs"><button class="tab-btn active" onclick="switchTab('theory')">Theory</button><button class="tab-btn" onclick="switchTab('practice')">Practice</button></div>
+<!-- THEORY -->
+<div id="theory" class="tab-content active">
+<div class="chapter open" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">1</span><span class="chapter-title">Core Architecture — Pods, Deployments, ReplicaSets</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><p>A <strong>Pod</strong> is the smallest deployable unit. A <strong>Deployment</strong> manages a <strong>ReplicaSet</strong> for desired pod count.</p><table class="info-table"><tr><th>Resource</th><th>Purpose</th><th>Key Field</th></tr><tr><td>Pod</td><td>Run containers</td><td><span class="ic">spec.containers[]</span></td></tr><tr><td>ReplicaSet</td><td>Maintain pod count</td><td><span class="ic">spec.replicas</span></td></tr><tr><td>Deployment</td><td>Updates + rollbacks</td><td><span class="ic">spec.strategy</span></td></tr></table><div class="warn-box">⚠️ <span class="ic">selector.matchLabels</span> MUST match <span class="ic">template.metadata.labels</span>.</div></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">2</span><span class="chapter-title">Services & Port Mapping</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><table class="info-table"><tr><th>Type</th><th>Access</th><th>Use Case</th></tr><tr><td><strong>ClusterIP</strong></td><td>Internal only</td><td>Backend (Redis, DB)</td></tr><tr><td><strong>NodePort</strong></td><td>External via nodeIP:port</td><td>Dev/testing</td></tr><tr><td><strong>LoadBalancer</strong></td><td>External via MetalLB/cloud</td><td>Production frontend</td></tr></table><table class="info-table"><tr><th>Field</th><th>What</th></tr><tr><td><span class="ic">port</span></td><td>Service port — clients connect here</td></tr><tr><td><span class="ic">targetPort</span></td><td>Container port — traffic forwards here (defaults to port)</td></tr><tr><td><span class="ic">nodePort</span></td><td>Static port on each node (30000–32767)</td></tr><tr><td><span class="ic">containerPort</span></td><td>Pod spec — informational only</td></tr></table><div class="warn-box">⚠️ Service <span class="ic">selector</span> matches <strong>Pod labels</strong>, not Deployment name.</div></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">3</span><span class="chapter-title">Environment Variables — All 6 Types</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><table class="info-table"><tr><th>Method</th><th>Source</th><th>Use Case</th></tr><tr><td><span class="ic">value</span></td><td>Hardcoded string</td><td>Static config</td></tr><tr><td><span class="ic">secretKeyRef</span></td><td>Secret</td><td>Passwords, tokens</td></tr><tr><td><span class="ic">configMapKeyRef</span></td><td>ConfigMap</td><td>Feature flags, URLs</td></tr><tr><td><span class="ic">fieldRef</span></td><td>Pod metadata (Downward API)</td><td>Pod name, IP, namespace</td></tr><tr><td><span class="ic">resourceFieldRef</span></td><td>Container resource limits</td><td>CPU/memory to app</td></tr><tr><td><span class="ic">envFrom</span></td><td>Bulk import all keys</td><td>Entire ConfigMap/Secret</td></tr></table><div class="warn-box">⚠️ <span class="ic">env</span> is <strong>container-level</strong> — sibling to <span class="ic">image</span> and <span class="ic">resources</span>. Nesting inside <span class="ic">resources</span> → error.</div><div class="note-box">💡 <span class="ic">envFrom</span> uses <span class="ic">configMapRef</span>/<span class="ic">secretRef</span> (no "Key"). Single-key uses <span class="ic">configMapKeyRef</span>/<span class="ic">secretKeyRef</span>.</div></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">4</span><span class="chapter-title">Secrets — Encoding vs. Encryption</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><p>Secrets use <strong>base64 encoding</strong> — NOT encryption. For encryption at rest: <span class="ic">EncryptionConfiguration</span> or HashiCorp Vault.</p><div class="warn-box">⚠️ <span class="ic">echo "YWRtaW4=" | base64 -d</span> → "admin". Not secure by default.</div></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">5</span><span class="chapter-title">Resource Requests & Limits</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><table class="info-table"><tr><th>Field</th><th>Meaning</th></tr><tr><td><span class="ic">requests</span></td><td>Guaranteed min — scheduler uses for placement</td></tr><tr><td><span class="ic">limits</span></td><td>Max — throttled (CPU) or OOM-killed (memory)</td></tr></table><div class="note-box">💡 HPA requires <span class="ic">requests.cpu</span> to calculate utilization %.</div></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">6</span><span class="chapter-title">Storage — Volumes, PVCs, emptyDir</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><table class="info-table"><tr><th>Type</th><th>Lifetime</th><th>Use Case</th></tr><tr><td><span class="ic">emptyDir</span></td><td>Pod lifetime</td><td>Temp scratch</td></tr><tr><td><span class="ic">hostPath</span></td><td>Node-level</td><td>Dev only</td></tr><tr><td><strong>PVC/PV</strong></td><td>Persistent</td><td>DB storage</td></tr></table></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">7</span><span class="chapter-title">Deployment Strategies</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><table class="info-table"><tr><th>Strategy</th><th>Native?</th><th>Downtime</th><th>Key</th></tr><tr><td><strong>RollingUpdate</strong></td><td>✅ Default</td><td>None</td><td>maxSurge/maxUnavailable</td></tr><tr><td><strong>Recreate</strong></td><td>✅ Yes</td><td>Yes</td><td>Kills all first</td></tr><tr><td><strong>Blue/Green</strong></td><td>❌ No</td><td>None</td><td>2 Deployments + selector</td></tr><tr><td><strong>Canary</strong></td><td>❌ No</td><td>None</td><td>Small %, needs mesh</td></tr></table></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">8</span><span class="chapter-title">Scaling — HPA, Manual, Formula</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><div class="code-block"><span class="comment"># Manual</span>
+kubectl scale --replicas=<span class="val">4</span> deployment/<span class="str">my-app</span>
+<span class="comment"># Auto (default cpu-percent=80)</span>
+kubectl autoscale deployment/<span class="str">my-app</span> --min=<span class="val">2</span> --max=<span class="val">8</span> --cpu-percent=<span class="val">70</span>
+<span class="comment"># Delete HPA</span>
+kubectl delete hpa <span class="str">my-app</span></div><p><strong>Formula:</strong> <span class="ic">desiredReplicas = ceil[ currentReplicas × (currentMetric / desiredMetric) ]</span></p><p><span class="ic">--min</span> = hard floor, <span class="ic">--max</span> = hard ceiling.</p></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">9</span><span class="chapter-title">Restart Policies</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><table class="info-table"><tr><th>Policy</th><th>Behaviour</th><th>Available In</th></tr><tr><td><span class="ic">Always</span> (default)</td><td>Restart on any exit</td><td>Deployments (only option)</td></tr><tr><td><span class="ic">OnFailure</span></td><td>Non-zero exit only</td><td>Jobs, bare Pods</td></tr><tr><td><span class="ic">Never</span></td><td>Never restart</td><td>Jobs, bare Pods</td></tr></table></div></div>
+<div class="chapter" onclick="toggleChapter(event,this)"><div class="chapter-header"><span class="chapter-num">10</span><span class="chapter-title">Essential kubectl Commands</span><span class="chapter-chevron">▶</span></div><div class="chapter-body"><div class="code-block">kubectl apply -f <span class="str">.</span>                        <span class="comment"># ALL YAML in dir (non-recursive)</span>
+kubectl get pods -o wide
+kubectl get svc
+kubectl describe svc/<span class="str">my-svc</span>
+kubectl logs <span class="str">pod-name</span>
+kubectl exec -it <span class="str">pod-name</span> -- /bin/sh
+kubectl scale --replicas=<span class="val">4</span> deployment/<span class="str">app</span>
+kubectl autoscale deployment/<span class="str">app</span> --min=<span class="val">2</span> --max=<span class="val">6</span>
+kubectl get hpa
+kubectl delete hpa <span class="str">app</span>
+kubectl get endpoints <span class="str">my-svc</span></div></div></div>
+</div>
+<!-- PRACTICE -->
+<div id="practice" class="tab-content">
+<div class="score-bar"><div><div class="score-label">Score</div><div class="score-val" id="score-display">0 / 14</div></div><button class="reset-btn" onclick="resetAll()">Reset All</button></div>
+<div id="questions-container"></div>
+</div>
+
+<script>
+function switchTab(t){document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelector('.tab-btn[onclick="switchTab(\''+t+'\')"]').classList.add('active')}
+function toggleChapter(e,el){if(e.target.closest('.chapter-body'))return;el.classList.toggle('open')}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+const Q=[
+// ========== Q1 BLOCK — Web Deployment + Service ==========
+{type:'block',title:'Build a complete web Deployment + LoadBalancer Service. The deployment needs 3 replicas, RollingUpdate strategy, a PVC volume "app-pvc" mounted at /data, resource limits, and 4 env vars: APP_MODE (hardcoded "production"), DB_PASS (from Secret "db-creds" key "password"), LOG_LEVEL (from ConfigMap "app-config" key "log_level"), MY_POD_NAME (Downward API metadata.name). Service selector must match pod labels "app: web-pod" and map port 8080 to container port 80. Place 9 correct blocks — beware of partial-correct and wrong distractors.',
+scaffold:`apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+spec:
+___SLOT_0___
+___SLOT_1___
+  template:
+    metadata:
+      labels:
+        app: web-pod
+    spec:
+___SLOT_2___
+      containers:
+        - name: web
+          image: nginx:1.25
+          ports:
+            - containerPort: 80
+___SLOT_3___
+___SLOT_4___
+___SLOT_5___
+___SLOT_6___
+___SLOT_7___
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-svc
+spec:
+___SLOT_8___`,
+slotLabels:['','','','','','','','',''],
+correctBlocks:[
+"  replicas: 3\n  selector:\n    matchLabels:\n      app: web-pod",
+"  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxSurge: 1\n      maxUnavailable: 1",
+"      volumes:\n        - name: data-vol\n          persistentVolumeClaim:\n            claimName: app-pvc",
+"          resources:\n            requests:\n              cpu: 250m\n              memory: 256Mi\n            limits:\n              cpu: 500m\n              memory: 512Mi",
+"          env:\n            - name: APP_MODE\n              value: \"production\"",
+"            - name: DB_PASS\n              valueFrom:\n                secretKeyRef:\n                  name: db-creds\n                  key: password",
+"            - name: LOG_LEVEL\n              valueFrom:\n                configMapKeyRef:\n                  name: app-config\n                  key: log_level\n            - name: MY_POD_NAME\n              valueFrom:\n                fieldRef:\n                  fieldPath: metadata.name",
+"          volumeMounts:\n            - mountPath: /data\n              name: data-vol",
+"  selector:\n    app: web-pod\n  ports:\n    - port: 8080\n      targetPort: 80\n  type: LoadBalancer"],
+distractorBlocks:[
+"  replicas: 3\n  selector:\n    matchLabels:\n      name: web-pod",
+"  strategy:\n    type: Recreate",
+"      volumes:\n        - name: data-vol\n          emptyDir: {}",
+"          resources:\n            requests:\n              cpu: 250m\n              memory: 256Mi\n            limits:\n              cpu: 500m\n              memory: 512Mi\n            env:\n              - name: APP_MODE\n                value: \"production\"",
+"            - name: DB_PASS\n              valueFrom:\n                configMapKeyRef:\n                  name: db-creds\n                  key: password",
+"            - name: DB_PASS\n              value: \"s3cret_password\"",
+"  selector:\n    name: web-pod\n  ports:\n    - port: 8080\n      targetPort: 80\n  type: LoadBalancer",
+"  selector:\n    app: web-pod\n  ports:\n    - port: 8080\n      nodePort: 30080\n  type: LoadBalancer"],
+explanation:{correct:'9 blocks assemble a full Deployment with RollingUpdate, PVC storage, resources, 4 env types (value, secretKeyRef, configMapKeyRef, fieldRef), volumeMount, and a Service with correct selector/port mapping.',
+details:['<strong>selector matchLabels "name: web-pod"</strong> — Pod labels use "app:", not "name:". Selector mismatch = "selector does not match template labels".','<strong>strategy: Recreate</strong> — Causes downtime. Question requires RollingUpdate.','<strong>emptyDir volume</strong> — Ephemeral (dies with pod). Question requires PVC for persistent data.','<strong>env nested inside resources</strong> — env is a container-level sibling to resources. Nesting causes "unknown field resources.env".','<strong>DB_PASS with configMapKeyRef</strong> — Passwords belong in Secrets (secretKeyRef), not ConfigMaps.','<strong>DB_PASS with plain value</strong> — Hardcoding passwords in YAML is insecure. Use secretKeyRef.','<strong>Service selector "name:"</strong> — Must be "app:" to match pod labels.','<strong>nodePort instead of targetPort</strong> — nodePort exposes on node (30000-32767). targetPort maps to container port.']}},
+
+// ========== Q2 BLOCK — PostgreSQL with Secrets + PVC ==========
+{type:'block',title:'Build a PostgreSQL Deployment + ClusterIP Service. The database needs: 1 replica, Recreate strategy (stateful app), a PVC "db-pvc" mounted at /var/lib/postgresql/data, POSTGRES_USER from Secret "db-creds" key "username" (secretKeyRef), POSTGRES_PASSWORD from Secret "db-creds" key "password" (secretKeyRef), POSTGRES_HOST_AUTH_METHOD hardcoded as "trust", resource limits, and pod IP exposed via Downward API as MY_IP. Service name must be "db" on port 5432, ClusterIP type.',
+scaffold:`apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+spec:
+___SLOT_0___
+___SLOT_1___
+  template:
+    metadata:
+      labels:
+        app: db-pod
+    spec:
+___SLOT_2___
+      containers:
+        - name: db
+          image: postgres:15
+          ports:
+            - containerPort: 5432
+___SLOT_3___
+___SLOT_4___
+___SLOT_5___
+___SLOT_6___
+___SLOT_7___
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+___SLOT_8___`,
+slotLabels:['','','','','','','','',''],
+correctBlocks:[
+"  replicas: 1\n  selector:\n    matchLabels:\n      app: db-pod",
+"  strategy:\n    type: Recreate",
+"      volumes:\n        - name: db-storage\n          persistentVolumeClaim:\n            claimName: db-pvc",
+"          resources:\n            requests:\n              cpu: 250m\n              memory: 512Mi\n            limits:\n              cpu: 500m\n              memory: 1Gi",
+"          env:\n            - name: POSTGRES_USER\n              valueFrom:\n                secretKeyRef:\n                  name: db-creds\n                  key: username",
+"            - name: POSTGRES_PASSWORD\n              valueFrom:\n                secretKeyRef:\n                  name: db-creds\n                  key: password\n            - name: POSTGRES_HOST_AUTH_METHOD\n              value: \"trust\"",
+"            - name: MY_IP\n              valueFrom:\n                fieldRef:\n                  fieldPath: status.podIP",
+"          volumeMounts:\n            - mountPath: /var/lib/postgresql/data\n              name: db-storage",
+"  selector:\n    app: db-pod\n  ports:\n    - port: 5432\n      targetPort: 5432\n  type: ClusterIP"],
+distractorBlocks:[
+"  replicas: 1\n  selector:\n    matchLabels:\n      app: db-pod\n  strategy:\n    type: RollingUpdate",
+"          env:\n            - name: POSTGRES_USER\n              value: \"admin\"\n            - name: POSTGRES_PASSWORD\n              value: \"password123\"",
+"            - name: POSTGRES_PASSWORD\n              valueFrom:\n                configMapKeyRef:\n                  name: db-creds\n                  key: password\n            - name: POSTGRES_HOST_AUTH_METHOD\n              value: \"trust\"",
+"            - name: MY_IP\n              valueFrom:\n                resourceFieldRef:\n                  resource: limits.cpu",
+"  selector:\n    app: db-pod\n  ports:\n    - port: 5432\n      targetPort: 5432\n  type: LoadBalancer",
+"          volumeMounts:\n            - mountPath: /var/lib/postgresql/data\n              name: db-pvc"],
+explanation:{correct:'PostgreSQL uses Recreate (stateful, can\'t run 2 versions). Credentials via secretKeyRef. PVC for persistent data. Service name "db" = DNS hostname. ClusterIP keeps DB internal.',
+details:['<strong>RollingUpdate for DB</strong> — Stateful apps need Recreate to avoid two instances writing to the same volume.','<strong>Hardcoded credentials</strong> — Passwords in plain YAML = security risk. Must use secretKeyRef.','<strong>POSTGRES_PASSWORD with configMapKeyRef</strong> — Passwords belong in Secrets, not ConfigMaps.','<strong>MY_IP with resourceFieldRef</strong> — resourceFieldRef exposes CPU/memory limits, not pod IP. Use fieldRef + status.podIP.','<strong>Service type: LoadBalancer</strong> — Exposing DB externally = security risk. Use ClusterIP.','<strong>volumeMount name: db-pvc</strong> — Must match the volume name (db-storage), not the PVC claim name.']}},
+
+// ========== Q3 BLOCK — Redis + Worker multi-service ==========
+{type:'block',title:'Build a Redis cache Deployment + ClusterIP Service AND a Worker Deployment. Redis: 1 replica, port 6379, resource limits, the service name MUST be "redis" for DNS. Worker: 2 replicas with RollingUpdate, env vars REDIS_HOST hardcoded as "redis", DB_HOST hardcoded as "db", and WORKER_ID from Downward API (metadata.name). Worker needs envFrom to bulk-import all keys from ConfigMap "worker-config". No service needed for worker.',
+scaffold:`apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+___SLOT_0___
+  template:
+    metadata:
+      labels:
+        app: redis-pod
+    spec:
+      containers:
+        - name: redis
+          image: redis:7
+          ports:
+            - containerPort: 6379
+___SLOT_1___
+---
+apiVersion: v1
+kind: Service
+metadata:
+___SLOT_2___
+spec:
+___SLOT_3___
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec:
+___SLOT_4___
+___SLOT_5___
+  template:
+    metadata:
+      labels:
+        app: worker-pod
+    spec:
+      containers:
+        - name: worker
+          image: myapp/worker:v2
+___SLOT_6___
+___SLOT_7___
+___SLOT_8___`,
+slotLabels:['','','','','','','','',''],
+correctBlocks:[
+"  replicas: 1\n  selector:\n    matchLabels:\n      app: redis-pod",
+"          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              cpu: 250m\n              memory: 256Mi",
+"  name: redis",
+"  selector:\n    app: redis-pod\n  ports:\n    - port: 6379\n      targetPort: 6379\n  type: ClusterIP",
+"  replicas: 2\n  selector:\n    matchLabels:\n      app: worker-pod",
+"  strategy:\n    type: RollingUpdate",
+"          envFrom:\n            - configMapRef:\n                name: worker-config",
+"          env:\n            - name: REDIS_HOST\n              value: \"redis\"\n            - name: DB_HOST\n              value: \"db\"",
+"            - name: WORKER_ID\n              valueFrom:\n                fieldRef:\n                  fieldPath: metadata.name"],
+distractorBlocks:[
+"  name: redis-service",
+"  selector:\n    app: redis-pod\n  ports:\n    - port: 6379\n      targetPort: 6379\n  type: LoadBalancer",
+"          envFrom:\n            - configMapKeyRef:\n                name: worker-config",
+"          env:\n            - name: REDIS_HOST\n              valueFrom:\n                configMapKeyRef:\n                  name: app-config\n                  key: redis_host\n            - name: DB_HOST\n              value: \"db\"",
+"            - name: WORKER_ID\n              valueFrom:\n                resourceFieldRef:\n                  resource: limits.memory",
+"  replicas: 2\n  selector:\n    matchLabels:\n      name: worker-pod",
+"  strategy:\n    type: Recreate"],
+explanation:{correct:'Redis service name = "redis" for DNS resolution. ClusterIP keeps it internal. Worker uses envFrom+configMapRef for bulk import, plain value for known hostnames, fieldRef for pod identity.',
+details:['<strong>name: redis-service</strong> — Apps connect to hostname "redis", not "redis-service". Service name = DNS name.','<strong>Redis as LoadBalancer</strong> — Cache should be internal only. Use ClusterIP.','<strong>envFrom with configMapKeyRef</strong> — envFrom uses configMapRef (no "Key"). configMapKeyRef is for single-key under env.','<strong>REDIS_HOST from configMapKeyRef</strong> — When the hostname is known and static ("redis"), use plain value. No need to create a ConfigMap for a constant.','<strong>WORKER_ID from resourceFieldRef</strong> — resourceFieldRef gives CPU/memory. Use fieldRef for pod metadata.','<strong>selector matchLabels "name:"</strong> — Pod labels use "app:", selector must match.','<strong>Worker with Recreate</strong> — Workers are stateless; RollingUpdate gives zero-downtime.']}},
+
+// ========== Q4 FILL — autoscale CLI (numbers in pool) ==========
+{type:'fill',title:'Your "api-server" deployment runs 4 replicas at 80% CPU. Create an HPA targeting 50% CPU, minimum 3, maximum 10 replicas. Complete every blank including the numbers.',
+yaml:`kubectl ___BLANK_0___ ___BLANK_1___/api-server \\
+  --___BLANK_2___=___BLANK_3___ \\
+  --___BLANK_4___=___BLANK_5___ \\
+  --___BLANK_6___=___BLANK_7___`,
+blanks:['autoscale','deployment','min','3','max','10','cpu-percent','50'],
+pool:['autoscale','scale','deployment','service','pod','min','max','replicas','cpu-percent','cpu-limit','memory-percent','3','4','5','8','10','50','80'],
+explanation:{correct:'kubectl autoscale deployment --min=3 --max=10 --cpu-percent=50. Each flag+value pair must be correct.',
+details:['<strong>scale</strong> — Fixed replicas (manual). autoscale = dynamic HPA.','<strong>service / pod</strong> — autoscale targets Deployments, not Services or Pods.','<strong>replicas</strong> — Used with kubectl scale, not autoscale.','<strong>cpu-limit / memory-percent</strong> — Invalid flags. Correct: --cpu-percent.','<strong>4</strong> — Current replica count, not the --min value (3).','<strong>80</strong> — Current CPU or default threshold, but question asks for 50%.','<strong>5 / 8</strong> — Distractor numbers that don\'t match the question\'s requirements.']}},
+
+// ========== Q5 MCQ — Secrets ==========
+{type:'mcq',title:'Kubernetes Secrets store data using which method by default?',
+options:[{label:'A',text:'AES-256 encryption',correct:false},{label:'B',text:'Base64 encoding',correct:true},{label:'C',text:'SHA-256 hashing',correct:false},{label:'D',text:'TLS encryption at rest',correct:false}],
+explanation:{correct:'Secrets use base64 encoding — reversible, NOT encryption.',
+details:['<strong>A</strong> — Requires EncryptionConfiguration. Not default.','<strong>B</strong> — Correct. Decode: echo "YWRtaW4=" | base64 -d','<strong>C</strong> — Hashing is one-way. Secrets must be retrievable.','<strong>D</strong> — Requires --encryption-provider-config.']}},
+
+// ========== Q6 FILL — envFrom + fieldRef ==========
+{type:'fill',title:'Bulk-import all keys from ConfigMap "app-settings", override DB_PASS from a Secret, and expose pod IP via Downward API.',
+yaml:`containers:
+  - name: app
+    image: myapp:v3
+    ___BLANK_0___:
+      - ___BLANK_1___:
+          name: app-settings
+    env:
+      - name: DB_PASS
+        valueFrom:
+          ___BLANK_2___:
+            name: db-creds
+            key: password
+      - name: MY_POD_IP
+        valueFrom:
+          ___BLANK_3___:
+            ___BLANK_4___: status.podIP`,
+blanks:['envFrom','configMapRef','secretKeyRef','fieldRef','fieldPath'],
+pool:['envFrom','env','configMapRef','configMapKeyRef','secretKeyRef','secretRef','fieldRef','fieldPath','resourceFieldRef','valuePath'],
+explanation:{correct:'envFrom + configMapRef = bulk import. secretKeyRef = single Secret key. fieldRef + fieldPath = Downward API.',
+details:['<strong>env</strong> — Individual vars. Bulk uses envFrom.','<strong>configMapKeyRef</strong> — Single key. Bulk uses configMapRef (no "Key").','<strong>secretRef</strong> — Bulk Secret import. Here we need configMapRef.','<strong>resourceFieldRef</strong> — Container resources, not pod metadata.','<strong>valuePath</strong> — Invalid. Correct: fieldPath.']}},
+
+// ========== Q7 MCQ — strategy ==========
+{type:'mcq',title:'Which deployment strategy is the Kubernetes default, and which is the ONLY strategy with downtime?',
+options:[{label:'A',text:'Default: RollingUpdate, Downtime: Recreate',correct:true},{label:'B',text:'Default: Recreate, Downtime: RollingUpdate',correct:false},{label:'C',text:'Default: Blue/Green, Downtime: Recreate',correct:false},{label:'D',text:'Default: RollingUpdate, Downtime: Canary',correct:false}],
+explanation:{correct:'RollingUpdate = default. Recreate = only strategy with downtime.',
+details:['<strong>A</strong> — Correct!','<strong>B</strong> — Backwards.','<strong>C</strong> — Blue/Green is NOT native K8s.','<strong>D</strong> — Canary has zero downtime.']}},
+
+// ========== Q8 FILL — Service selector + ports ==========
+{type:'fill',title:'Fix this Service. Pods have label "app: voting-pod", container listens on 80. Service exposes 8001 externally.',
+yaml:`apiVersion: v1
+kind: Service
+metadata:
+  name: voting-svc
+spec:
+  selector:
+    ___BLANK_0___: voting-pod
+  ports:
+    - port: ___BLANK_1___
+      ___BLANK_2___: 80
+      protocol: ___BLANK_3___
+  type: ___BLANK_4___`,
+blanks:['app','8001','targetPort','TCP','LoadBalancer'],
+pool:['app','name','8001','80','8080','targetPort','nodePort','containerPort','TCP','UDP','LoadBalancer','ClusterIP'],
+explanation:{correct:'"app" matches pod labels. port:8001 = external. targetPort:80 = container. TCP for HTTP.',
+details:['<strong>name</strong> — Pods use "app:" label. "name:" silently breaks.','<strong>80</strong> — Container port, but service should expose 8001.','<strong>nodePort</strong> — Static high port. targetPort maps to container.','<strong>containerPort</strong> — Pod spec only.','<strong>UDP</strong> — HTTP uses TCP.','<strong>ClusterIP</strong> — Internal only.']}},
+
+// ========== Q9 MCQ — restart policy ==========
+{type:'mcq',title:'You need a Deployment that restarts containers only on non-zero exit codes. Which works?',
+options:[
+{label:'A',text:'restartPolicy: OnFailure\n# restart only on non-zero exit code',correct:false},
+{label:'B',text:'restartPolicy: Always\n# restart on any exit code (0 or non-zero)',correct:false},
+{label:'C',text:'restartPolicy: Never\n# never restart containers',correct:false},
+{label:'D',text:'Not possible — Deployments only allow:\nrestartPolicy: Always',correct:true}],
+explanation:{correct:'Deployments ONLY support Always. For exit-code-based restart, use a Job with OnFailure.',
+details:['<strong>A: OnFailure</strong> — Does what was asked but NOT valid for Deployments. Jobs/bare Pods only.','<strong>B: Always</strong> — Valid for Deployments but restarts on ANY exit, not just failures.','<strong>C: Never</strong> — NOT valid for Deployments.','<strong>D</strong> — Correct! Use a Job with restartPolicy: OnFailure instead.']}},
+
+// ========== Q10 FILL — delete HPA + recreate (numbers in pool) ==========
+{type:'fill',title:'An existing HPA "result" is blocking. Delete it, then create a new HPA for deployment "result": min=2, max=8, targeting 70% CPU.',
+yaml:`kubectl ___BLANK_0___ hpa ___BLANK_1___
+
+kubectl ___BLANK_2___ deployment/result \\
+  --min=___BLANK_3___ \\
+  --max=___BLANK_4___ \\
+  --cpu-percent=___BLANK_5___`,
+blanks:['delete','result','autoscale','2','8','70'],
+pool:['delete','remove','result','result-hpa','autoscale','scale','1','2','3','5','8','10','50','70','80'],
+explanation:{correct:'kubectl delete hpa result, then autoscale with --min=2 --max=8 --cpu-percent=70.',
+details:['<strong>remove</strong> — Not a kubectl verb. Use "delete".','<strong>result-hpa</strong> — HPA name defaults to deployment name ("result").','<strong>scale</strong> — Fixed replicas. autoscale = HPA.','<strong>1 / 3 / 5 / 10</strong> — Distractor numbers; question specifies min=2, max=8.','<strong>50 / 80</strong> — 80 is default, 50 is common, but question asks for 70%.']}},
+
+// ========== Q11 MCQ — HPA formula ==========
+{type:'mcq',title:'A deployment has 4 replicas with HPA target 50% CPU. Current average is 80%. How many desired replicas?',
+options:[{label:'A',text:'5',correct:false},{label:'B',text:'7',correct:true},{label:'C',text:'6',correct:false},{label:'D',text:'8',correct:false}],
+explanation:{correct:'ceil[4 × (80/50)] = ceil[6.4] = 7.',
+details:['<strong>A (5)</strong> — Incorrect arithmetic.','<strong>B (7)</strong> — Correct! ceil(6.4) = 7.','<strong>C (6)</strong> — Truncates instead of ceiling.','<strong>D (8)</strong> — Doubling, not the formula.']}},
+
+// ========== Q12 MULTI — scaling scenario ==========
+{type:'multi',title:'Your "web-app" runs 3 replicas at ~30% CPU. You\'re onboarding 4× more users this week and expect sustained 75% CPU. You need to: (1) immediately set 6 replicas for the spike, (2) set up auto-scaling 4–12 replicas at 60% CPU for ongoing load. Pick the 2 correct commands.',
+options:[
+{label:'A',text:'kubectl scale --replicas=6 deployment/web-app',correct:true},
+{label:'B',text:'kubectl autoscale deployment/web-app --min=4 --max=12 --cpu-percent=60',correct:true},
+{label:'C',text:'kubectl scale --replicas=6 service/web-app',correct:false},
+{label:'D',text:'kubectl autoscale deployment/web-app --replicas=12 --cpu-percent=60',correct:false},
+{label:'E',text:'kubectl set replicas deployment/web-app --count=6',correct:false}],
+correctCount:2,
+explanation:{correct:'scale --replicas=6 for immediate action. autoscale --min/--max/--cpu-percent for ongoing HPA.',
+details:['<strong>A</strong> — Correct! Immediate manual scale.','<strong>B</strong> — Correct! Creates HPA.','<strong>C</strong> — Scale Deployments, not Services.','<strong>D</strong> — --replicas invalid for autoscale. Use --min/--max.','<strong>E</strong> — "kubectl set replicas" doesn\'t exist.']}},
+
+// ========== Q13 FILL — Redis service ==========
+{type:'fill',title:'Complete this Redis service. App connects to hostname "redis" on port 6379. Internal only.',
+yaml:`apiVersion: v1
+kind: ___BLANK_0___
+metadata:
+  name: ___BLANK_1___
+spec:
+  ports:
+    - port: 6379
+      targetPort: ___BLANK_2___
+  selector:
+    app: redis-pod
+  type: ___BLANK_3___`,
+blanks:['Service','redis','6379','ClusterIP'],
+pool:['Service','Deployment','redis','redis-svc','6379','6380','ClusterIP','LoadBalancer'],
+explanation:{correct:'Service name = "redis" for DNS. targetPort = 6379. ClusterIP = internal.',
+details:['<strong>Deployment</strong> — Wrong kind.','<strong>redis-svc</strong> — App expects hostname "redis".','<strong>6380</strong> — Wrong port.','<strong>LoadBalancer</strong> — Exposing cache externally = risk.']}},
+
+// ========== Q14 MCQ — apply -f ==========
+{type:'mcq',title:'What does `kubectl apply -f .` do?',
+options:[{label:'A',text:'Applies only the first YAML file',correct:false},{label:'B',text:'Applies all .yml/.yaml/.json files (non-recursive)',correct:true},{label:'C',text:'Applies all files recursively',correct:false},{label:'D',text:'Applies only *.k8s.yml files',correct:false}],
+explanation:{correct:'All .yml/.yaml/.json in current dir. NOT recursive.',
+details:['<strong>A</strong> — ALL matching files.','<strong>B</strong> — Correct! Use -R for recursive.','<strong>C</strong> — Needs -R flag.','<strong>D</strong> — No naming convention filter.']}}
+];
+
+let score=0,answered=new Set(),selectedWord={},selectedBlock={},blockSlotAssign={},blockPoolUsed={},multiSel={};
+
+function render(){
+  const c=document.getElementById('questions-container');c.innerHTML='';
+  Q.forEach((q,qi)=>{
+    const card=document.createElement('div');card.className='question-card';card.id='q-'+qi;
+    let bc,bt;if(q.type==='block'){bc='block';bt='BLOCK'}else if(q.type==='multi'){bc='multi';bt='MULTI'}else if(q.type==='mcq'){bc='mcq';bt='MCQ'}else{bc='fill';bt='FILL'}
+    let body='';
+    if(q.type==='block')body=renderBlock(q,qi);else if(q.type==='fill')body=renderFill(q,qi);else if(q.type==='mcq')body=renderMCQ(q,qi);else body=renderMulti(q,qi);
+    card.innerHTML='<div class="q-header"><span class="q-badge '+bc+'">'+bt+'</span><span class="q-text">Q'+(qi+1)+'. '+q.title+'</span></div><div class="q-body">'+body+'</div>';
+    c.appendChild(card);
+  });
+  updateScore();
+}
+
+function renderBlock(q,qi){
+  blockSlotAssign[qi]={};blockPoolUsed[qi]=new Set();
+  let sc=q.scaffold;
+  q.correctBlocks.forEach((_,si)=>{
+    const lbl=q.slotLabels[si]||('Slot '+(si+1));
+    sc=sc.replace('___SLOT_'+si+'___','<div class="block-slot" id="bslot-'+qi+'-'+si+'" onclick="placeBlock('+qi+','+si+')">▸ [ '+lbl+' ]</div>')
+  });
+  const all=[...q.correctBlocks,...q.distractorBlocks];
+  const sh=all.map((b,i)=>({text:b,idx:i}));
+  for(let i=sh.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[sh[i],sh[j]]=[sh[j],sh[i]]}
+  q._sh=sh;
+  let pool='<div class="block-pool-label">Block Pool — select a block, then click a slot to place it:</div><div class="block-pool">';
+  sh.forEach((it,pi)=>{pool+='<div class="block-chip" id="bchip-'+qi+'-'+pi+'" onclick="selBlock('+qi+','+pi+')">'+esc(it.text)+'</div>'});
+  pool+='</div>';
+  return '<div class="block-scaffold">'+sc+'</div>'+pool+'<button class="check-btn" id="check-'+qi+'" onclick="checkBlock('+qi+')">Check Answer</button><div class="explanation" id="exp-'+qi+'"></div>';
+}
+function selBlock(qi,pi){
+  if(answered.has(qi))return;
+  if(selectedBlock[qi]!==undefined){const p=document.getElementById('bchip-'+qi+'-'+selectedBlock[qi]);if(p)p.classList.remove('selected-chip')}
+  if(selectedBlock[qi]===pi){delete selectedBlock[qi];return}
+  selectedBlock[qi]=pi;document.getElementById('bchip-'+qi+'-'+pi).classList.add('selected-chip');
+}
+function placeBlock(qi,si){
+  if(answered.has(qi))return;const q=Q[qi];
+  if(selectedBlock[qi]!==undefined){
+    const pi=selectedBlock[qi],slotEl=document.getElementById('bslot-'+qi+'-'+si);
+    if(blockSlotAssign[qi][si]!==undefined){const old=blockSlotAssign[qi][si];document.getElementById('bchip-'+qi+'-'+old).classList.remove('used');blockPoolUsed[qi].delete(old)}
+    slotEl.textContent=q._sh[pi].text;slotEl.classList.add('filled');blockSlotAssign[qi][si]=pi;blockPoolUsed[qi].add(pi);
+    document.getElementById('bchip-'+qi+'-'+pi).classList.remove('selected-chip');document.getElementById('bchip-'+qi+'-'+pi).classList.add('used');delete selectedBlock[qi];
+  }else{
+    const slotEl=document.getElementById('bslot-'+qi+'-'+si),lbl=q.slotLabels[si]||('Slot '+(si+1));
+    if(blockSlotAssign[qi][si]!==undefined){const old=blockSlotAssign[qi][si];document.getElementById('bchip-'+qi+'-'+old).classList.remove('used');blockPoolUsed[qi].delete(old);delete blockSlotAssign[qi][si];slotEl.textContent='▸ [ '+lbl+' ]';slotEl.classList.remove('filled')}
+  }
+}
+function checkBlock(qi){
+  if(answered.has(qi))return;const q=Q[qi],n=q.correctBlocks.length;
+  for(let si=0;si<n;si++){if(blockSlotAssign[qi][si]===undefined)return}
+  answered.add(qi);document.getElementById('check-'+qi).disabled=true;
+  let ok=true;
+  for(let si=0;si<n;si++){const pi=blockSlotAssign[qi][si],placed=q._sh[pi].text,correct=q.correctBlocks[si],el=document.getElementById('bslot-'+qi+'-'+si);
+    if(placed===correct){el.classList.add('correct-slot');el.classList.remove('filled')}else{el.classList.add('wrong-slot');el.classList.remove('filled');ok=false}}
+  const card=document.getElementById('q-'+qi);card.classList.add(ok?'answered-correct':'answered-wrong');if(ok)score++;updateScore();showExp(qi,ok);
+}
+
+function renderFill(q,qi){
+  let y=q.yaml;q.blanks.forEach((_,bi)=>{y=y.replace('___BLANK_'+bi+'___','<span class="blank-slot" id="blank-'+qi+'-'+bi+'" onclick="fillBlank('+qi+','+bi+')">______</span>')});
+  let pool='<div class="pool-label">Word Pool:</div><div class="word-pool">';
+  q.pool.forEach((w,wi)=>{pool+='<span class="pool-word" id="pw-'+qi+'-'+wi+'" onclick="selWord('+qi+','+wi+')">'+w+'</span>'});
+  pool+='</div>';
+  return '<div class="yaml-exercise">'+y+'</div>'+pool+'<button class="check-btn" id="check-'+qi+'" onclick="checkFill('+qi+')">Check Answer</button><div class="explanation" id="exp-'+qi+'"></div>';
+}
+function selWord(qi,wi){if(answered.has(qi))return;if(selectedWord[qi]===wi){delete selectedWord[qi];return}selectedWord[qi]=wi}
+function fillBlank(qi,bi){
+  if(answered.has(qi))return;
+  if(selectedWord[qi]!==undefined){
+    const wi=selectedWord[qi],word=Q[qi].pool[wi],el=document.getElementById('blank-'+qi+'-'+bi);
+    if(el.dataset.word){const pw=parseInt(el.dataset.wi);document.getElementById('pw-'+qi+'-'+pw).classList.remove('selected')}
+    el.textContent=word;el.classList.add('filled');el.dataset.word=word;el.dataset.wi=wi;
+    document.getElementById('pw-'+qi+'-'+wi).classList.add('selected');delete selectedWord[qi];
+  }else{
+    const el=document.getElementById('blank-'+qi+'-'+bi);
+    if(el.dataset.word){const pw=parseInt(el.dataset.wi);document.getElementById('pw-'+qi+'-'+pw).classList.remove('selected');el.textContent='______';el.classList.remove('filled');el.dataset.word='';el.dataset.wi=''}
+  }
+}
+function checkFill(qi){
+  if(answered.has(qi))return;const q=Q[qi];let ok=true,filled=true;
+  q.blanks.forEach((ans,bi)=>{const el=document.getElementById('blank-'+qi+'-'+bi),ua=el.dataset.word||'';if(!ua){filled=false;return}
+    if(ua===ans){el.classList.add('correct');el.classList.remove('filled')}else{el.classList.add('wrong');el.classList.remove('filled');ok=false;setTimeout(()=>{el.textContent=ua+' \u2192 '+ans},300)}});
+  if(!filled)return;answered.add(qi);document.getElementById('check-'+qi).disabled=true;
+  const card=document.getElementById('q-'+qi);card.classList.add(ok?'answered-correct':'answered-wrong');if(ok)score++;updateScore();showExp(qi,ok);
+}
+
+function renderMCQ(q,qi){
+  let h='<div class="mcq-options">';
+  q.options.forEach((o,oi)=>{h+='<div class="mcq-opt" id="opt-'+qi+'-'+oi+'" onclick="selMCQ('+qi+','+oi+')"><span class="opt-letter">'+o.label+'</span><span class="opt-text">'+o.text+'</span></div>'});
+  return h+'</div><div class="explanation" id="exp-'+qi+'"></div>';
+}
+function selMCQ(qi,oi){
+  if(answered.has(qi))return;answered.add(qi);const q=Q[qi],ok=q.options[oi].correct;
+  q.options.forEach((o,i)=>{const el=document.getElementById('opt-'+qi+'-'+i);el.classList.add('disabled');if(o.correct)el.classList.add('correct-choice');if(i===oi&&!ok)el.classList.add('wrong-choice')});
+  const card=document.getElementById('q-'+qi);card.classList.add(ok?'answered-correct':'answered-wrong');if(ok)score++;updateScore();showExp(qi,ok);
+}
+
+function renderMulti(q,qi){
+  let h='<p style="color:var(--text-dim);font-size:.85rem;margin-bottom:.5rem">Select '+q.correctCount+' options:</p><div class="mcq-options">';
+  q.options.forEach((o,oi)=>{h+='<div class="mcq-opt" id="opt-'+qi+'-'+oi+'" onclick="togMulti('+qi+','+oi+')"><span class="opt-letter">'+o.label+'</span><span>'+o.text+'</span></div>'});
+  return h+'</div><button class="check-btn" id="check-'+qi+'" onclick="checkMulti('+qi+')">Check Answer</button><div class="explanation" id="exp-'+qi+'"></div>';
+}
+function togMulti(qi,oi){
+  if(answered.has(qi))return;if(!multiSel[qi])multiSel[qi]=new Set();
+  const el=document.getElementById('opt-'+qi+'-'+oi);
+  if(multiSel[qi].has(oi)){multiSel[qi].delete(oi);el.classList.remove('multi-selected')}else{multiSel[qi].add(oi);el.classList.add('multi-selected')}
+}
+function checkMulti(qi){
+  if(answered.has(qi))return;const q=Q[qi];if(!multiSel[qi]||multiSel[qi].size!==q.correctCount)return;
+  answered.add(qi);document.getElementById('check-'+qi).disabled=true;let ok=true;
+  q.options.forEach((o,i)=>{const el=document.getElementById('opt-'+qi+'-'+i);el.classList.add('disabled');el.classList.remove('multi-selected');if(o.correct)el.classList.add('correct-choice');if(multiSel[qi].has(i)&&!o.correct){el.classList.add('wrong-choice');ok=false}if(!multiSel[qi].has(i)&&o.correct)ok=false});
+  const card=document.getElementById('q-'+qi);card.classList.add(ok?'answered-correct':'answered-wrong');if(ok)score++;updateScore();showExp(qi,ok);
+}
+
+function showExp(qi,ok){
+  const q=Q[qi],el=document.getElementById('exp-'+qi);el.className='explanation show '+(ok?'correct-exp':'wrong-exp');
+  let d='';if(q.explanation.details){d='<div style="margin-top:.6rem">';q.explanation.details.forEach(x=>{d+='<div class="exp-detail">'+x+'</div>'});d+='</div>'}
+  el.innerHTML='<div class="exp-title">'+(ok?'\u2705 Correct!':'\u274C Incorrect')+'</div><div>'+q.explanation.correct+'</div>'+d;
+}
+function updateScore(){document.getElementById('score-display').textContent=score+' / '+Q.length}
+function resetAll(){score=0;answered=new Set();selectedWord={};selectedBlock={};blockSlotAssign={};blockPoolUsed={};multiSel={};render()}
+render();
+</script>
+</body></html>

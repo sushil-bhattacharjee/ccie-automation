@@ -112,6 +112,49 @@
             .quiz-header { flex-direction: column; text-align: center; }
             pre { font-size: 0.65rem; }
         }
+
+        /* ── MCQ Practice: enlarged + colorful (scoped to #quiz only) ─── */
+        #quiz { width: 1200px; max-width: 100%; margin: 0 auto; }
+        #quiz h1 { font-size: 2.75rem; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        #quiz .intro-text { font-size: 1.25rem; color: var(--text-primary); }
+        #quiz .quiz-header { background: linear-gradient(135deg, rgba(57,197,207,0.15), rgba(88,166,255,0.12), rgba(163,113,247,0.12)); border: 1px solid var(--accent-cyan); padding: 1.75rem 2rem; }
+        #quiz .score-display { font-size: 1.6rem; }
+        #quiz .score-correct { font-size: 1.9rem; }
+        #quiz .progress-bar { height: 12px; }
+        #quiz .btn { font-size: 1.05rem; padding: 0.75rem 1.5rem; }
+        #quiz .question-card { padding: 2rem; border-width: 2px; background: linear-gradient(180deg, var(--bg-secondary), rgba(22,27,34,0.85)); box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+        #quiz .question-card.answered-correct { box-shadow: 0 0 0 1px var(--accent-green), 0 4px 18px rgba(63,185,80,0.25); }
+        #quiz .question-card.answered-incorrect { box-shadow: 0 0 0 1px var(--accent-red), 0 4px 18px rgba(248,81,73,0.25); }
+        #quiz .question-number { font-size: 1rem; padding: 0.4rem 1rem; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); color: var(--bg-primary); font-weight: 700; }
+        #quiz .question-type { font-size: 1rem; color: var(--accent-orange); font-weight: 600; }
+        #quiz .question-text { font-size: 1.2rem; line-height: 1.6; color: var(--text-primary); }
+        #quiz .question-text pre { font-size: 0.95rem; line-height: 1.6; padding: 1rem 1.25rem; border-left: 4px solid var(--accent-purple); background: linear-gradient(135deg, #0d1117, #161b22); }
+        #quiz .q-prose { margin: 1rem 0; font-size: 1.2rem; line-height: 1.6; color: var(--text-primary); }
+        /* ── Payload blocks (XML / YAML / Jinja2) embedded in question prompts ── */
+        #quiz .payload-wrap { position: relative; margin: 1.1rem 0; }
+        #quiz .payload-label { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; padding: 0.35rem 0.95rem; border-radius: 8px 8px 0 0; color: var(--bg-primary); }
+        #quiz .payload-label.lang-xml { background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue)); }
+        #quiz .payload-label.lang-yaml { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); }
+        #quiz .payload-label.lang-jinja { background: linear-gradient(90deg, var(--accent-orange), #f0b440); }
+        #quiz .payload-block { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1.65; padding: 1rem 1.25rem 2.6rem; margin: 0; background: linear-gradient(135deg, #0d1117, #161b22); border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; overflow-x: auto; color: #c9d1d9; white-space: pre; }
+        #quiz .payload-block.lang-xml { border-color: var(--accent-purple); border-left: 4px solid var(--accent-purple); }
+        #quiz .payload-block.lang-yaml { border-color: var(--accent-cyan); border-left: 4px solid var(--accent-cyan); }
+        #quiz .payload-block.lang-jinja { border-color: var(--accent-orange); border-left: 4px solid var(--accent-orange); }
+        #quiz .payload-copy-btn { position: absolute; bottom: 0.55rem; right: 0.7rem; padding: 0.4rem 0.95rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 600; background: rgba(13, 17, 23, 0.92); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
+        #quiz .payload-copy-btn:hover { background: var(--accent-cyan); color: var(--bg-primary); }
+        #quiz .payload-copy-btn.copied { background: var(--accent-green); border-color: var(--accent-green); color: var(--bg-primary); }
+        #quiz .options-list { gap: 1rem; }
+        #quiz .option-item { padding: 1.1rem 1.35rem; border-width: 2px; }
+        #quiz .option-item:hover:not(.disabled) { border-color: var(--accent-cyan); background: rgba(57,197,207,0.08); }
+        #quiz .option-checkbox { min-width: 30px; height: 30px; font-size: 0.95rem; border-width: 2px; }
+        #quiz .option-text { font-size: 1.1rem; line-height: 1.55; }
+        /* The big one: JSON / XML / Jinja2 payloads inside MCQ options */
+        #quiz .option-text pre { font-size: 0.95rem; line-height: 1.6; padding: 0.85rem 1.1rem; background: linear-gradient(135deg, #0d1117, #161b22); border: 1px solid var(--accent-cyan); border-left: 4px solid var(--accent-cyan); border-radius: 8px; color: #c9d1d9; }
+        #quiz .submit-btn { font-size: 1.15rem; padding: 0.9rem; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); color: #fff; letter-spacing: 0.3px; }
+        #quiz .submit-btn:hover:not(:disabled) { background: linear-gradient(90deg, #5ad7e0, #79b8ff); }
+        #quiz .explanation { padding: 1.25rem 1.5rem; border-left-width: 5px; background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(57,197,207,0.06)); }
+        #quiz .explanation-title { font-size: 1.15rem; }
+        #quiz .explanation-text { font-size: 1.05rem; line-height: 1.7; color: var(--text-primary); }
     </style>
 </head>
 <body>
@@ -119,8 +162,8 @@
         <div class="nav-content">
             <div class="nav-title">🔧 NETCONF Operations & ACL Payloads - DevNet Expert</div>
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
-                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+                <button type="button" class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
+                <button type="button" class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
             </div>
         </div>
     </nav>
@@ -414,8 +457,8 @@
                     <span class="score-display">Score: <span class="score-correct" id="correctCount">0</span> <span class="score-total">/ <span id="totalAnswered">0</span> answered</span></span>
                 </div>
                 <div class="quiz-controls">
-                    <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
-                    <button class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset</button>
+                    <button type="button" class="btn btn-primary" onclick="showAllAnswers()">👁 Show All</button>
                 </div>
             </div>
 
@@ -645,12 +688,67 @@
             updateProgress();
         }
 
+        function detectPayloadLang(s) {
+            if (!s) return null;
+            if (/^&lt;/.test(s) || /^<[a-zA-Z!?\/]/.test(s)) return 'xml';
+            if (/\{%|\{\{/.test(s)) return 'jinja';
+            if (/^(YAML:|ACCESS_LISTS:)/.test(s)) return 'yaml';
+            var lines = s.split('\n');
+            if (lines.length >= 2) {
+                var yamlish = lines.filter(function(l){ return /^\s*[A-Z][A-Z0-9_]*:/.test(l); }).length;
+                if (yamlish >= 2) return 'yaml';
+            }
+            return null;
+        }
+
+        function formatQuestion(raw, qid) {
+            var segs = raw.split('\n\n');
+            if (segs.length === 1) return raw.replace(/\n/g, '<br>').replace(/ {2}/g, '&nbsp;&nbsp;');
+            var labels = { xml: 'XML', yaml: 'YAML', jinja: 'Jinja2' };
+            var icons  = { xml: '🧬', yaml: '📄', jinja: '🧩' };
+            var html = '';
+            var n = 0;
+            segs.forEach(function(seg, i) {
+                var trimmed = seg.replace(/^\s+|\s+$/g, '');
+                var lang = detectPayloadLang(trimmed);
+                if (lang) {
+                    n++;
+                    var content = trimmed;
+                    if (lang === 'yaml') content = content.replace(/^YAML:\s*\n/, '');
+                    var pid = 'pl-q' + qid + '-' + n;
+                    html += '<div class="payload-wrap">' +
+                        '<div class="payload-label lang-' + lang + '">' + icons[lang] + ' ' + labels[lang] + '</div>' +
+                        '<pre class="payload-block lang-' + lang + '" id="' + pid + '">' + content + '</pre>' +
+                        '<button type="button" class="payload-copy-btn" onclick="copyPayload(\'' + pid + '\', this)">📋 Copy</button>' +
+                        '</div>';
+                } else {
+                    var inline = seg.replace(/\n/g, '<br>').replace(/ {2}/g, '&nbsp;&nbsp;');
+                    html += i === 0 ? inline : '<div class="q-prose">' + inline + '</div>';
+                }
+            });
+            return html;
+        }
+
+        function copyPayload(elId, btn) {
+            var el = document.getElementById(elId);
+            if (!el) return;
+            var text = el.textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function(){
+                    var orig = btn.textContent;
+                    btn.textContent = '✓ Copied';
+                    btn.classList.add('copied');
+                    setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+                });
+            }
+        }
+
         function renderQuestion(q, idx) {
             var expHtml = q.explanation.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g, '<br>');
             var typeLabel = q.count === 1 ? 'Choose 1' : 'Choose ' + q.count;
             return '<div class="question-card" id="q' + q.id + '">' +
                 '<div class="question-header"><span class="question-number">Q' + (idx+1) + '</span><span class="question-type">' + typeLabel + '</span></div>' +
-                '<div class="question-text">' + q.question.replace(/\n/g, '<br>').replace(/ {2}/g, '&nbsp;&nbsp;') + '</div>' +
+                '<div class="question-text">' + formatQuestion(q.question, q.id) + '</div>' +
                 '<div class="options-list">' +
                 q.options.map(function(opt, i) {
                     var optHtml = opt.text.replace(/</g, '&lt;').replace(/>/g, '&gt;');

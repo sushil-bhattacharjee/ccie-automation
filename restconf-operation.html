@@ -10,7 +10,7 @@
 :root{--bg:#f7f7f5;--card:#fff;--text:#1a1a1a;--text2:#666;--text3:#999;--border:#e0e0de;--hover:#f0efeb;--sel:#e8e5ff;--sel-border:#7c6cef;--correct:#d4f5e5;--correct-border:#1d9e75;--correct-text:#085041;--wrong:#fde8e8;--wrong-border:#e24b4a;--wrong-text:#791f1f;--missed:#d4f5e5;--blue:#e8f1fb;--blue-text:#185fa5;--purple:#ece8ff;--purple-text:#534ab7;--code-bg:#f0efeb;--tree-hl:#fff3cd;--tree-hl-text:#856404;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono','SF Mono',monospace}
 @media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--card:#242424;--text:#e8e6df;--text2:#a0a0a0;--text3:#707070;--border:#333;--hover:#2a2a2a;--sel:#2d2854;--sel-border:#7c6cef;--correct:#0a3d2e;--correct-border:#1d9e75;--correct-text:#9fe1cb;--wrong:#3d1515;--wrong-border:#e24b4a;--wrong-text:#f7c1c1;--missed:#0a3d2e;--blue:#0a2a4a;--blue-text:#85b7eb;--purple:#2d2854;--purple-text:#b0a4f0;--code-bg:#2c2c2a;--tree-hl:#3d3510;--tree-hl-text:#f0d861}}
 body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6}
-.exam{max-width:800px;margin:0 auto;padding:1.5rem 1rem;min-height:100vh}
+.exam{max-width:1200px;margin:0 auto;padding:1.5rem 1rem;min-height:100vh}
 .exam-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
 .exam-title{font-size:1.2rem;font-weight:600;margin-bottom:0.25rem}
 .exam-sub{font-size:0.8rem;color:var(--text2)}
@@ -28,9 +28,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:
 .q-tag{font-size:0.65rem;font-weight:600;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.04em}
 .tag-single{background:var(--blue);color:var(--blue-text)}
 .tag-multi{background:var(--purple);color:var(--purple-text)}
-.q-text{font-size:0.95rem;font-weight:500;line-height:1.55;margin-bottom:10px}
-.q-scenario{font-size:0.78rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:10px;white-space:pre-wrap;line-height:1.55;border-left:3px solid var(--border)}
-.yang-tree{font-size:0.72rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:14px;white-space:pre;line-height:1.6;overflow-x:auto;border-left:3px solid var(--sel-border)}
+.q-text{font-size:1.05rem;font-weight:500;line-height:1.55;margin-bottom:10px}
+.q-scenario{font-size:0.88rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:10px;white-space:pre-wrap;line-height:1.55;border-left:3px solid var(--border)}
+.yang-tree{font-size:0.82rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:10px 14px;border-radius:8px;margin-bottom:14px;white-space:pre;line-height:1.6;overflow-x:auto;border-left:3px solid var(--sel-border)}
 .yang-tree .hl{background:var(--tree-hl);color:var(--tree-hl-text);padding:1px 4px;border-radius:3px;font-weight:500}
 .yang-label{font-size:0.65rem;font-weight:600;color:var(--sel-border);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
 .options{display:flex;flex-direction:column;gap:10px}
@@ -54,19 +54,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:
 .option.wrong .radio.checkbox::after{border-radius:2px}
 .option.missed .radio{border-color:var(--correct-border)}
 .opt-content{flex:1;min-width:0}
-.opt-label{font-size:0.85rem;font-weight:500;line-height:1.5;margin-bottom:2px}
-.curl-wrap{position:relative;margin-top:8px;background:var(--code-bg);border-radius:8px;padding:10px 12px;padding-right:56px;overflow-x:auto}
-.curl-code{font-family:var(--mono);font-size:0.7rem;line-height:1.55;white-space:pre;color:var(--text2)}
-.copy-btn{position:absolute;top:8px;right:8px;font-size:0.65rem;font-family:var(--font);padding:3px 10px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--text3);cursor:pointer;transition:all 0.15s}
+.opt-label{font-size:0.95rem;font-weight:500;line-height:1.5;margin-bottom:2px}
+.curl-wrap{margin-top:8px;background:var(--code-bg);border-radius:8px;overflow:hidden}
+.curl-scroll{padding:10px 12px;overflow-x:auto}
+.curl-code{font-family:var(--mono);font-size:0.8rem;line-height:1.6;white-space:pre;color:var(--text2)}
+.copy-row{display:flex;justify-content:flex-end;padding:6px 10px;border-top:1px solid var(--border)}
+.copy-btn{font-size:0.72rem;font-family:var(--font);padding:4px 14px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--text3);cursor:pointer;transition:all 0.15s}
 .copy-btn:hover{color:var(--text);background:var(--hover)}
 .actions{display:flex;gap:10px;margin-top:14px}
 .btn{padding:9px 22px;border-radius:8px;font-size:0.82rem;font-family:var(--font);font-weight:500;cursor:pointer;transition:all 0.15s;border:none}
 .btn-submit{background:var(--sel-border);color:#fff}
 .btn-submit:hover{opacity:0.9}
 .btn-submit:disabled{opacity:0.35;cursor:default}
-.explanation{margin-top:14px;padding:14px;background:var(--code-bg);border-radius:8px;border-left:3px solid var(--correct-border);display:none;font-size:0.82rem;color:var(--text2);line-height:1.7}
+.explanation{margin-top:14px;padding:14px;background:var(--code-bg);border-radius:8px;border-left:3px solid var(--correct-border);display:none;font-size:0.92rem;color:var(--text2);line-height:1.7}
 .explanation strong{color:var(--text);font-weight:500}
-.exp-tree{font-family:var(--mono);font-size:0.72rem;display:block;margin:8px 0;line-height:1.5;white-space:pre}
+.exp-tree{font-family:var(--mono);font-size:0.82rem;display:block;margin:8px 0;line-height:1.5;white-space:pre}
 </style>
 </head>
 <body>
@@ -697,7 +699,7 @@ let score=0,answered=0;
 const total=Q.length;
 const ctn=document.getElementById('qs');
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function mkCurl(raw,id){if(!raw)return '';return `<div class="curl-wrap"><div class="curl-code" id="${id}">${esc(raw)}</div><button class="copy-btn" onclick="cpCurl('${id}',this)">copy</button></div>`;}
+function mkCurl(raw,id){if(!raw)return '';return `<div class="curl-wrap"><div class="curl-scroll"><div class="curl-code" id="${id}">${esc(raw)}</div></div><div class="copy-row"><button class="copy-btn" onclick="cpCurl('${id}',this)">copy</button></div></div>`;}
 window.cpCurl=function(id,btn){const el=document.getElementById(id);navigator.clipboard.writeText(el.textContent).then(()=>{btn.textContent='copied!';setTimeout(()=>{btn.textContent='copy';},1500);});};
 function upd(){document.getElementById('sc').textContent=score;document.getElementById('prog').textContent=answered+' of '+total+' answered';document.getElementById('pb').style.width=(answered/total*100)+'%';}
 Q.forEach((q,qi)=>{

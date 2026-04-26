@@ -130,19 +130,21 @@
         #quiz .question-text { font-size: 1.2rem; line-height: 1.6; color: var(--text-primary); }
         #quiz .question-text pre { font-size: 0.95rem; line-height: 1.6; padding: 1rem 1.25rem; border-left: 4px solid var(--accent-purple); background: linear-gradient(135deg, #0d1117, #161b22); }
         #quiz .q-prose { margin: 1rem 0; font-size: 1.2rem; line-height: 1.6; color: var(--text-primary); }
-        /* ── Payload blocks (XML / YAML / Jinja2) embedded in question prompts ── */
-        #quiz .payload-wrap { position: relative; margin: 1.1rem 0; }
-        #quiz .payload-label { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; padding: 0.35rem 0.95rem; border-radius: 8px 8px 0 0; color: var(--bg-primary); }
-        #quiz .payload-label.lang-xml { background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue)); }
-        #quiz .payload-label.lang-yaml { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); }
-        #quiz .payload-label.lang-jinja { background: linear-gradient(90deg, var(--accent-orange), #f0b440); }
-        #quiz .payload-block { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1.65; padding: 1rem 1.25rem 2.6rem; margin: 0; background: linear-gradient(135deg, #0d1117, #161b22); border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; overflow-x: auto; color: #c9d1d9; white-space: pre; }
-        #quiz .payload-block.lang-xml { border-color: var(--accent-purple); border-left: 4px solid var(--accent-purple); }
-        #quiz .payload-block.lang-yaml { border-color: var(--accent-cyan); border-left: 4px solid var(--accent-cyan); }
-        #quiz .payload-block.lang-jinja { border-color: var(--accent-orange); border-left: 4px solid var(--accent-orange); }
-        #quiz .payload-copy-btn { position: absolute; bottom: 0.55rem; right: 0.7rem; padding: 0.4rem 0.95rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 600; background: rgba(13, 17, 23, 0.92); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
-        #quiz .payload-copy-btn:hover { background: var(--accent-cyan); color: var(--bg-primary); }
-        #quiz .payload-copy-btn.copied { background: var(--accent-green); border-color: var(--accent-green); color: var(--bg-primary); }
+        /* ── Payload blocks (XML / YAML / Jinja2 / pyang) — used in BOTH Learn and Quiz ── */
+        .payload-wrap { position: relative; margin: 1.1rem 0; }
+        .payload-label { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; padding: 0.35rem 0.95rem; border-radius: 8px 8px 0 0; color: var(--bg-primary); }
+        .payload-label.lang-xml { background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue)); }
+        .payload-label.lang-yaml { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); }
+        .payload-label.lang-jinja { background: linear-gradient(90deg, var(--accent-orange), #f0b440); }
+        .payload-label.lang-tree { background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan)); }
+        .payload-block { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1.65; padding: 1rem 1.25rem 2.6rem; margin: 0; background: linear-gradient(135deg, #0d1117, #161b22); border: 1px solid var(--border-color); border-radius: 0 8px 8px 8px; overflow-x: auto; color: #c9d1d9; white-space: pre; }
+        .payload-block.lang-xml { border-color: var(--accent-purple); border-left: 4px solid var(--accent-purple); }
+        .payload-block.lang-yaml { border-color: var(--accent-cyan); border-left: 4px solid var(--accent-cyan); }
+        .payload-block.lang-jinja { border-color: var(--accent-orange); border-left: 4px solid var(--accent-orange); }
+        .payload-block.lang-tree { border-color: var(--accent-green); border-left: 4px solid var(--accent-green); }
+        .payload-copy-btn { position: absolute; bottom: 0.55rem; right: 0.7rem; padding: 0.4rem 0.95rem; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 600; background: rgba(13, 17, 23, 0.92); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
+        .payload-copy-btn:hover { background: var(--accent-cyan); color: var(--bg-primary); }
+        .payload-copy-btn.copied { background: var(--accent-green); border-color: var(--accent-green); color: var(--bg-primary); }
         #quiz .options-list { gap: 1rem; }
         #quiz .option-item { padding: 1.1rem 1.35rem; border-width: 2px; }
         #quiz .option-item:hover:not(.disabled) { border-color: var(--accent-cyan); background: rgba(57,197,207,0.08); }
@@ -180,7 +182,7 @@
             <div class="tip-box">
                 <strong>💡 Key Prefixes:</strong> <code>ios-acl:</code> maps to <code>Cisco-IOS-XE-acl:</code> — Root path: <code>native/ip/access-list</code>
             </div>
-<pre>module: Cisco-IOS-XE-native
+<div class="payload-wrap"><div class="payload-label lang-tree">🌲 pyang Tree</div><pre class="payload-block lang-tree">module: Cisco-IOS-XE-native
   +--rw native
      +--rw ip
         +--rw access-list
@@ -208,7 +210,7 @@
                        +--:(dst-equal)        → &lt;dst-eq&gt;
                        +--:(dst-greater-than) → &lt;dst-gt&gt;
                        +--:(dst-less-than)    → &lt;dst-lt&gt;
-                       +--:(dst-range)        → &lt;dst-range1&gt; + &lt;dst-range2&gt;</pre>
+                       +--:(dst-range)        → &lt;dst-range1&gt; + &lt;dst-range2&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
 
             <!-- Four Operations -->
             <h2>⚙️ The Four NETCONF Operations</h2>
@@ -220,7 +222,7 @@
                 <li><strong>Fails if:</strong> Element already exists</li>
                 <li><strong>Idempotent:</strong> ❌ No (fails on second run)</li>
             </ul>
-<pre>&lt;access-list-seq-rule nc:operation="create"&gt;
+<div class="payload-wrap"><div class="payload-label lang-xml">🧬 XML</div><pre class="payload-block lang-xml">&lt;access-list-seq-rule nc:operation="create"&gt;
     &lt;sequence&gt;45&lt;/sequence&gt;
     &lt;ace-rule&gt;
         &lt;action&gt;permit&lt;/action&gt;
@@ -228,7 +230,7 @@
         &lt;any/&gt;
         &lt;dst-any/&gt;
     &lt;/ace-rule&gt;
-&lt;/access-list-seq-rule&gt;</pre>
+&lt;/access-list-seq-rule&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
 
             <div class="step-header"><h3>2. MERGE (like REST PATCH — Default)</h3></div>
             <ul>
@@ -236,7 +238,7 @@
                 <li><strong>Fails if:</strong> Never (always succeeds)</li>
                 <li><strong>Idempotent:</strong> ✅ Yes (safe to run multiple times)</li>
             </ul>
-<pre>&lt;access-list-seq-rule nc:operation="merge"&gt;
+<div class="payload-wrap"><div class="payload-label lang-xml">🧬 XML</div><pre class="payload-block lang-xml">&lt;access-list-seq-rule nc:operation="merge"&gt;
     &lt;sequence&gt;45&lt;/sequence&gt;
     &lt;ace-rule&gt;
         &lt;action&gt;permit&lt;/action&gt;
@@ -244,7 +246,7 @@
         &lt;any/&gt;
         &lt;dst-any/&gt;
     &lt;/ace-rule&gt;
-&lt;/access-list-seq-rule&gt;</pre>
+&lt;/access-list-seq-rule&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
 
             <div class="step-header"><h3>3. REPLACE (like REST PUT)</h3></div>
             <ul>
@@ -252,7 +254,7 @@
                 <li><strong>Deletes:</strong> Everything not mentioned at that level</li>
                 <li><strong>Idempotent:</strong> ✅ Yes</li>
             </ul>
-<pre>&lt;extended nc:operation="replace"&gt;
+<div class="payload-wrap"><div class="payload-label lang-xml">🧬 XML</div><pre class="payload-block lang-xml">&lt;extended nc:operation="replace"&gt;
     &lt;name&gt;MY-ACL&lt;/name&gt;
     &lt;access-list-seq-rule&gt;
         &lt;sequence&gt;10&lt;/sequence&gt;
@@ -263,7 +265,7 @@
             &lt;dst-any/&gt;
         &lt;/ace-rule&gt;
     &lt;/access-list-seq-rule&gt;
-&lt;/extended&gt;</pre>
+&lt;/extended&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
             <div class="warning-box"><strong>⚠️ Replace deletes unmentioned config!</strong> MY-ACL will have ONLY sequence 10. All other sequences are removed.</div>
 
             <div class="step-header"><h3>4. DELETE</h3></div>
@@ -272,9 +274,9 @@
                 <li><strong>Fails if:</strong> Element doesn't exist</li>
                 <li><strong>Idempotent:</strong> ❌ No (fails if already deleted)</li>
             </ul>
-<pre>&lt;access-list-seq-rule nc:operation="delete"&gt;
+<div class="payload-wrap"><div class="payload-label lang-xml">🧬 XML</div><pre class="payload-block lang-xml">&lt;access-list-seq-rule nc:operation="delete"&gt;
     &lt;sequence&gt;45&lt;/sequence&gt;
-&lt;/access-list-seq-rule&gt;</pre>
+&lt;/access-list-seq-rule&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
 
             <!-- REST Analogy Table -->
             <h2>🔄 REST API Analogy</h2>
@@ -321,7 +323,7 @@
                 <strong>Data Elements:</strong> <code>&lt;action&gt;</code>, <code>&lt;protocol&gt;</code>, <code>&lt;host&gt;</code> — actual config values. Mutable. Inherit operations from parent.
             </div>
             <p>To "change" a key (e.g., sequence 10→20), you must <strong>delete old + create new</strong>:</p>
-<pre>&lt;access-list-seq-rule nc:operation="delete"&gt;
+<div class="payload-wrap"><div class="payload-label lang-xml">🧬 XML</div><pre class="payload-block lang-xml">&lt;access-list-seq-rule nc:operation="delete"&gt;
     &lt;sequence&gt;10&lt;/sequence&gt;
 &lt;/access-list-seq-rule&gt;
 
@@ -333,14 +335,14 @@
         &lt;any/&gt;
         &lt;dst-any/&gt;
     &lt;/ace-rule&gt;
-&lt;/access-list-seq-rule&gt;</pre>
+&lt;/access-list-seq-rule&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
 
             <!-- Jinja2 Template Section -->
             <h2>📝 Jinja2 Template — ACL Payload Generator</h2>
             <p>The template <code>config_acl.j2</code> renders NETCONF XML payloads from YAML data (<code>acl_soth.yml</code>).</p>
 
             <h3>Template (config_acl.j2)</h3>
-<pre>&lt;config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"&gt;
+<div class="payload-wrap"><div class="payload-label lang-jinja">🧩 Jinja2</div><pre class="payload-block lang-jinja">&lt;config xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"&gt;
   &lt;native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native"&gt;
     &lt;ip&gt;
       &lt;access-list&gt;
@@ -385,10 +387,10 @@
       &lt;/access-list&gt;
     &lt;/ip&gt;
   &lt;/native&gt;
-&lt;/config&gt;</pre>
+&lt;/config&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
 
             <h3>YAML Data (acl_soth.yml) — Sequence 10</h3>
-<pre>ACCESS_LISTS:
+<div class="payload-wrap"><div class="payload-label lang-yaml">📄 YAML</div><pre class="payload-block lang-yaml">ACCESS_LISTS:
   EXTENDED:
     - NAME: challenge-207-pod-10
       ENTRIES:
@@ -401,10 +403,10 @@
           DEST_NETWORK: 203.36.36.32
           DEST_WILDCARD: 0.0.0.15
           DST_PORT_OP: eq
-          DST_PORT: 636</pre>
+          DST_PORT: 636</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
 
             <h3>Rendered XML Output (Sequence 10)</h3>
-<pre>&lt;access-list-seq-rule&gt;
+<div class="payload-wrap"><div class="payload-label lang-xml">🧬 XML</div><pre class="payload-block lang-xml">&lt;access-list-seq-rule&gt;
     &lt;sequence&gt;10&lt;/sequence&gt;
     &lt;ace-rule&gt;
         &lt;action&gt;permit&lt;/action&gt;
@@ -415,7 +417,7 @@
         &lt;dest-mask&gt;0.0.0.15&lt;/dest-mask&gt;
         &lt;dst-eq&gt;636&lt;/dst-eq&gt;
     &lt;/ace-rule&gt;
-&lt;/access-list-seq-rule&gt;</pre>
+&lt;/access-list-seq-rule&gt;</pre><button type="button" class="payload-copy-btn" onclick="copyPayload(this)">📋 Copy</button></div>
             <div class="tip-box">
                 <strong>💡 IOS CLI equivalent:</strong> <code>permit tcp any gt 100 203.36.36.32 0.0.0.15 eq 636</code>
             </div>
@@ -729,9 +731,16 @@
             return html;
         }
 
-        function copyPayload(elId, btn) {
-            var el = document.getElementById(elId);
-            if (!el) return;
+        function copyPayload(arg, btn) {
+            var el = null;
+            if (typeof arg === 'string') {
+                el = document.getElementById(arg);
+            } else if (arg && arg.nodeType === 1) {
+                btn = arg;
+                var wrap = btn.closest('.payload-wrap');
+                if (wrap) el = wrap.querySelector('.payload-block');
+            }
+            if (!el || !btn) return;
             var text = el.textContent;
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(function(){

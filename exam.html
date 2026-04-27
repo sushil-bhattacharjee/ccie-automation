@@ -63,6 +63,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:
 .q-text{font-size:1.02rem;font-weight:500;line-height:1.55;margin-bottom:0.6rem;white-space:pre-wrap}
 .q-text code{font-family:var(--mono);font-size:0.92em;background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px}
 .q-scenario{font-size:0.84rem;color:var(--text2);background:var(--code-bg);padding:8px 12px;border-radius:8px;margin-bottom:0.75rem;white-space:pre-wrap;line-height:1.55;border-left:3px solid var(--border);font-family:var(--mono)}
+.q-yang-label{font-size:0.65rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
 .q-yang{font-size:0.78rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:8px 12px;border-radius:8px;margin-bottom:0.75rem;white-space:pre;line-height:1.55;overflow-x:auto;border-left:3px solid var(--accent)}
 
 /* Options (single/multi) */
@@ -77,8 +78,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:
 .opt.selected .radio.checkbox::after{border-radius:2px}
 .opt-body{flex:1;min-width:0}
 .opt-label{font-size:0.9rem;line-height:1.5}
-.opt-pre{margin-top:6px;background:var(--code-bg);border-radius:6px;padding:8px 10px;overflow-x:auto}
-.opt-pre code{font-family:var(--mono);font-size:0.78rem;line-height:1.6;white-space:pre;display:block}
+.opt-pre{margin-top:0;background:var(--code-bg);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.opt-pre-scroll{padding:10px 12px;overflow-x:auto}
+.opt-pre code{font-family:var(--mono);font-size:0.78rem;line-height:1.6;white-space:pre;display:block;color:var(--text2)}
+.opt-pre-actions{display:flex;justify-content:flex-end;padding:5px 8px;border-top:1px solid var(--border)}
+.opt-copy-btn{font-size:0.7rem;font-family:var(--font);padding:3px 12px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--text3);cursor:pointer;transition:all 0.15s}
+.opt-copy-btn:hover{color:var(--text);background:var(--hover)}
+.opt-label + .opt-pre{margin-top:8px}
+.opt-body > .opt-label:only-child{font-size:0.92rem}
 
 /* Match: each left has a dropdown */
 .match-grid{display:flex;flex-direction:column;gap:8px}
@@ -346,28 +353,12 @@ function rQ(s){ return rawHtml(s); }
 
 const RENDERERS = {
   single(q, idx) {
-    const optsHtml = q.opts.map((o, i) => {
-      const meta = (q.optMeta || [])[i] || {};
-      const lbl  = (meta.l && meta.l.trim()) ? escapeHtml(meta.l) : escapeHtml(o);
-      const code = meta.c ? `<div class="opt-pre"><code>${escapeHtml(meta.c)}</code></div>` : '';
-      return `<div class="opt" data-i="${i}" onclick="pickSingle(${idx},${i})">
-        <span class="radio"></span>
-        <div class="opt-body"><div class="opt-label">${lbl}</div>${code}</div>
-      </div>`;
-    }).join('');
+    const optsHtml = q.opts.map((o, i) => renderMcqOption(idx, i, q, 'single')).join('');
     return `<div class="opts" id="opts-${idx}">${optsHtml}</div>`;
   },
 
   multi(q, idx) {
-    const optsHtml = q.opts.map((o, i) => {
-      const meta = (q.optMeta || [])[i] || {};
-      const lbl  = (meta.l && meta.l.trim()) ? escapeHtml(meta.l) : escapeHtml(o);
-      const code = meta.c ? `<div class="opt-pre"><code>${escapeHtml(meta.c)}</code></div>` : '';
-      return `<div class="opt" data-i="${i}" onclick="toggleMulti(${idx},${i})">
-        <span class="radio checkbox"></span>
-        <div class="opt-body"><div class="opt-label">${lbl}</div>${code}</div>
-      </div>`;
-    }).join('');
+    const optsHtml = q.opts.map((o, i) => renderMcqOption(idx, i, q, 'multi')).join('');
     const note = q.count ? `<div style="font-size:0.78rem;color:var(--text2);margin-bottom:6px">Select ${q.count}.</div>` : '';
     return `${note}<div class="opts" id="opts-${idx}">${optsHtml}</div>`;
   },
@@ -441,6 +432,49 @@ const RENDERERS = {
       `<select class="slot-select" data-sslot="${n}" onchange="setScaffold(${idx},${n},this.value)">${opts}</select>`);
     return `<pre class="tmpl-pre">${html}</pre>`;
   },
+};
+
+// Render one MCQ option. The bug we are fixing here:
+// for restconf-operation questions, q.opts[i] is the curl code itself (because
+// the source labels are empty). Showing it as both a wrapped label AND a code
+// block duplicates it. Fix: only emit a label when meta.l has real text;
+// only emit a code block when meta.c has real text; if both are empty fall
+// back to q.opts[i] as plain text. Adds a small copy button matching the
+// source guide's UI.
+function renderMcqOption(idx, i, q, mode) {
+  const meta = (q.optMeta || [])[i] || {};
+  const hasLbl  = meta.l && meta.l.trim();
+  const hasCode = meta.c && meta.c.trim();
+  let body = '';
+  if (hasLbl)  body += `<div class="opt-label">${escapeHtml(meta.l)}</div>`;
+  if (hasCode) {
+    const cid = `opt-code-${idx}-${i}`;
+    body += `<div class="opt-pre">
+      <div class="opt-pre-scroll"><code id="${cid}">${escapeHtml(meta.c)}</code></div>
+      <div class="opt-pre-actions">
+        <button type="button" class="opt-copy-btn" onclick="event.stopPropagation();cpExam('${cid}',this)">copy</button>
+      </div>
+    </div>`;
+  }
+  if (!hasLbl && !hasCode) body = `<div class="opt-label">${escapeHtml(q.opts[i])}</div>`;
+  const radioCls = mode === 'multi' ? 'radio checkbox' : 'radio';
+  const handler = mode === 'multi'
+    ? `toggleMulti(${idx},${i})`
+    : `pickSingle(${idx},${i})`;
+  return `<div class="opt" data-i="${i}" onclick="${handler}">
+    <span class="${radioCls}"></span>
+    <div class="opt-body">${body}</div>
+  </div>`;
+}
+
+window.cpExam = function(id, btn) {
+  const el = document.getElementById(id);
+  if (!el || !navigator.clipboard) return;
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1500);
+  });
 };
 
 function renderOrderList(idx, q, order) {
@@ -634,7 +668,7 @@ function renderExam() {
     const renderer = RENDERERS[q.type];
     const body = renderer ? renderer(q, i) : `<em>(unsupported type: ${q.type})</em>`;
     const scenario = q.scenario ? `<div class="q-scenario">${escapeHtml(q.scenario)}</div>` : '';
-    const yang = q.yangTree ? `<div class="q-yang">${escapeHtml(q.yangTree)}</div>` : '';
+    const yang = q.yangTree ? `<div class="q-yang-label">YANG TREE</div><div class="q-yang">${escapeHtml(q.yangTree)}</div>` : '';
     return `<div class="q-card" id="q-card-${i}">
       <div class="q-head">
         <span class="q-num">Question ${i+1} of ${STATE.exam.length}</span>
@@ -721,16 +755,23 @@ function renderReview(reviews) {
   return html;
 }
 
+function optDisplay(q, i) {
+  const meta = (q.optMeta || [])[i] || {};
+  const letter = String.fromCharCode(65 + i);
+  const lbl = (meta.l && meta.l.trim()) ? meta.l : '';
+  const code = (meta.c && meta.c.trim()) ? meta.c : '';
+  if (lbl && code) return `[${letter}] ${lbl}\n${code}`;
+  if (code) return `[${letter}]\n${code}`;
+  if (lbl)  return `[${letter}] ${lbl}`;
+  return `[${letter}] ${q.opts[i] || ''}`;
+}
+
 function fmtAnswer(q, ua) {
   if (ua == null) return '<em>(no answer)</em>';
   switch (q.type) {
     case 'single':
     case 'multi':
-      return ua.map(i => {
-        const meta = (q.optMeta || [])[i] || {};
-        const label = (meta.l && meta.l.trim()) ? meta.l : (q.opts[i] || '');
-        return label;
-      }).join('\n────\n');
+      return ua.map(i => optDisplay(q, i)).join('\n────\n');
     case 'match':
       return q.left.map((L, i) => `${L}  →  ${ua[i] != null && ua[i] >= 0 ? q.right[ua[i]] : '(unset)'}`).join('\n');
     case 'order':
@@ -753,11 +794,7 @@ function fmtCorrect(q) {
   switch (q.type) {
     case 'single':
     case 'multi':
-      return q.ans.map(i => {
-        const meta = (q.optMeta || [])[i] || {};
-        const label = (meta.l && meta.l.trim()) ? meta.l : (q.opts[i] || '');
-        return label;
-      }).join('\n────\n');
+      return q.ans.map(i => optDisplay(q, i)).join('\n────\n');
     case 'match':
       return q.left.map((L, i) => `${L}  →  ${q.right[q.ans[i]]}`).join('\n');
     case 'order':

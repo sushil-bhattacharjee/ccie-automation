@@ -517,6 +517,15 @@
                     </div>
                 </div>
 
+                <!-- Mock Exam — random 30-question weighted exam pulled from every quiz -->
+                <div class="nav-chapter">
+                    <div class="nav-item" onclick="loadContent('exam.html', this)">
+                        <span class="nav-item-icon">🎓</span>
+                        <span class="nav-item-text">Mock Exam (30 Q)</span>
+                        <span class="nav-item-badge badge-ready">New</span>
+                    </div>
+                </div>
+
                 <!-- List of Quizzes — flat index. Each item shows its chapter,
                      and the URL hash deep-links straight to the Practice tab. -->
                 <div class="nav-chapter expanded">
@@ -926,6 +935,25 @@
                     <div class="objective-text">
                         Master the CCIE DevNet Expert exam topics through interactive study guides, hands-on labs, and
                         MCQ practice. Each chapter includes theory, code examples, and quiz questions.
+                    </div>
+                </div>
+
+                <div class="chapter-overview">
+                    <h2>🎓 Featured</h2>
+                    <div class="guide-grid">
+                        <div class="guide-card" onclick="loadContentFromCard('exam.html')" style="border-color:#7c6cef">
+                            <div class="guide-card-header">
+                                <div class="guide-card-icon">🎓</div>
+                                <div class="guide-card-title">Mock Exam — 30 Questions</div>
+                            </div>
+                            <div class="guide-card-desc">Real-exam style. Random 30 questions, weighted across categories
+                                (Git 15% · YANG 15% · REST API 15% · RESTCONF 15% · others 40%). No feedback during the
+                                exam — graphical breakdown + every-question review afterwards.</div>
+                            <div class="guide-card-meta">
+                                <span class="meta-tag">All 7 Question Types</span>
+                                <span class="meta-tag">227-Question Bank</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

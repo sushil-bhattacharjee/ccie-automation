@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mock Exam — CCIE DevNet Expert</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f7f7f5;--card:#fff;--text:#1a1a1a;--text2:#666;--text3:#999;
+  --border:#e0e0de;--hover:#f0efeb;--code-bg:#f0efeb;
+  --accent:#7c6cef;--accent-2:#5046c4;--accent-soft:#e8e5ff;
+  --green:#1d9e75;--green-bg:#d4f5e5;
+  --red:#e24b4a;--red-bg:#fde8e8;
+  --orange:#d29922;--orange-bg:#fff3cd;
+  --blue:#185fa5;--blue-bg:#e8f1fb;
+  --font:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'IBM Plex Mono','SF Mono',monospace;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1a1a1a;--card:#242424;--text:#e8e6df;--text2:#a0a0a0;--text3:#707070;
+  --border:#333;--hover:#2a2a2a;--code-bg:#2c2c2a;
+  --accent:#9b8cff;--accent-2:#7c6cef;--accent-soft:#2d2854;
+  --green:#34d399;--green-bg:#0a3d2e;
+  --red:#f87171;--red-bg:#3d1515;
+  --orange:#fbbf24;--orange-bg:#3d3510;
+  --blue:#85b7eb;--blue-bg:#0a2a4a;
+}}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6}
+.app{max-width:1200px;margin:0 auto;padding:1.5rem 1rem;min-height:100vh}
+.app-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:1rem}
+.app-title{font-size:1.4rem;font-weight:700}
+.app-sub{font-size:0.85rem;color:var(--text2);margin-top:0.25rem}
+
+/* Welcome view */
+.welcome{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem 2.25rem;text-align:center}
+.welcome h2{font-size:1.5rem;font-weight:700;margin-bottom:1rem}
+.welcome p{color:var(--text2);margin-bottom:0.6rem;font-size:0.95rem}
+.welcome-stats{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin:1.5rem 0;font-size:0.85rem;color:var(--text2)}
+.welcome-stats span strong{color:var(--text);font-size:1rem;font-weight:700}
+.weights{margin:1rem 0 1.25rem;font-size:0.85rem;color:var(--text2)}
+.weights b{color:var(--text)}
+.start-btn{padding:0.85rem 2.2rem;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer;transition:transform 0.15s ease,box-shadow 0.15s ease;letter-spacing:0.02em}
+.start-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,108,239,0.35)}
+
+/* Exam top bar */
+.exam-top{position:sticky;top:0.5rem;z-index:10;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 16px;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.exam-top .progress-track{flex:1;min-width:160px;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.exam-top .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:4px;transition:width 0.3s ease}
+.exam-top .answered-count{font-size:0.85rem;color:var(--text2);white-space:nowrap}
+.exam-top .answered-count strong{color:var(--text)}
+
+/* Question card */
+.q-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.q-card.answered{border-color:var(--accent-soft);box-shadow:0 0 0 1px var(--accent-soft)}
+.q-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;gap:0.5rem;flex-wrap:wrap}
+.q-num{font-size:0.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em}
+.q-tags{display:flex;gap:6px}
+.q-tag{font-size:0.6rem;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em}
+.q-tag.cat{background:var(--blue-bg);color:var(--blue)}
+.q-tag.type{background:var(--accent-soft);color:var(--accent-2)}
+.q-text{font-size:1.02rem;font-weight:500;line-height:1.55;margin-bottom:0.6rem;white-space:pre-wrap}
+.q-text code{font-family:var(--mono);font-size:0.92em;background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px}
+.q-scenario{font-size:0.84rem;color:var(--text2);background:var(--code-bg);padding:8px 12px;border-radius:8px;margin-bottom:0.75rem;white-space:pre-wrap;line-height:1.55;border-left:3px solid var(--border);font-family:var(--mono)}
+.q-yang{font-size:0.78rem;font-family:var(--mono);color:var(--text2);background:var(--code-bg);padding:8px 12px;border-radius:8px;margin-bottom:0.75rem;white-space:pre;line-height:1.55;overflow-x:auto;border-left:3px solid var(--accent)}
+
+/* Options (single/multi) */
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;transition:all 0.15s;background:transparent}
+.opt:hover{border-color:var(--accent);background:var(--hover)}
+.opt.selected{border-color:var(--accent);background:var(--accent-soft)}
+.radio{width:18px;height:18px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.radio.checkbox{border-radius:4px}
+.opt.selected .radio{border-color:var(--accent)}
+.opt.selected .radio::after{content:'';width:9px;height:9px;background:var(--accent);border-radius:50%;display:block}
+.opt.selected .radio.checkbox::after{border-radius:2px}
+.opt-body{flex:1;min-width:0}
+.opt-label{font-size:0.9rem;line-height:1.5}
+.opt-pre{margin-top:6px;background:var(--code-bg);border-radius:6px;padding:8px 10px;overflow-x:auto}
+.opt-pre code{font-family:var(--mono);font-size:0.78rem;line-height:1.6;white-space:pre;display:block}
+
+/* Match: each left has a dropdown */
+.match-grid{display:flex;flex-direction:column;gap:8px}
+.match-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--hover)}
+.match-row .arrow{color:var(--text3);font-size:1.1rem}
+.match-row select{padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font-family:inherit;font-size:0.88rem;width:100%}
+
+/* Order: list with up/down */
+.order-list{display:flex;flex-direction:column;gap:6px;counter-reset:ordi}
+.order-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--hover)}
+.order-item:before{counter-increment:ordi;content:counter(ordi);min-width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent-2);font-size:0.8rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.order-item .text{flex:1;font-size:0.88rem;line-height:1.5}
+.order-item .text code{font-family:var(--mono);font-size:0.86em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+.order-btns{display:flex;gap:4px}
+.order-btns button{width:26px;height:26px;border:1px solid var(--border);background:var(--card);border-radius:5px;cursor:pointer;color:var(--text2);font-size:0.85rem;display:inline-flex;align-items:center;justify-content:center}
+.order-btns button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.order-btns button:disabled{opacity:0.3;cursor:default}
+
+/* Fill / blocks (slot+pool) — use dropdowns at each slot */
+.tmpl-pre{font-family:var(--mono);font-size:0.84rem;line-height:1.7;background:var(--code-bg);padding:12px 14px;border-radius:8px;border-left:3px solid var(--accent);overflow-x:auto;white-space:pre}
+.slot-select{display:inline-block;min-width:140px;padding:3px 6px;border:1.5px solid var(--border);border-radius:5px;background:var(--card);color:var(--text);font-family:var(--mono);font-size:0.78rem}
+.slot-row{display:flex;align-items:center;gap:8px;margin:6px 0;flex-wrap:wrap}
+.slot-row label{font-family:var(--mono);font-size:0.78rem;color:var(--text2);min-width:78px}
+.slot-row select{padding:5px 8px;border:1.5px solid var(--border);border-radius:5px;background:var(--card);color:var(--text);font-family:var(--mono);font-size:0.8rem;flex:1;max-width:520px}
+.blocks-section{margin-top:0.75rem;padding:10px 12px;background:var(--hover);border-radius:8px}
+.blocks-title{font-size:0.78rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent-2);margin-bottom:6px}
+
+/* Submit + actions */
+.submit-bar{position:sticky;bottom:0;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-top:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;box-shadow:0 -4px 14px rgba(0,0,0,0.08);flex-wrap:wrap}
+.submit-bar .btn{padding:10px 24px;border:none;border-radius:8px;font-family:inherit;font-size:0.92rem;font-weight:600;cursor:pointer;transition:all 0.15s}
+.btn-submit{background:var(--accent);color:#fff}
+.btn-submit:hover{background:var(--accent-2)}
+.btn-secondary{background:transparent;color:var(--text2);border:1px solid var(--border)!important}
+.btn-secondary:hover{background:var(--hover);color:var(--text)}
+
+/* Results */
+.results{display:flex;flex-direction:column;gap:1rem}
+.results-head{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;text-align:center}
+.score-big{font-size:3rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0.5rem 0}
+.score-pct{font-size:1.05rem;color:var(--text2);margin-bottom:1rem}
+.results-actions{display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem}
+.chart-card h3{font-size:1.05rem;font-weight:700;margin-bottom:1rem}
+.chart-row{display:grid;grid-template-columns:140px 1fr 80px;align-items:center;gap:12px;padding:7px 0}
+.chart-label{font-size:0.86rem;font-weight:500;color:var(--text)}
+.chart-track{height:14px;background:var(--border);border-radius:7px;overflow:hidden;position:relative}
+.chart-fill{height:100%;border-radius:7px;transition:width 0.6s ease}
+.chart-fill.green{background:linear-gradient(90deg,var(--green),#3fb950)}
+.chart-fill.amber{background:linear-gradient(90deg,var(--orange),#f0b440)}
+.chart-fill.red{background:linear-gradient(90deg,var(--red),#ff7a7a)}
+.chart-score{font-size:0.85rem;font-family:var(--mono);text-align:right;color:var(--text2)}
+.chart-score b{color:var(--text)}
+
+/* Review */
+.review-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
+.review-card.r-correct{border-left:4px solid var(--green)}
+.review-card.r-partial{border-left:4px solid var(--orange)}
+.review-card.r-wrong{border-left:4px solid var(--red)}
+.review-card.r-unanswered{border-left:4px solid var(--text3)}
+.review-head{display:flex;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap}
+.review-status{font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em}
+.review-status.s-correct{background:var(--green-bg);color:var(--green)}
+.review-status.s-partial{background:var(--orange-bg);color:var(--orange)}
+.review-status.s-wrong{background:var(--red-bg);color:var(--red)}
+.review-status.s-unanswered{background:var(--code-bg);color:var(--text3)}
+.review-q{font-size:0.96rem;font-weight:500;margin-bottom:0.5rem;white-space:pre-wrap}
+.review-q code{font-family:var(--mono);font-size:0.92em;background:var(--code-bg);padding:0.1rem 0.4rem;border-radius:4px}
+.review-row{margin:0.4rem 0;font-size:0.86rem}
+.review-row .lbl{font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.04em;font-size:0.7rem;margin-bottom:0.2rem}
+.review-row .val{padding:6px 10px;background:var(--hover);border-radius:6px;font-size:0.85rem;line-height:1.5;white-space:pre-wrap;font-family:var(--mono)}
+.review-row.user .val{border-left:3px solid var(--blue)}
+.review-row.correct .val{border-left:3px solid var(--green);background:var(--green-bg)}
+.review-exp{margin-top:0.6rem;padding:0.75rem 1rem;background:var(--code-bg);border-radius:8px;border-left:3px solid var(--accent);font-size:0.86rem;line-height:1.7;color:var(--text2)}
+.review-exp strong{color:var(--text);font-weight:600}
+.review-source{font-size:0.78rem;color:var(--text3);margin-top:0.4rem}
+.review-source a{color:var(--accent);text-decoration:none}
+.review-source a:hover{text-decoration:underline}
+
+/* Section dividers */
+.section-divider{font-size:0.95rem;font-weight:700;color:var(--text2);margin:0.75rem 0 0.25rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border)}
+
+@media(max-width:720px){
+  .chart-row{grid-template-columns:90px 1fr 60px;gap:8px}
+  .order-item{flex-wrap:wrap}
+  .match-row{grid-template-columns:1fr;gap:6px}
+  .match-row .arrow{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div>
+      <div class="app-title">🎓 Mock Exam — CCIE DevNet Expert</div>
+      <div class="app-sub">Random 30-question exam pulled from every quiz in this workbook</div>
+    </div>
+  </div>
+
+  <!-- Welcome view -->
+  <div id="welcome-view">
+    <div class="welcome">
+      <h2>Mock Exam — 30 questions</h2>
+      <p>Each exam picks 30 fresh questions at random from the unified bank below.
+      You can answer however you like; right/wrong is hidden until you click <b>Submit Exam</b>.</p>
+      <div class="welcome-stats">
+        <span><strong id="bank-count">…</strong> total questions in bank</span>
+        <span><strong id="bank-categories">…</strong> categories</span>
+        <span><strong>30</strong> questions per exam</span>
+      </div>
+      <p class="weights">Weight per pick: <b>Git 15%</b> · <b>YANG 15%</b> · <b>REST API 15%</b> · <b>RESTCONF 15%</b> · others (NETCONF, XPath, Docker, K8s, Click) split the remaining 40%.</p>
+      <button type="button" class="start-btn" onclick="startExam()">Start 30-Question Exam</button>
+    </div>
+  </div>
+
+  <!-- Exam view -->
+  <div id="exam-view" hidden>
+    <div class="exam-top">
+      <div style="font-weight:700">Mock Exam in progress</div>
+      <div class="progress-track"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <div class="answered-count">Answered <strong id="answeredCount">0</strong> / 30</div>
+    </div>
+    <div id="examContainer"></div>
+    <div class="submit-bar">
+      <span style="color:var(--text2);font-size:0.85rem">No feedback shown — review and submit when ready.</span>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <button type="button" class="btn btn-secondary" onclick="cancelExam()">Cancel</button>
+        <button type="button" class="btn btn-submit" onclick="submitExam()">Submit Exam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results view -->
+  <div id="results-view" hidden>
+    <div class="results">
+      <div class="results-head">
+        <div style="font-size:0.95rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;font-weight:700">Mock Exam Result</div>
+        <div class="score-big" id="scoreBig">—</div>
+        <div class="score-pct" id="scorePct">—</div>
+        <div class="results-actions">
+          <button type="button" class="btn btn-submit" onclick="startExam()">Take Another Exam</button>
+          <button type="button" class="btn btn-secondary" onclick="goWelcome()">Back to Welcome</button>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3>📊 Score by category</h3>
+        <div id="chartByCategory"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>📈 Score by question type</h3>
+        <div id="chartByType"></div>
+      </div>
+
+      <h2 style="font-size:1.15rem;font-weight:700;margin:1rem 0 0.25rem">📝 Review every question</h2>
+      <div id="reviewContainer"></div>
+    </div>
+  </div>
+</div>
+
+<script src="exam-bank.js"></script>
+<script>
+(function(){
+'use strict';
+
+// ───────────────────────────────────────────────────────────────────────
+// State
+// ───────────────────────────────────────────────────────────────────────
+const STATE = {
+  exam: [],          // 30 questions for the current exam
+  answers: {},       // idx → user answer (shape depends on type)
+};
+
+const WEIGHTS = {
+  git: 0.15, yang: 0.15, 'rest-api': 0.15, restconf: 0.15,
+  // remaining 40% split evenly across the 5 "other" buckets
+  netconf: 0.40/5, xpath: 0.40/5, docker: 0.40/5, k8s: 0.40/5, click: 0.40/5,
+};
+
+const TYPE_LABEL = {
+  single: 'Single MCQ',
+  multi: 'Multi MCQ',
+  match: 'Match',
+  order: 'Order',
+  fill: 'Fill-in',
+  blocks: 'Block-fill',
+  'blocks-template': 'Block-fill (template)',
+  'blocks-scaffold': 'Block-fill (scaffold)',
+};
+
+const CAT_LABEL = {
+  git:'Git', yang:'YANG', 'rest-api':'REST API', restconf:'RESTCONF',
+  netconf:'NETCONF', xpath:'XPath', docker:'Docker', k8s:'Kubernetes', click:'Click',
+};
+
+// ───────────────────────────────────────────────────────────────────────
+// Pick 30 random questions, weighted by category
+// ───────────────────────────────────────────────────────────────────────
+function pickExam(bank, n = 30) {
+  // Group by category
+  const byCat = {};
+  for (const q of bank) {
+    (byCat[q.category] = byCat[q.category] || []).push(q);
+  }
+  // Shuffle each category's pool (Fisher-Yates)
+  for (const c in byCat) byCat[c] = shuffle(byCat[c]);
+
+  // Compute target counts per category, rounded; then top up if short
+  const targets = {};
+  let sumTargets = 0;
+  for (const c in WEIGHTS) {
+    const target = Math.round(WEIGHTS[c] * n);
+    targets[c] = Math.min(target, (byCat[c] || []).length);
+    sumTargets += targets[c];
+  }
+  // If rounding under-shoots n, top up by drawing from any non-empty category.
+  let pool = [];
+  for (const c in WEIGHTS) {
+    const arr = (byCat[c] || []).slice();
+    pool.push(...arr);
+  }
+  pool = shuffle(pool);
+
+  // First pass — fill targets
+  const picked = new Set();
+  const out = [];
+  for (const c in targets) {
+    let want = targets[c];
+    while (want > 0 && byCat[c] && byCat[c].length) {
+      const q = byCat[c].shift();
+      if (!picked.has(q)) { picked.add(q); out.push(q); want--; }
+    }
+  }
+  // Second pass — top up to n from anything left
+  for (const q of pool) {
+    if (out.length >= n) break;
+    if (!picked.has(q)) { picked.add(q); out.push(q); }
+  }
+  return shuffle(out).slice(0, n);
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// Renderers (one per type)
+// ───────────────────────────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Some explanations contain raw HTML (from the source guides) so we don't escape them.
+function rawHtml(s){ return String(s == null ? '' : s); }
+
+// Question text often contains HTML <code>...</code>, so render as innerHTML directly.
+function rQ(s){ return rawHtml(s); }
+
+const RENDERERS = {
+  single(q, idx) {
+    const optsHtml = q.opts.map((o, i) => {
+      const meta = (q.optMeta || [])[i] || {};
+      const lbl  = (meta.l && meta.l.trim()) ? escapeHtml(meta.l) : escapeHtml(o);
+      const code = meta.c ? `<div class="opt-pre"><code>${escapeHtml(meta.c)}</code></div>` : '';
+      return `<div class="opt" data-i="${i}" onclick="pickSingle(${idx},${i})">
+        <span class="radio"></span>
+        <div class="opt-body"><div class="opt-label">${lbl}</div>${code}</div>
+      </div>`;
+    }).join('');
+    return `<div class="opts" id="opts-${idx}">${optsHtml}</div>`;
+  },
+
+  multi(q, idx) {
+    const optsHtml = q.opts.map((o, i) => {
+      const meta = (q.optMeta || [])[i] || {};
+      const lbl  = (meta.l && meta.l.trim()) ? escapeHtml(meta.l) : escapeHtml(o);
+      const code = meta.c ? `<div class="opt-pre"><code>${escapeHtml(meta.c)}</code></div>` : '';
+      return `<div class="opt" data-i="${i}" onclick="toggleMulti(${idx},${i})">
+        <span class="radio checkbox"></span>
+        <div class="opt-body"><div class="opt-label">${lbl}</div>${code}</div>
+      </div>`;
+    }).join('');
+    const note = q.count ? `<div style="font-size:0.78rem;color:var(--text2);margin-bottom:6px">Select ${q.count}.</div>` : '';
+    return `${note}<div class="opts" id="opts-${idx}">${optsHtml}</div>`;
+  },
+
+  match(q, idx) {
+    const opts = ['<option value="-1">— pick —</option>']
+      .concat(q.right.map((r,i) => `<option value="${i}">${escapeHtml(r)}</option>`)).join('');
+    const rows = q.left.map((L, i) =>
+      `<div class="match-row">
+         <div>${escapeHtml(L)}</div>
+         <div class="arrow">→</div>
+         <select onchange="setMatch(${idx},${i},this.value)" data-row="${i}">${opts}</select>
+       </div>`).join('');
+    return `<div class="match-grid" id="match-${idx}">${rows}</div>`;
+  },
+
+  order(q, idx) {
+    // Start with shuffled order; user moves up/down.
+    const initialOrder = shuffle(q.items.map((_, i) => i));
+    STATE.answers[idx] = initialOrder.slice();   // pre-seed user answer
+    return `<div class="order-list" id="order-${idx}">${renderOrderList(idx, q, initialOrder)}</div>`;
+  },
+
+  fill(q, idx) {
+    if (!q.template || !q.blanks) return `<em>(fill-in question — preview only)</em>`;
+    // Use _BLANK_N_ markers; replace with select dropdowns drawing from pool.
+    const pool = q.pool && q.pool.length ? q.pool : q.blanks;
+    const opts = ['<option value="">— pick —</option>']
+      .concat(pool.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`)).join('');
+    let html = escapeHtml(q.template);
+    let n = 0;
+    html = html.replace(/___BLANK_(\d+)___/g, (m, i) =>
+      `<select class="slot-select" data-blank="${i}" onchange="setFill(${idx},${i},this.value)">${opts}</select>`);
+    return `<pre class="tmpl-pre" id="fill-${idx}">${html}</pre>`;
+  },
+
+  blocks(q, idx) {
+    if (!q.blocks || !q.pool) return `<em>(blocks question — preview only)</em>`;
+    const pool = q.pool;
+    const opts = ['<option value="">— pick —</option>']
+      .concat(pool.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`)).join('');
+    return q.blocks.map((b, bi) => {
+      const slots = [];
+      for (let s = 0; s < b.slots; s++) {
+        slots.push(`<div class="slot-row">
+          <label>slot ${s+1}</label>
+          <select onchange="setBlock(${idx},${bi},${s},this.value)" data-slot="${bi}-${s}">${opts}</select>
+        </div>`);
+      }
+      return `<div class="blocks-section">
+        <div class="blocks-title">${escapeHtml(b.title)}</div>
+        ${slots.join('')}
+      </div>`;
+    }).join('');
+  },
+
+  'blocks-template'(q, idx) {
+    const pool = q.pool || [];
+    const opts = ['<option value="">— pick —</option>']
+      .concat(pool.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`)).join('');
+    let html = escapeHtml(q.template).replace(/\{\{(\d+)\}\}/g, (m, n) =>
+      `<select class="slot-select" data-tslot="${n}" onchange="setTemplate(${idx},${n},this.value)">${opts}</select>`);
+    return `<pre class="tmpl-pre">${html}</pre>`;
+  },
+
+  'blocks-scaffold'(q, idx) {
+    const pool = q.pool || [];
+    const opts = ['<option value="">— pick —</option>']
+      .concat(pool.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`)).join('');
+    let html = escapeHtml(q.scaffold).replace(/___SLOT_(\d+)___/g, (m, n) =>
+      `<select class="slot-select" data-sslot="${n}" onchange="setScaffold(${idx},${n},this.value)">${opts}</select>`);
+    return `<pre class="tmpl-pre">${html}</pre>`;
+  },
+};
+
+function renderOrderList(idx, q, order) {
+  return order.map((origIdx, pos) => {
+    const upDis  = pos === 0 ? 'disabled' : '';
+    const downDis = pos === order.length - 1 ? 'disabled' : '';
+    return `<div class="order-item" data-pos="${pos}">
+      <div class="text">${rQ(q.items[origIdx])}</div>
+      <div class="order-btns">
+        <button type="button" ${upDis} onclick="moveItem(${idx},${pos},-1)" title="Move up">▲</button>
+        <button type="button" ${downDis} onclick="moveItem(${idx},${pos},1)" title="Move down">▼</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// Input handlers — silently store user input, no feedback shown
+// ───────────────────────────────────────────────────────────────────────
+window.pickSingle = function(idx, optIdx) {
+  STATE.answers[idx] = [optIdx];
+  refreshOpts(idx, [optIdx]);
+  updateProgress();
+};
+window.toggleMulti = function(idx, optIdx) {
+  let arr = STATE.answers[idx] || [];
+  const k = arr.indexOf(optIdx);
+  if (k >= 0) arr.splice(k, 1); else arr.push(optIdx);
+  STATE.answers[idx] = arr;
+  refreshOpts(idx, arr);
+  updateProgress();
+};
+function refreshOpts(idx, sel) {
+  const root = document.getElementById('opts-' + idx);
+  if (!root) return;
+  root.querySelectorAll('.opt').forEach(el => {
+    const i = parseInt(el.dataset.i, 10);
+    el.classList.toggle('selected', sel.includes(i));
+  });
+}
+window.setMatch = function(idx, row, val) {
+  const arr = STATE.answers[idx] || [];
+  arr[row] = parseInt(val, 10);
+  STATE.answers[idx] = arr;
+  updateProgress();
+};
+window.moveItem = function(idx, pos, delta) {
+  const arr = STATE.answers[idx];
+  if (!arr) return;
+  const newPos = pos + delta;
+  if (newPos < 0 || newPos >= arr.length) return;
+  [arr[pos], arr[newPos]] = [arr[newPos], arr[pos]];
+  const q = STATE.exam[idx];
+  document.getElementById('order-' + idx).innerHTML = renderOrderList(idx, q, arr);
+  updateProgress();
+};
+window.setFill = function(idx, blank, val) {
+  const arr = STATE.answers[idx] || [];
+  arr[parseInt(blank,10)] = val;
+  STATE.answers[idx] = arr;
+  updateProgress();
+};
+window.setBlock = function(idx, bi, slot, val) {
+  const obj = STATE.answers[idx] || {};
+  (obj[bi] = obj[bi] || [])[slot] = val;
+  STATE.answers[idx] = obj;
+  updateProgress();
+};
+window.setTemplate = function(idx, n, val) {
+  const arr = STATE.answers[idx] || [];
+  arr[parseInt(n,10) - 1] = val; // template slots are 1-indexed
+  STATE.answers[idx] = arr;
+  updateProgress();
+};
+window.setScaffold = function(idx, n, val) {
+  const arr = STATE.answers[idx] || [];
+  arr[parseInt(n,10)] = val;
+  STATE.answers[idx] = arr;
+  updateProgress();
+};
+
+// ───────────────────────────────────────────────────────────────────────
+// Has-an-answer check (per type)
+// ───────────────────────────────────────────────────────────────────────
+function isAnswered(q, ua) {
+  if (ua == null) return false;
+  switch (q.type) {
+    case 'single': return Array.isArray(ua) && ua.length === 1;
+    case 'multi':  return Array.isArray(ua) && ua.length > 0;
+    case 'match':  return Array.isArray(ua) && ua.length === q.left.length && ua.every(v => v != null && v >= 0);
+    case 'order':  return Array.isArray(ua) && ua.length === q.items.length;
+    case 'fill':   return Array.isArray(ua) && ua.length === (q.blanks || []).length && ua.every(v => v && v.length);
+    case 'blocks': return typeof ua === 'object' && q.blocks.every((b, bi) => (ua[bi] || []).filter(Boolean).length === b.slots);
+    case 'blocks-template': return Array.isArray(ua) && ua.length >= ((q.answers||[]).length) && ua.slice(0, q.answers.length).every(v => v && v.length);
+    case 'blocks-scaffold': return Array.isArray(ua) && ua.filter(Boolean).length >= (q.slots || q.answers || []).length;
+  }
+  return false;
+}
+
+function updateProgress() {
+  let n = 0;
+  STATE.exam.forEach((q, i) => { if (isAnswered(q, STATE.answers[i])) n++; });
+  document.getElementById('answeredCount').textContent = n;
+  document.getElementById('progressBar').style.width = (n/STATE.exam.length*100) + '%';
+  // mark answered cards
+  STATE.exam.forEach((q, i) => {
+    const card = document.getElementById('q-card-' + i);
+    if (card) card.classList.toggle('answered', isAnswered(q, STATE.answers[i]));
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// Scoring (per type)
+// ───────────────────────────────────────────────────────────────────────
+function arrEq(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+function sortNum(a){return a.slice().sort((x,y)=>x-y);}
+
+function score(q, ua) {
+  if (!isAnswered(q, ua)) return 'unanswered';
+  switch (q.type) {
+    case 'single':
+      return q.ans.includes(ua[0]) ? 'correct' : 'wrong';
+    case 'multi':
+      return arrEq(sortNum(q.ans), sortNum(ua)) ? 'correct'
+           : (ua.some(v => q.ans.includes(v)) ? 'partial' : 'wrong');
+    case 'match':
+      return arrEq(q.ans, ua) ? 'correct'
+           : (ua.some((v,i) => v === q.ans[i]) ? 'partial' : 'wrong');
+    case 'order':
+      return arrEq(q.ans, ua) ? 'correct'
+           : (ua.some((v,i) => v === q.ans[i]) ? 'partial' : 'wrong');
+    case 'fill':
+      return arrEq(q.blanks, ua) ? 'correct'
+           : (ua.some((v,i) => v === q.blanks[i]) ? 'partial' : 'wrong');
+    case 'blocks': {
+      let ok = 0, total = 0;
+      q.blocks.forEach((b, bi) => {
+        b.answer.forEach((a, s) => {
+          total++;
+          if ((ua[bi] || [])[s] === a) ok++;
+        });
+      });
+      return ok === total ? 'correct' : (ok > 0 ? 'partial' : 'wrong');
+    }
+    case 'blocks-template': {
+      const ans = q.answers || [];
+      let ok = 0;
+      ans.forEach((a, i) => { if (ua[i] === a) ok++; });
+      return ok === ans.length ? 'correct' : (ok > 0 ? 'partial' : 'wrong');
+    }
+    case 'blocks-scaffold': {
+      const ans = q.slots || q.answers || [];
+      let ok = 0;
+      ans.forEach((a, i) => { if (ua[i] === a) ok++; });
+      return ans.length && ok === ans.length ? 'correct' : (ok > 0 ? 'partial' : 'wrong');
+    }
+  }
+  return 'wrong';
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// Top-level flow
+// ───────────────────────────────────────────────────────────────────────
+window.startExam = function() {
+  STATE.exam = pickExam(EXAM_BANK, 30);
+  STATE.answers = {};
+  document.getElementById('welcome-view').hidden = true;
+  document.getElementById('results-view').hidden = true;
+  document.getElementById('exam-view').hidden = false;
+  renderExam();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+};
+window.cancelExam = function() {
+  if (!confirm('Discard the current exam?')) return;
+  goWelcome();
+};
+window.goWelcome = function() {
+  document.getElementById('welcome-view').hidden = false;
+  document.getElementById('exam-view').hidden = true;
+  document.getElementById('results-view').hidden = true;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+function renderExam() {
+  const c = document.getElementById('examContainer');
+  c.innerHTML = STATE.exam.map((q, i) => {
+    const renderer = RENDERERS[q.type];
+    const body = renderer ? renderer(q, i) : `<em>(unsupported type: ${q.type})</em>`;
+    const scenario = q.scenario ? `<div class="q-scenario">${escapeHtml(q.scenario)}</div>` : '';
+    const yang = q.yangTree ? `<div class="q-yang">${escapeHtml(q.yangTree)}</div>` : '';
+    return `<div class="q-card" id="q-card-${i}">
+      <div class="q-head">
+        <span class="q-num">Question ${i+1} of ${STATE.exam.length}</span>
+        <div class="q-tags">
+          <span class="q-tag cat">${escapeHtml(CAT_LABEL[q.category] || q.category)}</span>
+          <span class="q-tag type">${escapeHtml(TYPE_LABEL[q.type] || q.type)}</span>
+        </div>
+      </div>
+      <div class="q-text">${rQ(q.q)}</div>
+      ${scenario}${yang}
+      ${body}
+    </div>`;
+  }).join('');
+  updateProgress();
+}
+
+window.submitExam = function() {
+  const unanswered = STATE.exam.filter((q, i) => !isAnswered(q, STATE.answers[i])).length;
+  if (unanswered > 0) {
+    if (!confirm(`${unanswered} question(s) are unanswered. Submit anyway?`)) return;
+  }
+  // Score everything
+  let correct = 0, partial = 0, wrong = 0, unans = 0;
+  const byCat = {}, byType = {};
+  const reviews = STATE.exam.map((q, i) => {
+    const ua = STATE.answers[i];
+    const s = score(q, ua);
+    if (s === 'correct') correct++;
+    else if (s === 'partial') partial++;
+    else if (s === 'unanswered') unans++;
+    else wrong++;
+    // Per-cat / per-type tally — partials count as 0.5
+    const v = s === 'correct' ? 1 : (s === 'partial' ? 0.5 : 0);
+    (byCat[q.category]  = byCat[q.category]  || {ok:0,total:0}).ok += v;  byCat[q.category].total++;
+    (byType[q.type]     = byType[q.type]     || {ok:0,total:0}).ok += v;  byType[q.type].total++;
+    return { q, ua, s };
+  });
+
+  const rawScore = correct + 0.5 * partial;
+  const totalQ = STATE.exam.length;
+  const pct = (rawScore / totalQ) * 100;
+
+  document.getElementById('scoreBig').textContent = `${rawScore.toFixed(1)} / ${totalQ}`;
+  document.getElementById('scorePct').textContent =
+    `${pct.toFixed(0)}% — ${correct} correct, ${partial} partial, ${wrong} wrong, ${unans} unanswered`;
+
+  document.getElementById('chartByCategory').innerHTML  = renderChart(byCat, CAT_LABEL);
+  document.getElementById('chartByType').innerHTML      = renderChart(byType, TYPE_LABEL);
+  document.getElementById('reviewContainer').innerHTML = renderReview(reviews);
+
+  document.getElementById('welcome-view').hidden = true;
+  document.getElementById('exam-view').hidden = true;
+  document.getElementById('results-view').hidden = false;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+};
+
+// ───────────────────────────────────────────────────────────────────────
+// Charts + review
+// ───────────────────────────────────────────────────────────────────────
+function renderChart(obj, labels) {
+  // Sort by total descending so big buckets sit on top
+  const rows = Object.entries(obj).sort((a,b) => b[1].total - a[1].total);
+  return rows.map(([key, val]) => {
+    const pct = val.total ? (val.ok / val.total * 100) : 0;
+    const cls = pct >= 70 ? 'green' : (pct >= 40 ? 'amber' : 'red');
+    return `<div class="chart-row">
+      <span class="chart-label">${escapeHtml(labels[key] || key)}</span>
+      <div class="chart-track"><div class="chart-fill ${cls}" style="width:${pct.toFixed(0)}%"></div></div>
+      <span class="chart-score"><b>${val.ok % 1 === 0 ? val.ok : val.ok.toFixed(1)}</b>/${val.total}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderReview(reviews) {
+  // Group by category for readability
+  const groups = {};
+  reviews.forEach(r => (groups[r.q.category] = groups[r.q.category] || []).push(r));
+  const cats = Object.keys(groups).sort((a,b) => groups[b].length - groups[a].length);
+  let html = '';
+  cats.forEach(c => {
+    html += `<div class="section-divider">${escapeHtml(CAT_LABEL[c] || c)} — ${groups[c].length} question(s)</div>`;
+    html += groups[c].map(r => renderReviewCard(r, reviews.indexOf(r))).join('');
+  });
+  return html;
+}
+
+function fmtAnswer(q, ua) {
+  if (ua == null) return '<em>(no answer)</em>';
+  switch (q.type) {
+    case 'single':
+    case 'multi':
+      return ua.map(i => {
+        const meta = (q.optMeta || [])[i] || {};
+        const label = (meta.l && meta.l.trim()) ? meta.l : (q.opts[i] || '');
+        return label;
+      }).join('\n────\n');
+    case 'match':
+      return q.left.map((L, i) => `${L}  →  ${ua[i] != null && ua[i] >= 0 ? q.right[ua[i]] : '(unset)'}`).join('\n');
+    case 'order':
+      return ua.map((origI, pos) => `${pos+1}. ${q.items[origI]}`).join('\n');
+    case 'fill':
+      return ua.map((v, i) => `[${i}] ${v || '(unset)'}`).join('\n');
+    case 'blocks':
+      return q.blocks.map((b, bi) =>
+        `${b.title}:\n` + b.answer.map((_, s) => `  slot ${s+1}: ${(ua[bi]||[])[s] || '(unset)'}`).join('\n')
+      ).join('\n\n');
+    case 'blocks-template':
+      return (q.answers || []).map((_, i) => `{{${i+1}}}: ${ua[i] || '(unset)'}`).join('\n');
+    case 'blocks-scaffold':
+      return ua.map((v, i) => `slot ${i}: ${v || '(unset)'}`).join('\n');
+  }
+  return JSON.stringify(ua);
+}
+
+function fmtCorrect(q) {
+  switch (q.type) {
+    case 'single':
+    case 'multi':
+      return q.ans.map(i => {
+        const meta = (q.optMeta || [])[i] || {};
+        const label = (meta.l && meta.l.trim()) ? meta.l : (q.opts[i] || '');
+        return label;
+      }).join('\n────\n');
+    case 'match':
+      return q.left.map((L, i) => `${L}  →  ${q.right[q.ans[i]]}`).join('\n');
+    case 'order':
+      return q.ans.map((origI, pos) => `${pos+1}. ${q.items[origI]}`).join('\n');
+    case 'fill':
+      return (q.blanks || []).map((v, i) => `[${i}] ${v}`).join('\n');
+    case 'blocks':
+      return q.blocks.map(b =>
+        `${b.title}:\n` + b.answer.map((a, s) => `  slot ${s+1}: ${a}`).join('\n')
+      ).join('\n\n');
+    case 'blocks-template':
+      return (q.answers || []).map((a, i) => `{{${i+1}}}: ${a}`).join('\n');
+    case 'blocks-scaffold':
+      return (q.slots || q.answers || []).map((a, i) => `slot ${i}: ${a}`).join('\n');
+  }
+  return '';
+}
+
+function renderReviewCard(r, idx) {
+  const cls = `r-${r.s}`;
+  const sCls = `s-${r.s}`;
+  const sLbl = r.s === 'correct' ? 'Correct'
+            : r.s === 'partial' ? 'Partial'
+            : r.s === 'unanswered' ? 'Unanswered'
+            : 'Wrong';
+  const exp = r.q.exp ? `<div class="review-exp">${rawHtml(r.q.exp).replace(/\n/g,'<br>')}</div>` : '';
+  return `<div class="review-card ${cls}">
+    <div class="review-head">
+      <span class="q-num">Q${idx+1} · ${escapeHtml(CAT_LABEL[r.q.category] || r.q.category)} · ${escapeHtml(TYPE_LABEL[r.q.type] || r.q.type)}</span>
+      <span class="review-status ${sCls}">${sLbl}</span>
+    </div>
+    <div class="review-q">${rQ(r.q.q)}</div>
+    ${r.q.scenario ? `<div class="q-scenario">${escapeHtml(r.q.scenario)}</div>` : ''}
+    ${r.q.yangTree ? `<div class="q-yang">${escapeHtml(r.q.yangTree)}</div>` : ''}
+    <div class="review-row user">
+      <div class="lbl">Your answer</div>
+      <div class="val">${escapeHtml(fmtAnswer(r.q, r.ua))}</div>
+    </div>
+    <div class="review-row correct">
+      <div class="lbl">Correct answer</div>
+      <div class="val">${escapeHtml(fmtCorrect(r.q))}</div>
+    </div>
+    ${exp}
+    <div class="review-source">Source: <a href="${escapeHtml(r.q.src)}" target="_blank">${escapeHtml(r.q.src)}</a></div>
+  </div>`;
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// Boot
+// ───────────────────────────────────────────────────────────────────────
+function boot() {
+  if (typeof EXAM_BANK === 'undefined' || !Array.isArray(EXAM_BANK)) {
+    document.getElementById('welcome-view').innerHTML =
+      '<div class="welcome"><h2>⚠️ Could not load exam-bank.js</h2><p>Make sure the page is being served from the same directory as exam-bank.js.</p></div>';
+    return;
+  }
+  const cats = new Set(EXAM_BANK.map(q => q.category));
+  document.getElementById('bank-count').textContent = EXAM_BANK.length;
+  document.getElementById('bank-categories').textContent = cats.size;
+}
+window.addEventListener('DOMContentLoaded', boot);
+
+})();
+</script>
+</body>
+</html>

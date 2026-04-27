@@ -348,8 +348,24 @@ function escapeHtml(s) {
 // Some explanations contain raw HTML (from the source guides) so we don't escape them.
 function rawHtml(s){ return String(s == null ? '' : s); }
 
-// Question text often contains HTML <code>...</code>, so render as innerHTML directly.
-function rQ(s){ return rawHtml(s); }
+// Question text rendering. Inputs may contain pre-escaped XML entities
+// (e.g. &lt;extended&gt; from netconf questions) which we need to preserve
+// as-is. We just enrich backticks (`x`) into <code> spans, and leave every
+// other character untouched (HTML tags, entities, etc).
+function rQ(s){
+  return String(s == null ? '' : s).replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
+// Safe text renderer — escapes HTML so XML/JSON option strings don't get
+// silently parsed as DOM, then re-introduces inline-code (`code`), bold
+// (*bold*) and italics (_em_) using markdown-style markers placed by the
+// extractor. Use this for option labels and review text.
+function renderText(s) {
+  return escapeHtml(s)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*([^*]+)\*/g, '<strong>$1</strong>')
+    .replace(/_([^_]+)_/g, '<em>$1</em>');
+}
 
 const RENDERERS = {
   single(q, idx) {
@@ -446,7 +462,7 @@ function renderMcqOption(idx, i, q, mode) {
   const hasLbl  = meta.l && meta.l.trim();
   const hasCode = meta.c && meta.c.trim();
   let body = '';
-  if (hasLbl)  body += `<div class="opt-label">${escapeHtml(meta.l)}</div>`;
+  if (hasLbl)  body += `<div class="opt-label">${renderText(meta.l)}</div>`;
   if (hasCode) {
     const cid = `opt-code-${idx}-${i}`;
     body += `<div class="opt-pre">
@@ -456,7 +472,7 @@ function renderMcqOption(idx, i, q, mode) {
       </div>
     </div>`;
   }
-  if (!hasLbl && !hasCode) body = `<div class="opt-label">${escapeHtml(q.opts[i])}</div>`;
+  if (!hasLbl && !hasCode) body = `<div class="opt-label">${renderText(q.opts[i])}</div>`;
   const radioCls = mode === 'multi' ? 'radio checkbox' : 'radio';
   const handler = mode === 'multi'
     ? `toggleMulti(${idx},${i})`

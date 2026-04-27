@@ -4827,11 +4827,11 @@ const EXAM_BANK = [
   },
   {
     "type": "multi",
-    "q": "In a production Nginx → Flask → MongoDB stack, which TWO services should have <code>ports:</code> mapping in docker-compose.yml?",
+    "q": "In a production Nginx → Flask → MongoDB stack, which TWO services should have `ports:` mapping in docker-compose.yml?",
     "opts": [
-      "Nginx with <code>\"8080:80\"</code>",
-      "Flask with <code>\"5000:5000\"</code>",
-      "MongoDB with <code>\"27017:27017\"</code>",
+      "Nginx with `\"8080:80\"`",
+      "Flask with `\"5000:5000\"`",
+      "MongoDB with `\"27017:27017\"`",
       "None — all services communicate internally",
       "Only Nginx — it is the single entry point"
     ],
@@ -4845,13 +4845,13 @@ const EXAM_BANK = [
   },
   {
     "type": "multi",
-    "q": "What is the difference between <code>EXPOSE</code> in Dockerfile and <code>ports:</code> in docker-compose.yml? Select TWO correct statements.",
+    "q": "What is the difference between `EXPOSE` in Dockerfile and `ports:` in docker-compose.yml? Select TWO correct statements.",
     "opts": [
-      "<code>EXPOSE</code> publishes the port to the host machine",
-      "<code>EXPOSE</code> is documentation only — it does NOT publish the port to the host",
-      "<code>ports:</code> in docker-compose maps host ↔ container ports (real exposure)",
-      "<code>ports:</code> is documentation only, same as <code>EXPOSE</code>",
-      "<code>EXPOSE</code> and <code>ports:</code> are interchangeable"
+      "`EXPOSE` publishes the port to the host machine",
+      "`EXPOSE` is documentation only — it does NOT publish the port to the host",
+      "`ports:` in docker-compose maps host ↔ container ports (real exposure)",
+      "`ports:` is documentation only, same as `EXPOSE`",
+      "`EXPOSE` and `ports:` are interchangeable"
     ],
     "ans": [
       1,
@@ -4863,13 +4863,13 @@ const EXAM_BANK = [
   },
   {
     "type": "multi",
-    "q": "What happens to MongoDB data when you run <code>docker-compose down</code> WITHOUT volumes configured? Select TWO correct statements.",
+    "q": "What happens to MongoDB data when you run `docker-compose down` WITHOUT volumes configured? Select TWO correct statements.",
     "opts": [
       "All database data is permanently lost",
       "Data is preserved in the container's writable layer",
-      "Named volumes (<code>mongo-data:/data/db</code>) survive <code>docker-compose down</code>",
-      "<code>docker-compose down -v</code> removes named volumes and data",
-      "<code>EXPOSE 27017</code> in Dockerfile ensures data persistence"
+      "Named volumes (`mongo-data:/data/db`) survive `docker-compose down`",
+      "`docker-compose down -v` removes named volumes and data",
+      "`EXPOSE 27017` in Dockerfile ensures data persistence"
     ],
     "ans": [
       0,
@@ -4881,13 +4881,13 @@ const EXAM_BANK = [
   },
   {
     "type": "multi",
-    "q": "How should <code>env_file:</code> paths be specified in docker-compose.yml?",
+    "q": "How should `env_file:` paths be specified in docker-compose.yml?",
     "opts": [
-      "<code>env_file: /home/user/project/db/.env</code> — absolute path",
-      "<code>env_file: ./db/some_env_file.env</code> — explicit relative path",
-      "<code>env_file: db/some_env_file.env</code> — implicit relative path",
-      "<code>env_file:</code> paths resolve relative to the user's home directory",
-      "<code>env_file:</code> paths resolve relative to the docker-compose.yml location"
+      "`env_file: /home/user/project/db/.env` — absolute path",
+      "`env_file: ./db/some_env_file.env` — explicit relative path",
+      "`env_file: db/some_env_file.env` — implicit relative path",
+      "`env_file:` paths resolve relative to the user's home directory",
+      "`env_file:` paths resolve relative to the docker-compose.yml location"
     ],
     "ans": [
       1,
@@ -4902,10 +4902,10 @@ const EXAM_BANK = [
     "q": "Why can't Nginx reach MongoDB directly in the production configuration? Select TWO correct reasons.",
     "opts": [
       "MongoDB's port 27017 is blocked by a firewall rule",
-      "Nginx is on <code>frontend</code> network only; MongoDB is on <code>backend</code> network only",
+      "Nginx is on `frontend` network only; MongoDB is on `backend` network only",
       "Docker DNS only resolves service names within the same network",
-      "MongoDB has <code>EXPOSE 27017</code> which blocks external access",
-      "Nginx's <code>nginx.conf</code> explicitly blocks MongoDB connections"
+      "MongoDB has `EXPOSE 27017` which blocks external access",
+      "Nginx's `nginx.conf` explicitly blocks MongoDB connections"
     ],
     "ans": [
       1,
@@ -4919,8 +4919,8 @@ const EXAM_BANK = [
     "type": "multi",
     "q": "In development, all ports are exposed. What are the security risks? Select THREE correct statements.",
     "opts": [
-      "Attackers can bypass Nginx and hit Flask directly at <code>localhost:5000</code>",
-      "MongoDB is accessible directly at <code>localhost:27017</code> — skipping all auth layers",
+      "Attackers can bypass Nginx and hit Flask directly at `localhost:5000`",
+      "MongoDB is accessible directly at `localhost:27017` — skipping all auth layers",
       "SSL termination, rate limiting, and auth headers configured in Nginx are bypassed",
       "Docker DNS resolution stops working when ports are exposed",
       "The frontend/backend network segmentation is completely removed"
@@ -4938,7 +4938,7 @@ const EXAM_BANK = [
     "type": "single",
     "q": "What is the correct decorator for the following requirement?",
     "opts": [
-      "@click.option('--all/--project', default=\"all\", show_default=\"all: show all projects\") @click.option('--all/--project', default=True, help=\"Show all projects or specific project\", show_default=\"all: show all projects\") @click.option('--all/--project', is_flag=True, default=\"all\") @click.option('--all', '--project', default=True, help=\"Show all projects\")"
+      "`@click.option('--all/--project', default=\"all\", show_default=\"all: show all projects\")` `@click.option('--all/--project', default=True, help=\"Show all projects or specific project\", show_default=\"all: show all projects\")` `@click.option('--all/--project', is_flag=True, default=\"all\")` `@click.option('--all', '--project', default=True, help=\"Show all projects\")`"
     ],
     "ans": [],
     "exp": "",
@@ -4949,7 +4949,7 @@ const EXAM_BANK = [
     "type": "single",
     "q": "Which is the correct way to define a Choice option with \"lines\" as the default?",
     "opts": [
-      "@click.option('--outformat', '-o', type=click.Choice('lines', 'raw'), default=\"lines\") @click.option('--outformat', '-o', type=click.Choice['lines', 'raw'], default=True) @click.option('--outformat', '-o', type=click.Choice(['lines', 'raw']), default=\"lines\", show_default=True) @click.option('--outformat', '-o', choices=['lines', 'raw'], default=\"lines\")"
+      "`@click.option('--outformat', '-o', type=click.Choice('lines', 'raw'), default=\"lines\")` `@click.option('--outformat', '-o', type=click.Choice['lines', 'raw'], default=True)` `@click.option('--outformat', '-o', type=click.Choice(['lines', 'raw']), default=\"lines\", show_default=True)` `@click.option('--outformat', '-o', choices=['lines', 'raw'], default=\"lines\")`"
     ],
     "ans": [],
     "exp": "",
@@ -4960,7 +4960,7 @@ const EXAM_BANK = [
     "type": "single",
     "q": "What decorator combination is needed for the main group to share data with commands?",
     "opts": [
-      "@click.group() and @click.pass_obj on the group @click.group() + @click.pass_context on group, @click.pass_obj on commands @click.command() + @click.pass_context on everything @click.share_data() decorator"
+      "`@click.group()` and `@click.pass_obj` on the group `@click.group()` + `@click.pass_context` on group, `@click.pass_obj` on commands `@click.command()` + `@click.pass_context` on everything `@click.share_data()` decorator"
     ],
     "ans": [],
     "exp": "",
@@ -4971,7 +4971,7 @@ const EXAM_BANK = [
     "type": "single",
     "q": "How do you add a subgroup called \"individual\" to the main \"gitlab\" group?",
     "opts": [
-      "gitlab.add_subgroup(individual) gitlab.add_command(individual) @gitlab.group() def individual(): gitlab.add_subcommand(individual)"
+      "`gitlab.add_subgroup(individual)` `gitlab.add_command(individual)` `@gitlab.group() def individual():` `gitlab.add_subcommand(individual)`"
     ],
     "ans": [],
     "exp": "",
@@ -4982,7 +4982,7 @@ const EXAM_BANK = [
     "type": "single",
     "q": "What is the default value of is_flag=True when the flag is NOT used?",
     "opts": [
-      "None True False (implicit, no need to write it) \"\" (empty string)"
+      "`None` `True` `False` (implicit, no need to write it) `\"\"` (empty string)"
     ],
     "ans": [],
     "exp": "",

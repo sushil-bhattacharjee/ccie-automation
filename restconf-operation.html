@@ -1586,14 +1586,25 @@ What do you want to do?
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 // ── Tab switching ────────────────────────────────────────────────────────
+function _activateTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.tab === tab); });
+  document.querySelectorAll('.tab-section').forEach(function(s){ s.classList.toggle('active', s.id === tab); });
+}
 document.querySelectorAll('.tab-btn').forEach(function(btn){
   btn.addEventListener('click', function(){
-    var tab = btn.dataset.tab;
-    document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b === btn); });
-    document.querySelectorAll('.tab-section').forEach(function(s){ s.classList.toggle('active', s.id === tab); });
+    _activateTab(btn.dataset.tab);
     window.scrollTo({top:0,behavior:'smooth'});
   });
 });
+
+// Deep-link: opening with #practice lands directly on Practice (skipping Theory).
+function _applyHash(){
+  var h = (location.hash || '').replace('#','');
+  var sec = h && document.getElementById(h);
+  if (sec && sec.classList.contains('tab-section')) _activateTab(h);
+}
+window.addEventListener('DOMContentLoaded', _applyHash);
+window.addEventListener('hashchange', _applyHash);
 
 // ── Render the markdown with marked ──────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function(){

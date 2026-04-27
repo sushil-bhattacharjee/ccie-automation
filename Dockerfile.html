@@ -1630,6 +1630,15 @@ Network isolation  → even if Nginx compromised, can't reach MongoDB</pre>
     document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
   }
 
+  // Deep-link: opening with #practice lands directly on Practice (skipping Theory).
+  function _applyHash() {
+    var h = (location.hash || '').replace('#', '');
+    var sec = h && document.getElementById(h);
+    if (sec && sec.classList.contains('tab-content')) switchTab(h);
+  }
+  window.addEventListener('DOMContentLoaded', _applyHash);
+  window.addEventListener('hashchange', _applyHash);
+
   // === Interactivity wiring (one-time, on load) ===
   // Lets the user select MCQ options and tick matrix cells BEFORE clicking
   // "Show Answer" — which then grades the selection.

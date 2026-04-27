@@ -384,8 +384,8 @@
 
     <!-- Navigation -->
     <div class="nav">
-        <button class="nav-btn active" onclick="showSection('theory')">📚 Theory</button>
-        <button class="nav-btn" onclick="showSection('practice')">✍️ Practice</button>
+        <button class="nav-btn active" onclick="showSection('theory')">Theory</button>
+        <button class="nav-btn" onclick="showSection('practice')">Practice</button>
     </div>
 
     <div class="container">
@@ -1274,8 +1274,18 @@ def listprojects(obj):
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            event.target.classList.add('active');
+            var btn = document.querySelector('.nav-btn[onclick*="\'' + sectionId + '\'"]');
+            if (btn) btn.classList.add('active');
+            else if (typeof event !== 'undefined' && event && event.target) event.target.classList.add('active');
         }
+
+        // Deep-link: opening with #practice lands directly on Practice.
+        function _applyHash(){
+            var h = (location.hash || '').replace('#','');
+            if (h && document.getElementById(h)) showSection(h);
+        }
+        window.addEventListener('DOMContentLoaded', _applyHash);
+        window.addEventListener('hashchange', _applyHash);
 
         function toggleChapter(header) {
             header.parentElement.classList.toggle('open');

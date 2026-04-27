@@ -517,7 +517,8 @@
                     </div>
                 </div>
 
-                <!-- List of Quizzes — flat index, deep-links straight to Practice tab -->
+                <!-- List of Quizzes — flat index. Each item shows its chapter,
+                     and the URL hash deep-links straight to the Practice tab. -->
                 <div class="nav-chapter expanded">
                     <div class="chapter-header" onclick="toggleChapter(this)">
                         <span class="chapter-icon">
@@ -528,65 +529,69 @@
                         <span class="chapter-title">📋 List of Quizzes</span>
                     </div>
                     <div class="chapter-items">
-                        <div class="nav-item" onclick="loadContent('git-workflows.html', this)">
+                        <div class="nav-item" onclick="loadContent('git-workflows.html#quiz', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Git Workflows</span>
+                            <span class="nav-item-text">Git — Workflows</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('git-ops.html', this)">
+                        <div class="nav-item" onclick="loadContent('git-ops.html#quiz', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Git Operations</span>
+                            <span class="nav-item-text">Git — Operations</span>
                         </div>
                         <div class="nav-item" onclick="loadContent('git-cherry-pick.html#quiz1', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Cherry-Pick & Rebase — MCQ 1</span>
+                            <span class="nav-item-text">Git — Cherry-Pick (Practice-1)</span>
                         </div>
                         <div class="nav-item" onclick="loadContent('git-cherry-pick.html#quiz2', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Cherry-Pick & Rebase — MCQ 2</span>
+                            <span class="nav-item-text">Git — Cherry-Pick (Practice-2)</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('git-merge-strategies.html', this)">
+                        <div class="nav-item" onclick="loadContent('git-merge-strategies.html#quiz', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Merge Strategies</span>
+                            <span class="nav-item-text">Git — Merge Strategies</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('git-stash-sync-merge.html', this)">
+                        <div class="nav-item" onclick="loadContent('git-stash-sync-merge.html#quiz', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Git Stash, Sync & Merge</span>
+                            <span class="nav-item-text">Git — Stash, Sync & Merge</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('nx-os-api.html', this)">
+                        <div class="nav-item" onclick="loadContent('nx-os-api.html#quiz', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">NX-OS API</span>
+                            <span class="nav-item-text">REST API — NX-OS (Practice-1)</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('when_statement.html', this)">
+                        <div class="nav-item" onclick="loadContent('nx-os-api.html#quiz2', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">YANG when Statement</span>
+                            <span class="nav-item-text">REST API — NX-OS (Practice-2)</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('yang-when-must.html', this)">
+                        <div class="nav-item" onclick="loadContent('when_statement.html#lab', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">YANG when & must</span>
+                            <span class="nav-item-text">YANG — when Statement</span>
+                        </div>
+                        <div class="nav-item" onclick="loadContent('yang-when-must.html#quiz', this)">
+                            <span class="nav-item-icon">📝</span>
+                            <span class="nav-item-text">YANG — when & must</span>
                         </div>
                         <div class="nav-item" onclick="loadContent('netconf-operation.html#quiz', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">NETCONF Operations</span>
+                            <span class="nav-item-text">NETCONF — Operations</span>
                         </div>
                         <div class="nav-item" onclick="loadContent('xpath-operation.html#quiz', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">XPath Operations</span>
+                            <span class="nav-item-text">NETCONF — XPath Filtering</span>
                         </div>
                         <div class="nav-item" onclick="loadContent('restconf-operation.html#practice', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">RESTCONF Operations</span>
+                            <span class="nav-item-text">RESTCONF — Operations</span>
                         </div>
                         <div class="nav-item" onclick="loadContent('Dockerfile.html#practice', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Docker & Compose</span>
+                            <span class="nav-item-text">Docker — Compose</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('K8s-Basics.html', this)">
+                        <div class="nav-item" onclick="loadContent('K8s-Basics.html#practice', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Kubernetes Basics</span>
+                            <span class="nav-item-text">Kubernetes — Basics</span>
                         </div>
-                        <div class="nav-item" onclick="loadContent('click.html', this)">
+                        <div class="nav-item" onclick="loadContent('click.html#practice', this)">
                             <span class="nav-item-icon">📝</span>
-                            <span class="nav-item-text">Click Framework</span>
+                            <span class="nav-item-text">Click — Framework</span>
                         </div>
                     </div>
                 </div>

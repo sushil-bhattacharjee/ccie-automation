@@ -545,8 +545,8 @@
         <div class="nav-content">
             <div class="nav-title">🔀 Git Workflows - CCIE Automation</div>
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showSection('learn')">📚 Learn Workflows</button>
-                <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+                <button class="nav-tab active" onclick="showSection('learn')">Theory</button>
+                <button class="nav-tab" onclick="showSection('quiz')">Practice</button>
             </div>
         </div>
     </nav>
@@ -1587,14 +1587,24 @@ else:
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            
+
             document.getElementById(sectionId).classList.add('active');
-            event.target.classList.add('active');
+            var btn = document.querySelector('.nav-tab[onclick*="\'' + sectionId + '\'"]');
+            if (btn) btn.classList.add('active');
+            else if (typeof event !== 'undefined' && event && event.target) event.target.classList.add('active');
 
             if (sectionId === 'quiz' && !document.getElementById('quizContainer').innerHTML) {
                 initQuiz();
             }
         }
+
+        // Deep-link: opening with #quiz lands directly on Practice.
+        function _applyHash(){
+            var h = (location.hash || '').replace('#','');
+            if (h && document.getElementById(h)) showSection(h);
+        }
+        window.addEventListener('DOMContentLoaded', _applyHash);
+        window.addEventListener('hashchange', _applyHash);
 
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {

@@ -633,8 +633,8 @@
     <div class="nav-content">
       <div class="nav-title">📐 YANG when & must Statements - DevNet Expert</div>
       <div class="nav-tabs">
-        <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
-        <button class="nav-tab" onclick="showSection('quiz')">📝 MCQ Practice</button>
+        <button class="nav-tab active" onclick="showSection('learn')">Theory</button>
+        <button class="nav-tab" onclick="showSection('quiz')">Practice</button>
         <a href="docs/yang_when_must.md" class="nav-tab" target="_blank">📄 Lab Guide</a>
       </div>
     </div>
@@ -2337,8 +2337,17 @@ Which TWO payloads are valid?`,
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
       document.getElementById(id).classList.add('active');
-      event.target.classList.add('active');
+      var btn=document.querySelector(`.nav-tab[onclick*="'${id}'"]`);if (btn) btn.classList.add('active');else if (typeof event !== 'undefined' && event && event.target) event.target.classList.add('active');
     }
+
+        // Deep-link: opening with a section hash activates that tab on load.
+        function _applyHash(){
+            var h = (location.hash || '').replace('#','');
+            if (h && document.getElementById(h)) showSection(h);
+        }
+        window.addEventListener('DOMContentLoaded', _applyHash);
+        window.addEventListener('hashchange', _applyHash);
+
 
     function initQuiz() {
       const container = document.getElementById('quizContainer');

@@ -165,7 +165,7 @@
 <!-- ======== TOP LEVEL TABS ======== -->
 <div class="top-tabs">
   <button class="top-tab active" data-tab="theory" onclick="switchTab(this)">Theory</button>
-  <button class="top-tab" data-tab="lab" onclick="switchTab(this)">Lab-Practice</button>
+  <button class="top-tab" data-tab="lab" onclick="switchTab(this)">Practice</button>
 </div>
 
 <!-- ================================================================ -->
@@ -1121,6 +1121,17 @@ function switchTab(btn) {
   btn.classList.add('active');
   document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
 }
+
+  // Deep-link: opening with a section hash activates that tab on load.
+  function _applyHash(){
+    var h = (location.hash || '').replace('#','');
+    if (!h) return;
+    var btn = document.querySelector('.top-tab[data-tab="' + h + '"]');
+    if (btn) btn.click();
+  }
+  window.addEventListener('DOMContentLoaded', _applyHash);
+  window.addEventListener('hashchange', _applyHash);
+
 
 // ---- ACCORDION ----
 function toggleAccordion(btn) {

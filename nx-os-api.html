@@ -198,9 +198,9 @@ tr:last-child td{border-bottom:none}
     <nav class="nav-container"><div class="nav-content">
         <div class="nav-title">📡 NXOS-API (DME, RESTCONF, NX-API CLI) - DevNet Expert</div>
         <div class="nav-tabs">
-            <button class="nav-tab active" onclick="showSection('learn')">📚 Learn</button>
-            <button class="nav-tab" onclick="showSection('quiz')">📝 Lab Practice</button>
-            <button class="nav-tab" onclick="showSection('quiz2')">📝 Lab Practice-2</button>
+            <button class="nav-tab active" onclick="showSection('learn')">Theory</button>
+            <button class="nav-tab" onclick="showSection('quiz')">Practice-1</button>
+            <button class="nav-tab" onclick="showSection('quiz2')">Practice-2</button>
         </div>
     </div></nav>
     <main class="main-content">
@@ -2350,7 +2350,16 @@ vrf context challenge-A5
         let submitted={},score=0;
         const slotState={};
 
-        function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');event.target.classList.add('active');}
+        function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');var btn=document.querySelector(`.nav-tab[onclick*="'${id}'"]`);if (btn) btn.classList.add('active');else if (typeof event !== 'undefined' && event && event.target) event.target.classList.add('active');}
+
+        // Deep-link: opening with a section hash activates that tab on load.
+        function _applyHash(){
+            var h = (location.hash || '').replace('#','');
+            if (h && document.getElementById(h)) showSection(h);
+        }
+        window.addEventListener('DOMContentLoaded', _applyHash);
+        window.addEventListener('hashchange', _applyHash);
+
 
         function initQuiz(){
             document.getElementById('quizContainer').innerHTML=questions.map((q,i)=>renderQ(q,i)).join('');

@@ -157,6 +157,25 @@
         #quiz .explanation { padding: 1.25rem 1.5rem; border-left-width: 5px; background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(57,197,207,0.06)); }
         #quiz .explanation-title { font-size: 1.15rem; }
         #quiz .explanation-text { font-size: 1.05rem; line-height: 1.7; color: var(--text-primary); }
+
+        /* ── EXAM MODE — used when this page is iframed by exam.html with
+              hash #exam-q=N. Hides chrome and shows ONLY question N. The
+              source's own click-handling for selection still runs; we just
+              suppress per-question submit/explanation reveal so the user
+              doesn't see right/wrong inside the exam. ───────────────────── */
+        body.exam-mode { padding: 0; margin: 0; }
+        body.exam-mode .nav-container,
+        body.exam-mode .top-bar,
+        body.exam-mode #quiz h1,
+        body.exam-mode #quiz .intro-text,
+        body.exam-mode #quiz .quiz-header,
+        body.exam-mode #quiz .submit-btn,
+        body.exam-mode #quiz .explanation,
+        body.exam-mode #learn { display: none !important; }
+        body.exam-mode .main-content { padding: 1rem !important; }
+        body.exam-mode #quiz { width: auto !important; max-width: none !important; padding: 0 !important; }
+        body.exam-mode #quizContainer .question-card:not(.exam-target) { display: none !important; }
+        body.exam-mode #quizContainer .question-card.exam-target { margin: 0 !important; box-shadow: none !important; }
     </style>
 </head>
 <body>
@@ -687,12 +706,56 @@
         }
 
         // Deep-link: opening the file with #quiz lands directly on the MCQ tab.
+        // Also: #exam-q=N puts the page in exam-iframe mode showing ONLY question N.
         function _applyHash() {
             var h = (location.hash || '').replace('#','');
+            // exam-iframe mode
+            var em = h.match(/^exam-q=(\d+)$/);
+            if (em) { _enterExamMode(parseInt(em[1], 10)); return; }
+            // ordinary tab deep-link
+            document.body.classList.remove('exam-mode');
+            document.querySelectorAll('.exam-target').forEach(function(el){ el.classList.remove('exam-target'); });
             if (h && document.getElementById(h)) showSection(h);
+        }
+        function _enterExamMode(n) {
+            // Make sure the quiz section is rendered
+            showSection('quiz');
+            // initQuiz() runs at the bottom of this script, so #quizContainer is
+            // already populated by the time this function is reached. Find the
+            // n-th card (1-indexed).
+            var cards = document.querySelectorAll('#quizContainer .question-card');
+            document.querySelectorAll('.exam-target').forEach(function(el){ el.classList.remove('exam-target'); });
+            if (cards[n-1]) cards[n-1].classList.add('exam-target');
+            document.body.classList.add('exam-mode');
         }
         window.addEventListener('DOMContentLoaded', _applyHash);
         window.addEventListener('hashchange', _applyHash);
+
+        // Exam-iframe API — exam.html parent reads selection state through these.
+        // questions/answers globals are this script's let-scoped vars; they are
+        // not on window but ARE in scope from these closures.
+        window.examGetType = function() {
+            var n = _examIdx(); if (!n) return null;
+            var q = questions[n-1]; if (!q) return null;
+            return q.count > 1 ? 'multi' : 'single';
+        };
+        window.examGetUserAnswer = function() {
+            var n = _examIdx(); if (!n) return null;
+            var q = questions[n-1]; if (!q) return null;
+            return (answers[q.id] || []).slice().sort(function(a,b){return a-b;});
+        };
+        window.examGetCorrectAnswer = function() {
+            var n = _examIdx(); if (!n) return null;
+            var q = questions[n-1]; if (!q) return null;
+            return q.options.map(function(o,i){ return o.correct ? i : -1; })
+                            .filter(function(i){return i>=0;})
+                            .sort(function(a,b){return a-b;});
+        };
+        window.examQuestionCount = function() { return questions.length; };
+        function _examIdx() {
+            var m = (location.hash || '').match(/exam-q=(\d+)/);
+            return m ? parseInt(m[1], 10) : 0;
+        }
 
         function initQuiz() {
             var container = document.getElementById('quizContainer');

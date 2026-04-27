@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Iframe — End-to-End Test</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#f7f7f5;color:#1a1a1a;padding:1.5rem;line-height:1.6}
+@media(prefers-color-scheme:dark){body{background:#1a1a1a;color:#e8e6df}}
+h1{font-size:1.3rem;margin-bottom:1rem}
+.card{background:#fff;border:1px solid #e0e0de;border-radius:10px;padding:1rem;margin-bottom:1rem}
+@media(prefers-color-scheme:dark){.card{background:#242424;border-color:#333}}
+.iframe-host{width:100%;border:1px solid #e0e0de;border-radius:8px;overflow:hidden;background:#f7f7f5}
+@media(prefers-color-scheme:dark){.iframe-host{background:#1a1a1a;border-color:#333}}
+iframe{width:100%;border:0;display:block;background:transparent}
+button{padding:8px 16px;border:1px solid #999;background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;font-size:0.9rem}
+@media(prefers-color-scheme:dark){button{background:#242424;color:#e8e6df;border-color:#555}}
+button:hover{background:#f0efeb}
+@media(prefers-color-scheme:dark){button:hover{background:#2a2a2a}}
+pre{background:#f0efeb;padding:0.75rem;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:0.85rem;white-space:pre-wrap;word-break:break-word;margin:0.5rem 0}
+@media(prefers-color-scheme:dark){pre{background:#2c2c2a;color:#e8e6df}}
+.result{margin-top:0.5rem;padding:0.75rem 1rem;border-radius:6px;font-weight:600}
+.result.correct{background:#d4f5e5;color:#085041}
+.result.wrong{background:#fde8e8;color:#791f1f}
+.result.partial{background:#fff3cd;color:#856404}
+@media(prefers-color-scheme:dark){
+  .result.correct{background:#0a3d2e;color:#9fe1cb}
+  .result.wrong{background:#3d1515;color:#f7c1c1}
+  .result.partial{background:#3d3510;color:#f0d861}
+}
+.row{display:flex;gap:1rem;align-items:center;margin-bottom:0.75rem;flex-wrap:wrap}
+label{font-size:0.9rem;color:#666}
+@media(prefers-color-scheme:dark){label{color:#a0a0a0}}
+input[type="number"]{padding:6px 10px;border:1px solid #999;border-radius:6px;width:80px;font-family:inherit;font-size:0.9rem}
+@media(prefers-color-scheme:dark){input[type="number"]{background:#242424;color:#e8e6df;border-color:#555}}
+</style>
+</head>
+<body>
+
+<h1>Stage 1 — Iframe + Grading Pilot (netconf-operation.html)</h1>
+
+<div class="card">
+  <div class="row">
+    <label>Question #:</label>
+    <input id="qnum" type="number" min="1" max="17" value="3">
+    <button onclick="loadQuestion()">Load question</button>
+    <button onclick="grade()">Grade my answer</button>
+  </div>
+  <div class="iframe-host">
+    <iframe id="frame" src="" onload="onLoad()"></iframe>
+  </div>
+</div>
+
+<div class="card">
+  <strong>Inspector</strong>
+  <pre id="inspector">Click "Load question" to start.</pre>
+  <div id="result"></div>
+</div>
+
+<script>
+const FRAME = document.getElementById('frame');
+const INSP = document.getElementById('inspector');
+const RES = document.getElementById('result');
+
+function loadQuestion() {
+  const n = parseInt(document.getElementById('qnum').value, 10);
+  // Cache-bust so reloading the same N still triggers onload
+  FRAME.src = `netconf-operation.html#exam-q=${n}`;
+}
+
+function onLoad() {
+  const win = FRAME.contentWindow;
+  const doc = FRAME.contentDocument;
+  if (!doc) { INSP.textContent = 'no contentDocument (cross-origin?)'; return; }
+
+  // Auto-size the iframe to its content
+  setTimeout(() => {
+    const h = doc.documentElement.scrollHeight;
+    FRAME.style.height = (h + 8) + 'px';
+  }, 60);
+
+  // Quick sanity dump
+  const lines = [];
+  lines.push('iframe URL: ' + FRAME.src);
+  lines.push('exam-mode body class: ' + (doc.body.classList.contains('exam-mode') ? 'YES' : 'no'));
+  lines.push('target card: ' + (doc.querySelector('.exam-target')?.querySelector('.question-text')?.textContent.slice(0,80) || 'NONE'));
+  lines.push('total questions in this guide: ' + (typeof win.examQuestionCount === 'function' ? win.examQuestionCount() : '?'));
+  lines.push('type (from iframe): ' + (typeof win.examGetType === 'function' ? win.examGetType() : '?'));
+  lines.push('correct (from iframe): ' + JSON.stringify(typeof win.examGetCorrectAnswer === 'function' ? win.examGetCorrectAnswer() : '?'));
+  INSP.textContent = lines.join('\n');
+  RES.innerHTML = '';
+}
+
+function grade() {
+  const win = FRAME.contentWindow;
+  const ua = typeof win.examGetUserAnswer === 'function' ? win.examGetUserAnswer() : null;
+  const ca = typeof win.examGetCorrectAnswer === 'function' ? win.examGetCorrectAnswer() : null;
+  const t = typeof win.examGetType === 'function' ? win.examGetType() : null;
+  if (!Array.isArray(ua) || !Array.isArray(ca)) {
+    RES.innerHTML = '<div class="result wrong">No iframe API responding.</div>';
+    return;
+  }
+  const eq = ua.length === ca.length && ua.every((v, i) => v === ca[i]);
+  const overlap = ua.some(v => ca.includes(v));
+  const status = eq ? 'correct' : (overlap ? 'partial' : 'wrong');
+  RES.innerHTML = `
+    <div class="result ${status}">${status.toUpperCase()}</div>
+    <pre>type: ${t}\nuser: ${JSON.stringify(ua)}\ncorrect: ${JSON.stringify(ca)}</pre>
+  `;
+}
+
+// Auto-load Q3 on first paint
+window.addEventListener('DOMContentLoaded', loadQuestion);
+</script>
+</body>
+</html>

@@ -176,7 +176,7 @@
             fill: var(--text-secondary);
         }
 
-        .nav-chapter.expanded .chapter-icon {
+        .nav-chapter.expanded > .chapter-header .chapter-icon {
             transform: rotate(90deg);
         }
 
@@ -201,7 +201,7 @@
             padding-left: 0.75rem;
         }
 
-        .nav-chapter.expanded .chapter-items {
+        .nav-chapter.expanded > .chapter-items {
             display: block;
         }
 
@@ -647,8 +647,6 @@
                                     <span class="nav-item-text">NETCONF Operations</span>
                                     <span class="nav-item-badge badge-ready">Ready</span>
                                 </div>
-                            </div>
-                            <div class="chapter-items">
                                 <div class="nav-item" onclick="loadContent('xpath-operation.html', this)">
                                     <span class="nav-item-icon">📄</span>
                                     <span class="nav-item-text">xPATH Operations</span>

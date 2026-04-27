@@ -430,6 +430,112 @@
     transition: all 0.2s;
   }
   .score-bar button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* === REFERENCE STACK PANEL === */
+  .ref-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    padding: 0;
+    overflow: hidden;
+  }
+  .ref-panel > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 1rem 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .ref-panel > summary::-webkit-details-marker { display: none; }
+  .ref-panel > summary:hover { background: var(--surface-2); }
+  .ref-panel[open] > summary {
+    background: var(--surface-2);
+    border-bottom-color: var(--border);
+  }
+  .ref-panel > summary::after {
+    content: "▸";
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    transition: transform 0.2s;
+  }
+  .ref-panel[open] > summary::after { transform: rotate(90deg); }
+  .ref-panel-intro {
+    padding: 1rem 1.5rem 0;
+    font-size: 0.86rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+  }
+  .ref-file {
+    margin: 1rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .ref-file-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 1rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+  }
+  .ref-file-header .ref-file-name { color: var(--accent); font-weight: 600; }
+  .ref-file-header .ref-file-tag {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.55rem;
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .ref-file-body {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: var(--text);
+    overflow-x: auto;
+    white-space: pre;
+    background: var(--bg);
+  }
+  .ref-file-body .kw { color: var(--cyan); }
+  .ref-file-body .str { color: var(--green); }
+  .ref-file-body .cmt { color: var(--text-dim); font-style: italic; }
+  .ref-file-body .num { color: var(--purple); }
+
+  /* === Per-question file hint === */
+  .q-files {
+    margin: 0.4rem 0 0.7rem;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .q-files code {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 0.78rem;
+  }
 </style>
 </head>
 <body>
@@ -454,6 +560,212 @@
     <button onclick="revealAll()">Reveal All</button>
   </div>
 
+  <!-- ============================================================ -->
+  <!-- REFERENCE STACK — actual files the questions refer to        -->
+  <!-- ============================================================ -->
+  <details class="ref-panel" open>
+    <summary>📂 Reference Stack — open to view the docker-compose.yml, Dockerfile, nginx.conf, app.py and .env files used across all 10 questions</summary>
+    <p class="ref-panel-intro">All questions assume the same three-tier stack: <strong>Nginx → Flask → MongoDB</strong>, with two Docker bridge networks (<code>frontend</code> and <code>backend</code>). Production exposes only Nginx; the dev variant exposes everything for debugging.</p>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">docker-compose.yml</span>
+        <span class="ref-file-tag">production</span>
+      </div>
+<pre class="ref-file-body">version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.27
+    container_name: nginx
+    ports:
+      - "8080:80"                         # only public-facing service
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - flask-app
+    networks:
+      - frontend
+
+  flask-app:
+    build: ./flask                        # builds from flask/Dockerfile
+    container_name: flask-app
+    expose:
+      - "5000"                            # internal only — NOT published to host
+    env_file:
+      - ./flask/.env                      # path relative to docker-compose.yml
+    depends_on:
+      - mongodb
+    networks:
+      - frontend                          # so nginx can reach it
+      - backend                           # so it can reach mongodb
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    expose:
+      - "27017"                           # internal only
+    env_file:
+      - ./db/.env
+    volumes:
+      - mongo-data:/data/db               # persists data across `down/up`
+    networks:
+      - backend                           # isolated from nginx
+
+volumes:
+  mongo-data:                             # named volume — survives `docker-compose down`
+
+networks:
+  frontend:                               # nginx + flask
+  backend:                                # flask + mongodb (mongodb cannot see nginx)
+</pre>
+    </div>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">docker-compose.yml</span>
+        <span class="ref-file-tag">development (insecure)</span>
+      </div>
+<pre class="ref-file-body">version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.27
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  flask-app:
+    build: ./flask
+    ports:
+      - "5000:5000"                       # ⚠ host can hit Flask directly, bypassing Nginx
+    env_file:
+      - ./flask/.env
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"                     # ⚠ anyone on the host can connect to Mongo
+    env_file:
+      - ./db/.env
+    # ⚠ no `volumes:` and no `networks:` — data is lost on `docker-compose down`,
+    # and every service lands on the default bridge so segmentation is gone.
+</pre>
+    </div>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">flask/Dockerfile</span>
+        <span class="ref-file-tag">image build</span>
+      </div>
+<pre class="ref-file-body">FROM python:3.12-slim
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py .
+
+EXPOSE 5000                # documentation only — does NOT publish the port to host
+CMD ["python", "app.py"]
+</pre>
+    </div>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">nginx/nginx.conf</span>
+        <span class="ref-file-tag">reverse proxy</span>
+      </div>
+<pre class="ref-file-body">server {
+    listen 80;
+    server_name _;
+
+    # Resolved via Docker's embedded DNS — works because nginx and flask-app
+    # share the `frontend` network. Trying to proxy_pass to "mongodb" here
+    # would fail: nginx has no leg on the `backend` network.
+    location / {
+        proxy_pass         http://flask-app:5000;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+    }
+}
+</pre>
+    </div>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">flask/app.py</span>
+        <span class="ref-file-tag">application code</span>
+      </div>
+<pre class="ref-file-body">import os
+from flask import Flask, jsonify
+from pymongo import MongoClient
+
+app = Flask(__name__)
+
+# All values are injected by `env_file: ./flask/.env` in docker-compose.yml.
+# The hostname "mongodb" resolves via Docker DNS because flask-app shares
+# the `backend` network with the mongodb service.
+MONGO_USER = os.getenv("MONGO_USER")
+MONGO_PASS = os.getenv("MONGO_PASS")
+MONGO_HOST = os.getenv("MONGO_HOST", "mongodb")
+MONGO_PORT = os.getenv("MONGO_PORT", "27017")
+
+mongo = MongoClient(
+    f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}/"
+)
+db = mongo.appdb
+
+@app.route("/health")
+def health():
+    return jsonify(status="ok", mongo=mongo.admin.command("ping"))
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+</pre>
+    </div>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">flask/.env</span>
+        <span class="ref-file-tag">secrets — gitignored</span>
+      </div>
+<pre class="ref-file-body"># Read by Flask via os.getenv() — injected by env_file: in docker-compose.yml
+MONGO_USER=appuser
+MONGO_PASS=changeme
+MONGO_HOST=mongodb
+MONGO_PORT=27017
+</pre>
+    </div>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">db/.env</span>
+        <span class="ref-file-tag">secrets — gitignored</span>
+      </div>
+<pre class="ref-file-body"># Consumed by the official mongo image to bootstrap the root user + initial DB
+MONGO_INITDB_ROOT_USERNAME=root
+MONGO_INITDB_ROOT_PASSWORD=changeme
+MONGO_INITDB_DATABASE=appdb
+</pre>
+    </div>
+
+    <div class="ref-file">
+      <div class="ref-file-header">
+        <span class="ref-file-name">.env</span>
+        <span class="ref-file-tag">compose-level — referenced as ${VAR}</span>
+      </div>
+<pre class="ref-file-body"># Sits next to docker-compose.yml. Compose substitutes ${PORT} / ${IMAGE_TAG}
+# at parse time — useful for things like  ports: "${PORT}:80".
+PORT=8080
+IMAGE_TAG=1.27
+</pre>
+    </div>
+  </details>
+
   <!-- ===== Q1 ===== -->
   <div class="q-card" data-correct="A,E">
     <div class="q-header">
@@ -462,6 +774,7 @@
       <span class="q-type mcq">MCQ</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (production)</code></div>
       <p>Select <strong>2</strong> correct answers:</p>
       <ul class="mcq-options">
         <li><span class="letter">A</span> Nginx with <code>"8080:80"</code></li>
@@ -491,6 +804,7 @@
       <span class="q-type matrix">MATRIX</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (production)</code> · <code>nginx.conf</code> · <code>app.py</code></div>
       <p>Check all that apply for each row:</p>
       <table class="matrix-table" id="matrix-q2">
         <thead>
@@ -524,6 +838,7 @@
       <span class="q-type mcq">MCQ</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>flask/Dockerfile</code> · <code>docker-compose.yml (production)</code></div>
       <p>Select <strong>2</strong> correct answers:</p>
       <ul class="mcq-options">
         <li><span class="letter">A</span> <code>EXPOSE</code> publishes the port to the host machine</li>
@@ -552,6 +867,7 @@
       <span class="q-type matrix">MATRIX</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (production)</code> — focus on the <code>networks:</code> blocks</div>
       <p>Can the row service reach the column service?</p>
       <table class="matrix-table" id="matrix-q4">
         <thead>
@@ -587,6 +903,7 @@
       <span class="q-type mcq">MCQ</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (development)</code> (no volumes) vs <code>docker-compose.yml (production)</code> (uses <code>mongo-data:/data/db</code>)</div>
       <p>Select <strong>2</strong> correct answers:</p>
       <ul class="mcq-options">
         <li><span class="letter">A</span> All database data is permanently lost</li>
@@ -616,6 +933,7 @@
       <span class="q-type mcq">MCQ</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (production)</code> — see the <code>env_file: ./flask/.env</code> and <code>./db/.env</code> directives</div>
       <p>Select <strong>2</strong> correct answers:</p>
       <ul class="mcq-options">
         <li><span class="letter">A</span> <code>env_file: /home/user/project/db/.env</code> — absolute path</li>
@@ -645,6 +963,7 @@
       <span class="q-type matrix">MATRIX</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>flask/.env</code> · <code>db/.env</code> · <code>.env</code> (compose-level) · <code>app.py</code> (<code>os.getenv</code>) · <code>docker-compose.yml</code></div>
       <p>Check the correct method for each statement:</p>
       <table class="matrix-table" id="matrix-q7">
         <thead>
@@ -676,6 +995,7 @@
       <span class="q-type mcq">MCQ</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (production)</code> — note nginx is on <code>frontend</code> only, mongodb on <code>backend</code> only · <code>nginx.conf</code></div>
       <p>Select <strong>2</strong> correct answers:</p>
       <ul class="mcq-options">
         <li><span class="letter">A</span> MongoDB's port 27017 is blocked by a firewall rule</li>
@@ -705,6 +1025,7 @@
       <span class="q-type matrix">MATRIX</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (production)</code> · <code>nginx.conf</code> · <code>app.py</code></div>
       <p>Match each connection to where it is configured:</p>
       <table class="matrix-table" id="matrix-q9">
         <thead>
@@ -739,6 +1060,7 @@
       <span class="q-type mcq">MCQ</span>
     </div>
     <div class="q-body">
+      <div class="q-files">📁 References: <code>docker-compose.yml (development)</code> — Flask and MongoDB both have <code>ports:</code> mapped to host · <code>nginx.conf</code></div>
       <p>Select <strong>3</strong> correct answers:</p>
       <ul class="mcq-options">
         <li><span class="letter">A</span> Attackers can bypass Nginx and hit Flask directly at <code>localhost:5000</code></li>
